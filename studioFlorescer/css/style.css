@@ -1,0 +1,274 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap");
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  font-family: "Roboto", system-ui;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.btn {
+  display: inline-block;
+  padding: 15px 60px;
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  background: #111;
+  color: #eee;
+  border-radius: 5px;
+  transition: backgroud 500ms ease;
+}
+
+.btn:hover {
+  cursor: pointer;
+  background: #000000;
+}
+
+.headline {
+  font-size: 2.2rem;
+  text-transform: uppercase;
+  font-weight: bold;
+  text-align: center;
+  padding-bottom: 50px;
+  letter-spacing: 2px;
+}
+
+/* Navbar */
+#navbar {
+  width: 100%;
+  background: #48024b;
+  color: #c4b708;
+  height: 80px;
+  position: fixed;
+}
+
+#navbar-container {
+  width: 80%;
+  height: 100%;
+  margin: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-size: 2rem;
+}
+
+#navbar-items {
+  display: flex;
+  list-style: none;
+  text-transform: uppercase;
+}
+
+#navbar-items li {
+  padding: 10px;
+}
+
+/* Showcase */
+#showcase {
+  height: 95vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #eee;
+  background: url("/img/app1.jpg") no-repeat center/cover;
+
+  /* Overlay */
+  background-color: rgba(0, 0, 0, 0.5);
+  background-blend-mode: color;
+}
+
+#showcase-container {
+  text-align: center;
+}
+
+#showcase-container h2 {
+  font-size: 2.5rem;
+}
+
+#showcase-container p {
+  font-size: 1.2rem;
+  padding: 7px 0;
+}
+
+/* clients */
+#clients {
+  width: 100%;
+  background: #eee;
+  color: #111;
+  padding: 50px;
+}
+
+#clients-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  justify-items: center;
+  padding: 15px;
+}
+
+.client {
+  display: inline-block;
+  width: 25%;
+}
+/* About */
+#features {
+  width: 100%;
+  background: #222;
+  color: #eee;
+  padding: 50px;
+}
+
+#features-container {
+  width: 100%;
+  margin: auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-column-gap: 50px;
+  align-items: center;
+}
+
+.feature {
+  display: flex;
+  flex-direction: column;
+  background: #333;
+  padding: 20px;
+  border-radius: 5px;
+}
+
+.feature-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.feature .fas {
+  margin: 0 15px;
+}
+
+/* Product */
+#product {
+  width: 100%;
+  padding: 50px;
+}
+
+#product-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#items {
+  width: 650px;
+}
+
+#items .item {
+  display: flex;
+  padding: 10px;
+  margin: 15px 0;
+  font-size: 1.2rem;
+}
+
+#items .item .fas {
+  margin: 0 15px;
+}
+
+/* Testimonials */
+.testimonial {
+  display: flex;
+  align-items: center;
+  font-size: 1.2rem;
+  background: #333;
+  padding: 15px;
+  margin: 15px 0;
+  border-radius: 5px;
+}
+
+#testimonials {
+  width: 100%;
+  background: #222;
+  color: #eee;
+  padding: 50px;
+}
+
+#testimonials-container {
+  width: 65%;
+  margin: auto;
+  display: block;
+  align-items: center;
+  flex-direction: column;
+}
+
+.testimonial .testimonial-image {
+  height: 100px;
+  width: auto;
+  border-radius: 50%;
+  margin: 15px;
+}
+
+/* Gallery */
+#gallery {
+  width: 100%;
+  margin: auto;
+  padding: 10px;
+}
+
+#gallery-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  max-width: 1652px;
+  margin: 0 auto;
+  justify-items: center;
+  padding: 0 16px;
+}
+
+.gallery-image {
+  display: inline-block;
+  width: 540px;
+  height: 360px;
+  border-radius: 5px;
+}
+
+
+@media (max-width: 1620px) {
+  #gallery-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 1096px) {
+  #gallery-container {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
+
+#contato {
+  font-size: 1.2rem;
+  padding: 50px;
+  text-align: center;
+}
+
+#endereco {
+  font-size: 1.2rem;
+  padding: 50px;
+  text-align: center;
+}
+
+
+
+
+
+/* Footer */
+#footer {
+  background: #48024b;
+  color: #c4b708;
+  padding: 30px;
+  text-align: center;
+}
