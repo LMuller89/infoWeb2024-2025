@@ -173,6 +173,8 @@ a {
   margin: 15px;
 }
 
+
+
 /* Gallery */
 #gallery {
   width: 90%;
@@ -235,9 +237,17 @@ a {
   padding: 15px;
 }
 
+/**/
 .client {
   display: inline-block;
   width: 25%;
+}
+
+/*Inserção de dados referente ao contato*/
+#contact {
+  font-size: 1.2rem;  
+  padding: 50px;
+  text-align: center;
 }
 
 /* Footer */
