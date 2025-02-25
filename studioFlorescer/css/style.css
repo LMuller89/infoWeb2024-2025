@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap");
+@import url("https://fonts.googleapis.com/css?family=Roboto&display=swap");
 
 * {
   box-sizing: border-box;
@@ -7,7 +7,7 @@
 }
 
 body {
-  font-family: "Roboto", system-ui;
+  font-family: "Roboto", sans-serif;
 }
 
 a {
@@ -23,12 +23,12 @@ a {
   background: #111;
   color: #eee;
   border-radius: 5px;
-  transition: backgroud 500ms ease;
+  transition: background 500ms ease;
 }
 
 .btn:hover {
   cursor: pointer;
-  background: #000000;
+  background: #000;
 }
 
 .headline {
@@ -43,10 +43,11 @@ a {
 /* Navbar */
 #navbar {
   width: 100%;
-  background: #48024b;
-  color: #c4b708;
+  background: #111;
+  color: #eee;
   height: 80px;
   position: fixed;
+  z-index: 1000;
 }
 
 #navbar-container {
@@ -74,12 +75,12 @@ a {
 
 /* Showcase */
 #showcase {
-  height: 95vh;
+  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
   color: #eee;
-  background: url("/img/app1.jpg") no-repeat center/cover;
+  background: url("/img/showcase.png") no-repeat center center/cover;
 
   /* Overlay */
   background-color: rgba(0, 0, 0, 0.5);
@@ -99,25 +100,6 @@ a {
   padding: 7px 0;
 }
 
-/* clients */
-#clients {
-  width: 100%;
-  background: #eee;
-  color: #111;
-  padding: 50px;
-}
-
-#clients-container {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  justify-items: center;
-  padding: 15px;
-}
-
-.client {
-  display: inline-block;
-  width: 25%;
-}
 /* About */
 #features {
   width: 100%;
@@ -132,7 +114,6 @@ a {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-column-gap: 50px;
-  align-items: center;
 }
 
 .feature {
@@ -148,22 +129,6 @@ a {
   font-weight: bold;
 }
 
-.feature .fas {
-  margin: 0 15px;
-}
-
-/* Product */
-#product {
-  width: 100%;
-  padding: 50px;
-}
-
-#product-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
 #items {
   width: 650px;
 }
@@ -173,10 +138,6 @@ a {
   padding: 10px;
   margin: 15px 0;
   font-size: 1.2rem;
-}
-
-#items .item .fas {
-  margin: 0 15px;
 }
 
 /* Testimonials */
@@ -198,15 +159,15 @@ a {
 }
 
 #testimonials-container {
-  width: 65%;
+  width: 80%;
   margin: auto;
-  display: block;
+  display: flex;
   align-items: center;
   flex-direction: column;
 }
 
 .testimonial .testimonial-image {
-  height: 100px;
+  height: 200px;
   width: auto;
   border-radius: 50%;
   margin: 15px;
@@ -214,19 +175,16 @@ a {
 
 /* Gallery */
 #gallery {
-  width: 100%;
+  width: 90%;
   margin: auto;
-  padding: 10px;
+  padding: 50px;
 }
 
 #gallery-container {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  max-width: 1652px;
-  margin: 0 auto;
+  grid-gap: 30px;
   justify-items: center;
-  padding: 0 16px;
 }
 
 .gallery-image {
@@ -236,39 +194,56 @@ a {
   border-radius: 5px;
 }
 
-
-@media (max-width: 1620px) {
-  #gallery-container {
-    grid-template-columns: repeat(2, 1fr);
-  }
+/* Video Slot */
+.video-wireframe {
+  position: relative;
+  width: 100%;
+  max-width: 1400px; /* You can adjust this value */
+  margin: 0 auto;
+  padding: 0px;
+  background-color: #ffffff;
+  border: 0px solid #000000; /* Wireframe border */
+  border-radius: 8px; /* Rounded corners */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  margin-bottom: 100px;
 }
 
-@media (max-width: 1096px) {
-  #gallery-container {
-    grid-template-columns: repeat(1, 1fr);
-  }
+#video-container video {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 5px; /* Rounded edges for the video */
 }
 
-#contato {
-  font-size: 1.2rem;
+/* Optional: Hover effect for the play icon */
+.play-icon:hover {
+  opacity: 0.8;
+}
+
+/* Redes Sociais */
+#clients {
+  width: 100%;
+  background: #eee;
+  color: #111;
   padding: 50px;
-  text-align: center;
 }
 
-#endereco {
-  font-size: 1.2rem;
-  padding: 50px;
-  text-align: center;
+#clients-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  justify-items: center;
+  padding: 15px;
 }
 
-
-
-
+.client {
+  display: inline-block;
+  width: 25%;
+}
 
 /* Footer */
 #footer {
-  background: #48024b;
-  color: #c4b708;
+  background: #222;
+  color: #eee;
   padding: 30px;
   text-align: center;
 }
