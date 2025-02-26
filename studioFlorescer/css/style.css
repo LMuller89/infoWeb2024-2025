@@ -160,21 +160,8 @@ a {
   background: #333;
   padding: 20px; /* Aumentado o padding para melhor espaçamento */
   border-radius: 5px;
-}
-
-#testimonials {
-  width: 100%;
-  background: #222;
-  color: #eee;
-  padding: 50px;
-}
-
-#testimonials-container {
-  width: 80%;
-  margin: auto;
-  display: flex;
-  align-items: center;
-  flex-direction: column;
+  margin-bottom: 20px;
+  color: #eee; /* Adicionado para cor do texto */
 }
 
 .testimonial .testimonial-image {
