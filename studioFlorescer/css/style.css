@@ -112,7 +112,7 @@ a {
 #features-container {
   width: 100%;
   margin: auto;
-  display: grid;
+  display: flex;
   grid-template-columns: repeat(3, 1fr);
   grid-column-gap: 50px;
 }
@@ -142,39 +142,65 @@ a {
 }
 
 /* Testimonials */
-.testimonial {
-  display: flex;
-  align-items: center;
-  font-size: 1.2rem;
-  background: #333;
-  padding: 15px;
-  margin: 15px 0;
-  border-radius: 5px;
-}
-
-#testimonials {
-  width: 100%;
-  background: #ac704c;
-  color: #eee;
-  padding: 50px;
-}
-
 #testimonials-container {
-  width: 80%;
+  width: 80%; /* Ajuste a largura conforme necessário */
   margin: auto;
   display: flex;
-  align-items: center;
-  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap; /* Adicionado para responsividade */
+}
+
+.testimonial {
+  width: 48%; /* Ajuste a largura conforme necessário */
+  display: flex;
+  flex-direction: column; /* Alinha os itens verticalmente */
+  align-items: center; /* Centraliza os itens horizontalmente */
+  font-size: 1.2rem;
+  background: #333;
+  padding: 20px; /* Aumentado o padding para melhor espaçamento */
+  border-radius: 5px;
+  margin-bottom: 20px;
+  color: #eee; /* Adicionado para cor do texto */
 }
 
 .testimonial .testimonial-image {
-  height: 200px;
-  width: auto;
+  height: 100px;
+  width: 100px; /* Ajustado para manter a proporção */
   border-radius: 50%;
-  margin: 15px;
+  margin-bottom: 10px; /* Adicionado espaçamento abaixo da imagem */
 }
 
+.testimonial .testimonial-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 10px; /* Adicionado espaçamento abaixo do título */
+  text-align: center; /* Centraliza o título */
+}
 
+.testimonial .testimonial-info {
+  margin: 10px 0; /* Reduzido o espaçamento */
+  width: 100%; /* Garante que as listas ocupem toda a largura */
+  display: flex;
+  justify-content: space-around; /* Distribui as listas igualmente */
+}
+
+.testimonial .testimonial-info ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  text-align: left; /* Alinha os itens da lista à esquerda */
+}
+
+.testimonial .testimonial-info ul li {
+  margin: 5px 0; /* Adicionado espaçamento entre os itens da lista */
+}
+
+.orcamento {
+  margin: 20px auto; /* Centraliza e adiciona espaçamento */
+  text-align: center;
+  font-size: 1.2rem;
+}
 
 /* Gallery */
 #gallery {
