@@ -29,10 +29,21 @@ a {
 
 .btn:hover {
   cursor: pointer;
-  background: #539c3c;
+  background: #664c45;
+}
+.headline1 {
+  color: #eee;
+  padding-top: 70px;
+  font-size: 2.2rem;
+  text-transform: uppercase;
+  font-weight: bold;
+  text-align: center;
+  padding-bottom: 50px;
+  letter-spacing: 2px;
 }
 
 .headline {
+  padding-top: 70px;
   font-size: 2.2rem;
   text-transform: uppercase;
   font-weight: bold;
@@ -84,7 +95,7 @@ a {
   background: url("/img/showcase.png") no-repeat center center/cover;
 
   /* Overlay */
-  background-color: rgba(122, 85, 50, 0.836);
+  background-color: rgba(109, 78, 50, 0.836);
   background-blend-mode: color;
 }
 
@@ -165,7 +176,7 @@ a {
   background: #5d372c;
   padding: 15px;
   margin: 15px 0;
-  background: #333;
+  background: #ac704c;
   padding: 20px; /* Aumentado o padding para melhor espaçamento */
   border-radius: 5px;
   margin-bottom: 20px;
@@ -205,6 +216,7 @@ a {
 }
 
 .orcamento {
+  color: #eee;
   margin: 20px auto; /* Centraliza e adiciona espaçamento */
   text-align: center;
   font-size: 1.2rem;
@@ -212,6 +224,7 @@ a {
 
 /* Gallery */
 #gallery {
+  color: #eee;
   width: 90%;
   margin: auto;
   padding: 50px;
@@ -261,7 +274,7 @@ a {
 #clients {
   width: 100%;
   background: #fffde8;
-  color: #111;
+  color: #1f1d1d;
   padding: 50px;
 }
 
@@ -280,7 +293,8 @@ a {
 
 /*Inserção de dados referente ao contato*/
 #contact {
-  font-size: 1.2rem;  
+  color: #eee;
+  font-size: 1.2rem;
   padding: 50px;
   text-align: center;
 }
