@@ -8,7 +8,7 @@
 
 body {
   font-family: "Roboto", sans-serif;
-  background: #5d372c;
+  background: #fffde8;
 }
 
 a {
@@ -82,9 +82,9 @@ a {
   align-items: center;
   color: #ffff;
   background: url("/img/showcase.png") no-repeat center center/cover;
-
+  
   /* Overlay */
-  background-color: rgba(122, 85, 50, 0.836);
+  background-color: rgba(0, 0, 0, 0.5);
   background-blend-mode: color;
 }
 
@@ -276,6 +276,31 @@ a {
 .client {
   display: inline-block;
   width: 25%;
+}
+
+/*Inserção de dados referente ao contato*/
+.localizacao {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 40px; /* Aumente o valor para mais espaço */
+  max-width: 900px;
+  margin: auto;
+}
+
+.mapa {
+  flex: 1;
+  min-width: 300px;
+  max-width: 50%;
+  margin-right: 20px; /* Adiciona margem à direita do mapa */
+}
+
+/* Se a tela for menor, o mapa e o texto ficarão empilhados */
+@media (max-width: 768px) {
+  .localizacao {
+      flex-direction: column;
+      text-align: center;
+  }
 }
 
 /*Inserção de dados referente ao contato*/
