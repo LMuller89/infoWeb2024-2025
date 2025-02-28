@@ -8,7 +8,7 @@
 
 body {
   font-family: "Roboto", sans-serif;
-  background: #5d372c;
+  background: #fffde8;
 }
 
 a {
@@ -29,7 +29,17 @@ a {
 
 .btn:hover {
   cursor: pointer;
-  background: #539c3c;
+  background: #664c45;
+}
+.headline1 {
+  color: #eee;
+  padding-top: 70px;
+  font-size: 2.2rem;
+  text-transform: uppercase;
+  font-weight: bold;
+  text-align: center;
+  padding-bottom: 50px;
+  letter-spacing: 2px;
 }
 
 .headline {
@@ -83,9 +93,9 @@ a {
   align-items: center;
   color: #ffff;
   background: url("/img/showcase.png") no-repeat center center/cover;
-
+  
   /* Overlay */
-  background-color: rgba(122, 85, 50, 0.836);
+  background-color: rgba(0, 0, 0, 0.5);
   background-blend-mode: color;
 }
 
@@ -118,6 +128,11 @@ a {
   grid-column-gap: 50px;
 }
 
+.texto {
+  font-size: 1.2rem; /* Adicionado nova class para mudar cor e tamanho do texto*/ 
+  color: #5d372c;
+}
+
 .feature {
   display: flex;
   flex-direction: column;
@@ -127,7 +142,7 @@ a {
 }
 
 .feature-title {
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   font-weight: bold;
   color: #5d372c;
 }
@@ -166,9 +181,9 @@ a {
   background: #5d372c;
   padding: 15px;
   margin: 15px 0;
-  background: #333;
+  background: #ac704c;
   padding: 20px; /* Aumentado o padding para melhor espaçamento */
-  border-radius: 5px;
+  border-radius: 10px;
   margin-bottom: 20px;
   color: #eee; /* Adicionado para cor do texto */
 }
@@ -181,7 +196,7 @@ a {
 }
 
 .testimonial .testimonial-title {
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   font-weight: bold;
   margin-bottom: 10px; /* Adicionado espaçamento abaixo do título */
   text-align: center; /* Centraliza o título */
@@ -196,7 +211,7 @@ a {
 
 .testimonial .testimonial-info ul {
   list-style-type: none;
-  padding: 0;
+  padding: 5px;
   margin: 0;
   text-align: left; /* Alinha os itens da lista à esquerda */
 }
@@ -206,6 +221,7 @@ a {
 }
 
 .orcamento {
+  color: #eee;
   margin: 20px auto; /* Centraliza e adiciona espaçamento */
   text-align: center;
   font-size: 1.2rem;
@@ -213,6 +229,7 @@ a {
 
 /* Gallery */
 #gallery {
+  color: #eee;
   width: 90%;
   margin: auto;
   padding: 50px;
@@ -298,7 +315,7 @@ a {
 #clients {
   width: 100%;
   background: #fffde8;
-  color: #111;
+  color: #1f1d1d;
   padding: 50px;
 }
 
@@ -316,7 +333,33 @@ a {
 }
 
 /*Inserção de dados referente ao contato*/
+.localizacao {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 40px; /* Aumente o valor para mais espaço */
+  max-width: 900px;
+  margin: auto;
+}
+
+.mapa {
+  flex: 1;
+  min-width: 300px;
+  max-width: 50%;
+  margin-right: 20px; /* Adiciona margem à direita do mapa */
+}
+
+/* Se a tela for menor, o mapa e o texto ficarão empilhados */
+@media (max-width: 768px) {
+  .localizacao {
+      flex-direction: column;
+      text-align: center;
+  }
+}
+
+/*Inserção de dados referente ao contato*/
 #contact {
+  color: #eee;
   font-size: 1.2rem;
   padding: 50px;
   text-align: center;
