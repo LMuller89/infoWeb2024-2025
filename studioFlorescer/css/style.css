@@ -8,7 +8,7 @@
 
 body {
   font-family: "Roboto", sans-serif;
-  background: #5d372c;
+  background: #fffde8;
 }
 
 a {
@@ -93,9 +93,9 @@ a {
   align-items: center;
   color: #ffff;
   background: url("/img/showcase.png") no-repeat center center/cover;
-
+  
   /* Overlay */
-  background-color: rgba(109, 78, 50, 0.836);
+  background-color: rgba(0, 0, 0, 0.5);
   background-blend-mode: color;
 }
 
@@ -128,6 +128,11 @@ a {
   grid-column-gap: 50px;
 }
 
+.texto {
+  font-size: 1.2rem; /* Adicionado nova class para mudar cor e tamanho do texto*/ 
+  color: #5d372c;
+}
+
 .feature {
   display: flex;
   flex-direction: column;
@@ -137,7 +142,7 @@ a {
 }
 
 .feature-title {
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   font-weight: bold;
   color: #5d372c;
 }
@@ -178,7 +183,7 @@ a {
   margin: 15px 0;
   background: #ac704c;
   padding: 20px; /* Aumentado o padding para melhor espaçamento */
-  border-radius: 5px;
+  border-radius: 10px;
   margin-bottom: 20px;
   color: #eee; /* Adicionado para cor do texto */
 }
@@ -191,7 +196,7 @@ a {
 }
 
 .testimonial .testimonial-title {
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   font-weight: bold;
   margin-bottom: 10px; /* Adicionado espaçamento abaixo do título */
   text-align: center; /* Centraliza o título */
@@ -206,7 +211,7 @@ a {
 
 .testimonial .testimonial-info ul {
   list-style-type: none;
-  padding: 0;
+  padding: 5px;
   margin: 0;
   text-align: left; /* Alinha os itens da lista à esquerda */
 }
@@ -289,6 +294,31 @@ a {
 .client {
   display: inline-block;
   width: 25%;
+}
+
+/*Inserção de dados referente ao contato*/
+.localizacao {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 40px; /* Aumente o valor para mais espaço */
+  max-width: 900px;
+  margin: auto;
+}
+
+.mapa {
+  flex: 1;
+  min-width: 300px;
+  max-width: 50%;
+  margin-right: 20px; /* Adiciona margem à direita do mapa */
+}
+
+/* Se a tela for menor, o mapa e o texto ficarão empilhados */
+@media (max-width: 768px) {
+  .localizacao {
+      flex-direction: column;
+      text-align: center;
+  }
 }
 
 /*Inserção de dados referente ao contato*/
