@@ -33,22 +33,22 @@ a {
 }
 .headline1 {
   color: #eee;
-  padding-top: 70px;
+  padding-top: 50px;
   font-size: 2.2rem;
   text-transform: uppercase;
   font-weight: bold;
   text-align: center;
-  padding-bottom: 50px;
+  padding-bottom: 30px;
   letter-spacing: 2px;
 }
 
 .headline {
-  padding-top: 70px;
+  padding-top: 30px;
   font-size: 2.2rem;
   text-transform: uppercase;
   font-weight: bold;
   text-align: center;
-  padding-bottom: 50px;
+  padding-bottom: 30px;
   letter-spacing: 2px;
 }
 
@@ -93,7 +93,7 @@ a {
   align-items: center;
   color: #ffff;
   background: url("/img/showcase.png") no-repeat center center/cover;
-  
+
   /* Overlay */
   background-color: rgba(0, 0, 0, 0.5);
   background-blend-mode: color;
@@ -117,7 +117,9 @@ a {
   width: 100%;
   background: #ac704c;
   color: #eee;
-  padding: 50px;
+  padding-left: 50px;
+  padding-right: 50px;
+  padding-bottom: 50px;
 }
 
 #features-container {
@@ -129,7 +131,7 @@ a {
 }
 
 .texto {
-  font-size: 1.2rem; /* Adicionado nova class para mudar cor e tamanho do texto*/ 
+  font-size: 1.2rem; /* Adicionado nova class para mudar cor e tamanho do texto*/
   color: #5d372c;
 }
 
@@ -232,7 +234,8 @@ a {
   color: #eee;
   width: 90%;
   margin: auto;
-  padding: 50px;
+  padding-left: 50px;
+  padding-right: 50px;
 }
 
 #gallery-container {
@@ -296,7 +299,7 @@ a {
   border: 0px solid #7e6147a4; /* Wireframe border */
   border-radius: 8px; /* Rounded corners */
   box-shadow: 0 0 10px rgba(rgb(107, 0, 62)); /* Subtle shadow */
-  margin-bottom: 100px;
+  margin-bottom: 20px;
 }
 
 #video-container video {
@@ -324,6 +327,7 @@ a {
   grid-template-columns: repeat(4, 1fr);
   justify-items: center;
   padding: 15px;
+  padding-bottom: 80px;
 }
 
 /**/
@@ -343,17 +347,14 @@ a {
 }
 
 .mapa {
-  flex: 1;
-  min-width: 300px;
-  max-width: 50%;
-  margin-right: 20px; /* Adiciona margem à direita do mapa */
+  position: center;
 }
 
 /* Se a tela for menor, o mapa e o texto ficarão empilhados */
 @media (max-width: 768px) {
   .localizacao {
-      flex-direction: column;
-      text-align: center;
+    flex-direction: column;
+    text-align: center;
   }
 }
 
