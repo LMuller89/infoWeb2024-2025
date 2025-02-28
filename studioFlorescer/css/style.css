@@ -33,6 +33,7 @@ a {
 }
 
 .headline {
+  padding-top: 70px;
   font-size: 2.2rem;
   text-transform: uppercase;
   font-weight: bold;
@@ -117,6 +118,11 @@ a {
   grid-column-gap: 50px;
 }
 
+.texto {
+  font-size: 1.2rem; /* Adicionado nova class para mudar cor e tamanho do texto*/ 
+  color: #5d372c;
+}
+
 .feature {
   display: flex;
   flex-direction: column;
@@ -126,7 +132,7 @@ a {
 }
 
 .feature-title {
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   font-weight: bold;
   color: #5d372c;
 }
@@ -167,7 +173,7 @@ a {
   margin: 15px 0;
   background: #333;
   padding: 20px; /* Aumentado o padding para melhor espaçamento */
-  border-radius: 5px;
+  border-radius: 10px;
   margin-bottom: 20px;
   color: #eee; /* Adicionado para cor do texto */
 }
@@ -180,7 +186,7 @@ a {
 }
 
 .testimonial .testimonial-title {
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   font-weight: bold;
   margin-bottom: 10px; /* Adicionado espaçamento abaixo do título */
   text-align: center; /* Centraliza o título */
@@ -195,7 +201,7 @@ a {
 
 .testimonial .testimonial-info ul {
   list-style-type: none;
-  padding: 0;
+  padding: 5px;
   margin: 0;
   text-align: left; /* Alinha os itens da lista à esquerda */
 }
