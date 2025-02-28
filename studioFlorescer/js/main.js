@@ -22,3 +22,15 @@ window.addEventListener("scroll", function () {
     document.querySelector("#navbar").style.opacity = 1;
   }
 });
+
+function openModal(imgElement) {
+  var modal = document.getElementById("modal");
+  var fullImage = document.getElementById("full-image");
+
+  fullImage.src = imgElement.src;
+  modal.style.display = "flex";
+}
+
+function closeModal() {
+  document.getElementById("modal").style.display = "none";
+}
