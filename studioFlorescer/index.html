@@ -131,18 +131,27 @@
     <section id="gallery">
       <div class="headline">Galeria</div>
       <div id="gallery-container">
-        <img src="img/image-1.jpg" alt="" class="gallery-image" />
-        <img src="img/image-2.jpg" alt="" class="gallery-image" />
-        <img src="img/image-3.jpg" alt="" class="gallery-image" />
-        <img src="img/image-4.jpg" alt="" class="gallery-image" />
-        <img src="img/image-5.jpg" alt="" class="gallery-image" />
-        <img src="img/image-6.jpg" alt="" class="gallery-image" />
+        <img src="img/image-1.jpg" alt="" class="gallery-image" onclick="openModal(this)">
+        <img src="img/image-2.jpg" alt="" class="gallery-image" onclick="openModal(this)">
+        <img src="img/image-3.jpg" alt="" class="gallery-image" onclick="openModal(this)">
+        <img src="img/image-4.jpg" alt="" class="gallery-image" onclick="openModal(this)">
+        <img src="img/image-5.jpg" alt="" class="gallery-image" onclick="openModal(this)">
+        <img src="img/image-6.jpg" alt="" class="gallery-image" onclick="openModal(this)">
       </div>
+      
+      <!-- Modal para exibir a imagem em tela cheia -->
+      <div id="modal" class="modal" onclick="closeModal()">
+      <span class="close">&times;</span>
+      <img class="modal-content" id="full-image">
+      </div>
+
+      <script src="main.js"></script>
     </section>
 
     <section id="videoslot">
       <div class="headline"></div>
       <div id="video-container" class="video-wireframe">
+        
         <!-- Video player -->
         <video
           id="my-video"
