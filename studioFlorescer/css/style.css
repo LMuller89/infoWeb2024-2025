@@ -131,7 +131,7 @@ a {
 }
 
 .texto {
-  font-size: 1.2rem; /* Adicionado nova class para mudar cor e tamanho do texto*/
+  font-size: 1.2rem;
   color: #5d372c;
 }
 
@@ -147,6 +147,7 @@ a {
   font-size: 1.4rem;
   font-weight: bold;
   color: #5d372c;
+  margin-left: 20px; /* Adiciona espaço entre a imagem e o título */
 }
 
 .fa-solid {
@@ -162,6 +163,11 @@ a {
   padding: 10px;
   margin: 15px 0;
   font-size: 1.2rem;
+}
+
+.icon-title { /* Estilos para o novo container */
+  display: flex;
+  align-items: center;
 }
 
 /* Testimonials */
