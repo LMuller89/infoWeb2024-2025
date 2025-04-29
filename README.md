@@ -10,10 +10,14 @@ Para começar a trabalhar com este repositório no **VS Code**, siga os passos a
    ```bash
    git --version
    ```
-2. **Para o login pela primeira vez, deve aplicar os seguintes códigos**
+2. **Para o login pela primeira vez, deve aplicar os seguintes códigos:**
    ```bash
    git config --global user.name "Seu Nome"
    git config --global user.email "seuemail@exemplo.com"
+   ```
+3. **Para a aplicação do início das operações, deve estar com a pasta aberta e dar o comando seguinte:**
+   ```bash
+   git init
    ```
 3. **Clone o repositório (se for instrutor) ou seu fork (se for aluno):**
    ```bash
