@@ -6,17 +6,25 @@ Este repositório faz parte das atividades do curso **Técnico em Informática p
 ## 🚀 Como Clonar e Configurar no VS Code
 Para começar a trabalhar com este repositório no **VS Code**, siga os passos abaixo:
 
-1. **Abra o terminal no VS Code** (`Ctrl + ` `).
-2. **Clone o repositório (se for instrutor) ou seu fork (se for aluno):**
+1. **Abra o terminal no VS Code** (`Ctrl + ` `), e para verificar a versão é aplicando:**
+   ```bash
+   git --version
+   ```
+2. **Para o login pela primeira vez, deve aplicar os seguintes códigos**
+   ```bash
+   git config --global user.name "Seu Nome"
+   git config --global user.email "seuemail@exemplo.com"
+   ```
+3. **Clone o repositório (se for instrutor) ou seu fork (se for aluno):**
    ```bash
    git clone https://github.com/Luciano/informaticaWeb2024-2025.git
    ```
    Se você for aluno e fez um fork, substitua `Luciano` pelo seu nome de usuário no GitHub.
-3. **Entre na pasta do projeto:**
+4. **Entre na pasta do projeto:**
    ```bash
    cd informaticaWeb2024-2025
    ```
-4. **Abra o projeto no VS Code:**
+5. **Abra o projeto no VS Code:**
    ```bash
    code .
    ```
