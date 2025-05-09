@@ -1,90 +1,110 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Área Admin</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
-</head>
-<body>
-
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/admin.css') }}"
+    />
+  </head>
+  <body>
     <header class="admin-header">
-        <div class="container">
-            <h1>Administração</h1>
-        </div>
+      <div class="container admin-header-content">
+        <h1>Administração</h1>
+        {% if logged_in %}
+        <a href="{{ url_for('logout') }}" class="btn-logout">Sair</a>
+        {% endif %}
+      </div>
     </header>
 
     <main class="admin-main">
-        <div class="container">
+      <div class="container">
+        {% if not logged_in %}
+        <!-- Se NÃO estiver logado -->
+        <section id="login-section">
+          <h2>Login</h2>
+          <form id="login-form" action="/admin/login" method="POST">
+            <div class="form-group">
+              <label for="email">Email:</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                required
+                placeholder="Digite seu email"
+              />
+            </div>
+            <div class="form-group">
+              <label for="senha">Senha:</label>
+              <input
+                type="password"
+                id="senha"
+                name="password"
+                required
+                placeholder="Digite sua senha"
+              />
+            </div>
+            <button type="submit" class="btn">Entrar</button>
+          </form>
+        </section>
+        {% else %}
+        <!-- Se JÁ estiver logado -->
+        <section id="dashboard-section">
+          <div class="dashboard-content">
+            <h2>Painel de Administração</h2>
+          </div>
+        </section>
 
-            {% if not logged_in %}
-            <!-- Se NÃO estiver logado -->
-            <section id="login-section">
-                <h2>Login</h2>
-                <form id="login-form" action="/admin/login" method="POST">
-                    <div class="form-group">
-                        <label for="email">Email:</label>
-                        <input type="email" id="email" name="email" required placeholder="Digite seu email">
-                    </div>
-                    <div class="form-group">
-                        <label for="senha">Senha:</label>
-                        <input type="password" id="senha" name="password" required placeholder="Digite sua senha">
-                    </div>
-                    <button type="submit" class="btn">Entrar</button>
-                </form>
-            </section>
-            {% else %}
-            <!-- Se JÁ estiver logado -->
-            <section id="dashboard-section">
-                <div class="dashboard-content">
-                    <h2>Painel de Administração</h2>
-                    <a href="{{ url_for('logout') }}" class="btn1">Sair</a>
-                </div>
-            </section>
+        <section id="theme-section">
+          <h3>Alterar Cor do Tema</h3>
+          <div class="form-group">
+            <label for="theme-color">Cor de Fundo:</label>
+            <input
+              type="color"
+              id="theme-color"
+              name="theme-color"
+              value="#ffffff"
+            />
+            <button id="save-theme-btn" class="btn">Salvar Cor</button>
+          </div>
+        </section>
 
-            <section id="theme-section">
-                <h3>Alterar Cor do Tema</h3>
-                <div class="form-group">
-                    <label for="theme-color">Cor de Fundo:</label>
-                    <input type="color" id="theme-color" name="theme-color" value="#ffffff">
-                    <button id="save-theme-btn" class="btn">Salvar Cor</button>
-                </div>
-            </section>
-            
-            <script>
-                document.getElementById('save-theme-btn').addEventListener('click', async () => {
-                    const color = document.getElementById('theme-color').value;
-            
-                    const response = await fetch('/api/theme', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ color })
-                    });
-            
-                    const data = await response.json();
-                    if (data.message) {
-                        alert('Cor atualizada com sucesso!');
-                    } else {
-                        alert('Erro: ' + data.error);
-                    }
-                });
-            
-                // Carregar cor atual ao abrir a página
-                window.addEventListener('DOMContentLoaded', async () => {
-                    const res = await fetch('/api/theme');
-                    const data = await res.json();
-                    if (data.color) {
-                        document.getElementById('theme-color').value = data.color;
-                    }
-                });
-            </script>
-            
-            {% endif %}
+        <script>
+          document
+            .getElementById("save-theme-btn")
+            .addEventListener("click", async () => {
+              const color = document.getElementById("theme-color").value;
 
-        </div>
+              const response = await fetch("/api/theme", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ color }),
+              });
+
+              const data = await response.json();
+              if (data.message) {
+                alert("Cor atualizada com sucesso!");
+              } else {
+                alert("Erro: " + data.error);
+              }
+            });
+
+          // Carregar cor atual ao abrir a página
+          window.addEventListener("DOMContentLoaded", async () => {
+            const res = await fetch("/api/theme");
+            const data = await res.json();
+            if (data.color) {
+              document.getElementById("theme-color").value = data.color;
+            }
+          });
+        </script>
+
+        {% endif %}
+      </div>
     </main>
-
-</body>
+  </body>
 </html>

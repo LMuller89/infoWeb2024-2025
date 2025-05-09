@@ -1,39 +1,54 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Cadastro</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
-</head>
-<body>
-
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/register.css') }}"
+    />
+  </head>
+  <body>
     <header class="admin-header">
-        <div class="container">
-            <h1>Cadastro de Usuário</h1>
-        </div>
+      <div class="container">
+        <h1>Cadastro de Usuário</h1>
+      </div>
     </header>
 
     <main class="admin-main">
-        <div class="container">
-            <section id="register-section">
-                <h2>Registrar Nova Conta</h2>
-                <form id="register-form" action="/register" method="POST">
-                    <div class="form-group">
-                        <label for="email">Email:</label>
-                        <input type="email" id="email" name="email" required placeholder="Digite seu email">
-                    </div>
-                    <div class="form-group">
-                        <label for="password">Senha:</label>
-                        <input type="password" id="password" name="password" required placeholder="Digite sua senha">
-                    </div>
-                    <button type="submit" class="btn">Registrar</button>
-                </form>
+      <div class="container">
+        <section id="register-section">
+          <h2>Registrar Nova Conta</h2>
+          <form id="register-form" action="/register" method="POST">
+            <div class="form-group">
+              <label for="email">Email:</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                required
+                placeholder="Digite seu email"
+              />
+            </div>
+            <div class="form-group">
+              <label for="password">Senha:</label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                required
+                placeholder="Digite sua senha"
+              />
+            </div>
+            <button type="submit" class="btn">Registrar</button>
+          </form>
 
-                <p>Já tem uma conta? <a href="{{ url_for('admin') }}">Fazer login</a></p>
-            </section>
-        </div>
+          <p>
+            Já tem uma conta? <a href="{{ url_for('admin') }}">Fazer login</a>
+          </p>
+        </section>
+      </div>
     </main>
-
-</body>
+  </body>
 </html>
