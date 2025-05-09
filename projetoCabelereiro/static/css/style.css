@@ -34,7 +34,7 @@ a {
   background: #664c45;
 }
 .headline1 {
-  color: #eee;
+  color: #080707b9;
   padding-top: 50px;
   font-size: 2.2rem;
   text-transform: uppercase;
@@ -232,7 +232,7 @@ a {
 }
 
 .orcamento {
-  color: #eee;
+  color: #100e0eda;
   margin: 20px auto; /* Centraliza e adiciona espaçamento */
   text-align: center;
   font-size: 1.2rem;
@@ -240,7 +240,7 @@ a {
 
 /* Gallery */
 #gallery {
-  color: #eee;
+  color: #0a0909eb;
   width: 90%;
   margin: auto;
   padding-left: 50px;
@@ -369,7 +369,7 @@ a {
 
 /*Inserção de dados referente ao contato*/
 #contact {
-  color: #eee;
+  color: #100e0ee0;
   font-size: 1.2rem;
   padding: 50px;
   text-align: center;
