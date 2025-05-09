@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="css/style.css" />
+    
+    <link
+      rel="stylesheet"
+      media="screen and (max-width: 768px)"
+      href="css/mobile.css"
+    />
+    <title>Studio Florescer</title>
+  </head>
+
+  <body>
+    <nav id="navbar">
+      <div id="navbar-container">
+        <h1 class="logo">Studio Florescer</h1>
+        <ul id="navbar-items">
+          <li><a href="#showcase">Início</a></li>
+          <li><a href="#testimonials">Serviços</a></li>
+          <li><a href="#gallery">Galeria</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <header id="showcase">
+      <div id="showcase-container">
+        <h2>Nada muda mais um visual do que um bom corte!</h2>
+        <p>Atualize seu estilo com um toque profissional.</p>
+        <a href="#testimonials" class="btn">Saiba mais</a>
+      </div>
+    </header>
+
+    <section id="features">
+      <div class="headline">Como atuamos</div>
+      <div id="features-container">
+          <div class="feature">
+              <div class="icon-title"> <i class="fa-solid fa-calendar fa-3x"></i>
+                  <span class="feature-title">Flexibilidade!</span>
+              </div>
+              <span class="texto">
+                  <p>
+                      Atendemos tanto com horários agendados quanto por ordem de chegada, garantindo flexibilidade para nossos clientes.
+                  </p>
+              </span>
+          </div>
+          <div class="feature">
+              <div class="icon-title">
+                  <i class="fa-solid fa-scissors fa-3x"></i>
+                  <span class="feature-title">Equipe Preparada!</span>
+              </div>
+              <span class="texto">
+                  <p>
+                      Nossa equipe é composta por mais de 10 profissionais altamente qualificados, prontos para oferecer o melhor atendimento.
+                  </p>
+              </span>
+          </div>
+          <div class="feature">
+              <div class="icon-title">
+                  <i class="fa-solid fa-mug-saucer fa-3x"></i>
+                  <span class="feature-title">Ambientação!</span>
+              </div>
+              <span class="texto">
+                  <p>
+                      Proporcionamos um ambiente acolhedor e moderno, para que cada cliente tenha uma experiência relaxante e satisfatória.
+                  </p>
+              </span>
+          </div>
+      </div>
+  </section>
+
+    <!-- Inserido novo modelo de lista -->
+    <div id="testimonials">
+      <div class="headline1">Nossos Serviços</div>
+      <div id="testimonials-container">
+        <div class="testimonial">
+          <img src="img/person-1.jpeg" alt="" class="testimonial-image" />
+          <span class="testimonial-title">Tratamentos Capilares</span>
+          <div class="testimonial-info">
+            <ul>
+              <li>Escova</li>
+              <li>Corte</li>
+              <li>Mechas</li>
+              <li>Luzes</li>
+              <li>Botox</li>
+              <li>Progressiva</li>
+              <li>Penteados</li>
+            </ul>
+            <ul>
+              <li>Selagem</li>
+              <li>Cauterização</li>
+              <li>Tintura</li>
+              <li>Reconstrução</li>
+              <li>Descoloração</li>
+              <li>Desintoxicação capilar</li>
+              <li>Corte e Barba (Barba terapia)</li>
+            </ul>
+          </div>
+        </div>
+        <div class="testimonial">
+          <img src="img/person-2.jpeg" alt="" class="testimonial-image" />
+          <span class="testimonial-title">Outros Serviços</span>
+          <div class="testimonial-info">
+            <ul>
+              <li>Maquiagem</li>
+              <li>Argiloterapia</li>
+              <li>Manicura e Pedicura</li>
+              <li>Design de sobrancelhas</li>
+              <li>SPA dos Pés</li>
+              <li>Microagulhamento</li>
+              <li>Auriculoterapia</li>
+            </ul>
+            <ul>
+              <li>Limpeza de pele</li>
+              <li>Massagens</li>
+              <li>Depilação a laser</li>
+              <li>Designer de unhas</li>
+              <li>Ozonoterapia</li>
+              <li>Designer de cílios</li>
+            </ul>
+        </div>
+      </div>
+    </div>
+    <div class="orcamento"><h3>Faça seu orçamento sem compromisso!</h3></div>
+    
+    <section id="gallery">
+      <div class="headline">Galeria</div>
+      <div id="gallery-container">
+        <img src="img/image-1.jpg" alt="" class="gallery-image" onclick="openModal(this)">
+        <img src="img/image-2.jpg" alt="" class="gallery-image" onclick="openModal(this)">
+        <img src="img/image-3.jpg" alt="" class="gallery-image" onclick="openModal(this)">
+        <img src="img/image-4.jpg" alt="" class="gallery-image" onclick="openModal(this)">
+        <img src="img/image-5.jpg" alt="" class="gallery-image" onclick="openModal(this)">
+        <img src="img/image-6.jpg" alt="" class="gallery-image" onclick="openModal(this)">
+      </div>
+      
+      <!-- Modal para exibir a imagem em tela cheia -->
+      <div id="modal" class="modal" onclick="closeModal()">
+      <span class="close">&times;</span>
+      <img class="modal-content" id="full-image">
+      </div>
+
+      <script src="main.js"></script>
+    </section>
+    <br/><br/><br/><br/>
+    <section id="videoslot">
+      <div class="headline"></div>
+      <div id="video-container" class="video-wireframe">
+        
+        <!-- Video player -->
+        <video
+          id="my-video"
+          width="100%"
+          height="auto"
+          controls
+          controlsList="nodownload"
+          poster="/img/capa.png"
+        >
+          <source src="/img/video.mp4" type="video/mp4" />
+        </video>
+      </div>
+    </section>
+
+    <section id="clients">
+      <div class="headline">Nossas Redes Sociais</div>
+      <div id="clients-container">
+        <img src="/img/smInsta.png" class="client" alt="" />
+        <img src="/img/smFace.png" class="client" alt="" />
+        <img src="/img/smX.png" class="client" alt="" />
+        <img src="/img/smYt.png" class="client" alt="" />
+      </div>
+    </section>
+
+    <!-- Inserção de dados referente ao contato -->
+    <section class="localizacao">
+      <div class="mapa">
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3628.8976439762773!2d-54.07716702382809!3d-24.558198978127873!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94f3800de3558881%3A0xc56e603befd6fe31!2sR.%20Santa%20Catarina%2C%205736%20-%20Vila%20Ga%C3%BAcha%2C%20Mal.%20C%C3%A2ndido%20Rondon%20-%20PR%2C%2085960-000!5e0!3m2!1spt-BR!2sbr!4v1740765858801!5m2!1spt-BR!2sbr"
+          width="854"
+          height="540"
+          style="border:0;"
+          allowfullscreen=""
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade">
+        </iframe>
+      </div>
+    </section>
+  
+    <section id="contact">
+      <div class="headline">Entre em Contato</div>
+        <p>Agende seu horário pelo WhatsApp ou visite nosso salão!</p>
+        <p><i class="fas fa-phone"></i> (45) 3254-4200</p>
+        <p>
+          <i class="fas fa-map-marker-alt"></i> Rua Santa Catarina, N° 577 - Centro,
+          Cidade: Marechal Cândido Rondon PR
+        </p>
+      </div>
+    </section>
+
+    <footer id="footer">
+      <p>&copy; 2025 Studio Florescer - Todos os direitos reservados.</p>
+    </footer>
+    
+    <!-- Font Awesome -->
+    <script src="https://kit.fontawesome.com/8bd8696d67.js" crossorigin="anonymous"></script>
+
+    <!-- jQuery CDN -->
+    <script
+      src="https://code.jquery.com/jquery-3.4.1.min.js"
+      integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+      crossorigin="anonymous"
+    ></script>
+
+    <!-- Our JS file -->
+    <script src="js/main.js"></script>
+  </body>
+</html>
