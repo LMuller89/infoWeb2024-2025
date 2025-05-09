@@ -27,6 +27,11 @@ def get_cached_theme_color():
             cor_cache["valor"] = "#ffffff"
     return cor_cache["valor"]
 
+# Redirecionamento da raiz para /home
+@app.route('/')
+def redirect_to_home():
+    return redirect(url_for('index'))
+
 # Rota principal
 @app.route('/home')
 def index():
