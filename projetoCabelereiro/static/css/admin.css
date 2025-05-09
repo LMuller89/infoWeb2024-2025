@@ -1,104 +1,127 @@
 /* Estilo específico para a área de administração */
 
 .admin-header {
-    background-color: #ac704c;
-    color: #fff;
-    padding: 20px 0;
-    text-align: center;
+  background-color: #c5ebeec9;
+  color: #080808;
+  padding: 10px 0;
+  text-align: center;
+}
+
+.admin-header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.btn-logout {
+  background: #004297;
+  color: #ffffff;
+  padding: 8px 16px;
+  font-size: 1rem;
+  text-transform: uppercase;
+  border: none;
+  border-radius: 5px;
+  text-decoration: none;
+  transition: background 300ms ease;
+  cursor: pointer;
+}
+
+.btn-logout:hover {
+  background: #022e68;
 }
 
 .admin-main {
-    padding: 40px 0;
-    background-color: #f9f9f9;
-    min-height: 80vh;
+  padding: 40px 0;
+  background-color: #f9f9f9;
+  min-height: 80vh;
 }
 
 .container {
-    width: 90%;
-    max-width: 1200px;
-    margin: 0 auto;
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-#login-section, #dashboard-section {
-    background: #fff;
-    padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    max-width: 400px;
-    margin: 0 auto;
+#login-section,
+#dashboard-section {
+  background: #fff;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
+  margin: 0 auto;
 }
 
 .form-group {
-    margin-bottom: 20px;
+  margin-bottom: 20px;
 }
 
 .form-group label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
 }
 
 .form-group input {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 
 .btn {
-    background-color: #007BFF;
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    width: 100%;
+  background-color: #0564c9;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 100%;
 }
 
 #dashboard-section .dashboard-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
-#dashboard-section .btn1 {
-    margin-top: 20px;
-    text-align: center;
-    padding: 15px 60px;
-    font-size: 1.1rem;
-    text-transform: uppercase;
-    background: #6e463b;
-    color: #ffffff;
-    border-radius: 5px;
-    transition: background 500ms ease;
-    display: inline-block;
-}
-      
+/*#dashboard-section .btn1 {
+  margin-top: 20px;
+  text-align: center;
+  padding: 10px 20px;
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  background: #004297;
+  color: #ffffff;
+  border-radius: 5px;
+  transition: background 500ms ease;
+  display: inline-block;
+}*/
 
 .btn:hover {
-    background-color: #0056b3;
+  background-color: #0056b3;
 }
 
 /* Estilo dos cards do dashboard */
 .dashboard-cards {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    margin-top: 30px;
-    justify-content: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-top: 30px;
+  justify-content: center;
 }
 
 .card {
-    background: #fff;
-    border: 1px solid #ddd;
-    padding: 20px;
-    border-radius: 8px;
-    width: 280px;
-    text-align: center;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  background: #fff;
+  border: 1px solid #ddd;
+  padding: 20px;
+  border-radius: 8px;
+  width: 280px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .card h3 {
-    margin-bottom: 15px;
+  margin-bottom: 15px;
 }
