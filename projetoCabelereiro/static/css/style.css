@@ -326,7 +326,7 @@ a {
 /* Redes Sociais */
 #clients {
   width: 100%;
-  background: #fffde8;
+  background: #ffdada
   color: #1f1d1d;
   padding: 50px;
 }
@@ -381,4 +381,20 @@ a {
   color: #eee;
   padding: 30px;
   text-align: center;
+}
+body {
+  background: linear-gradient(
+    135deg,
+    #f3eac2,
+    #664c45
+  ); /* Gradiente amarelo claro */
+}
+
+#features,
+.testimonial,
+#footer,
+#clients,
+.video-wireframe {
+  background: #e8d8c3(255, 250, 235, 0.8); /* Um bege suave e translúcido */
+  color: #a56322; /* Um marrom escuro legível */
 }
