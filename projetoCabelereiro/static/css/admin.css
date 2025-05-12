@@ -1,9 +1,13 @@
 /* Estilo específico para a área de administração */
 
 .admin-header {
-  background-color: #c5ebeec9;
-  color: #080808;
+  background-color: #d9f3e5;
   padding: 10px 0;
+  font-size: 1.2rem;
+}
+
+.admin-header .h1 {
+  color: #0a0a0a;
   text-align: center;
 }
 
@@ -14,25 +18,26 @@
 }
 
 .btn-logout {
-  background: #004297;
-  color: #ffffff;
-  padding: 8px 16px;
+  /*background: #004297; Retirado*/
+  color: #0a0a0a;
+  /*padding: 5px 10px; Retirado*/
   font-size: 1rem;
   text-transform: uppercase;
   border: none;
-  border-radius: 5px;
+  /*border-radius: 5px; Retirado*/
   text-decoration: none;
-  transition: background 300ms ease;
+  /*transition: background 300ms ease; Retirado*/
   cursor: pointer;
 }
 
+/* Retirei para o botão de sair ficar limpo.
 .btn-logout:hover {
   background: #022e68;
-}
+}*/
 
 .admin-main {
   padding: 40px 0;
-  background-color: #f9f9f9;
+  background-color: #edf7f7;
   min-height: 80vh;
 }
 
@@ -45,38 +50,44 @@
 #login-section,
 #dashboard-section {
   background: #fff;
-  padding: 30px;
-  border-radius: 8px;
+  padding: 20px;
+  /*border-radius: 4px; Retirado*/
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  max-width: 400px;
-  margin: 0 auto;
+  max-width: 300px;
+  margin: auto;
 }
 
-.form-group {
-  margin-bottom: 20px;
-}
+/*.form-group {
+  margin-bottom: 200px;
+}*/
 
 .form-group label {
   display: block;
-  margin-bottom: 5px;
+  margin-bottom: 10px;
   font-weight: bold;
 }
 
 .form-group input {
-  width: 100%;
-  padding: 10px;
+  width: 30%; /* Faz com que a barra de login e a barra cor de fundo mudar de tamanho*/
+  padding: 15px;
   border: 1px solid #ccc;
   border-radius: 4px;
 }
 
 .btn {
+  display: block;
+  width: 20%;
+  margin: 10px;
   background-color: #0564c9;
   color: white;
-  padding: 10px 15px;
+  padding: 10px;
   border: none;
   border-radius: 4px;
-  cursor: pointer;
-  width: 100%;
+  /*cursor: pointer;*/
+}
+
+.btn:hover {
+  background-color: #0056b3;
 }
 
 #dashboard-section .dashboard-content {
@@ -99,10 +110,6 @@
   display: inline-block;
 }*/
 
-.btn:hover {
-  background-color: #0056b3;
-}
-
 /* Estilo dos cards do dashboard */
 .dashboard-cards {
   display: flex;
@@ -122,6 +129,6 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.card h3 {
+/*.card h3 {
   margin-bottom: 15px;
-}
+}*/
