@@ -4,6 +4,7 @@ from supabase import create_client, Client
 import os
 from functools import lru_cache
 import time
+from flask import jsonify
 
 # Cache com expiração
 # Cache simples sem LRU_CACHE
@@ -84,8 +85,6 @@ def register():
     
     # Se for GET, exibe a página de registro
     return render_template('register.html')
-
-from flask import jsonify
 
 # Rota para obter a cor do tema
 @app.route('/api/theme', methods=['GET'])

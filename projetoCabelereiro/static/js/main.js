@@ -1,3 +1,17 @@
+console.log("main.js carregado");
+
+function openModal(img) {
+  var modal = document.getElementById("modal");
+  var modalImg = document.getElementById("full-image");
+  modal.style.display = "block";
+  modalImg.src = img.src;
+}
+
+function closeModal() {
+  var modal = document.getElementById("modal");
+  modal.style.display = "none";
+}
+
 // Smooth Scrolling
 $("#navbar a, .btn").on("click", function (event) {
   if (this.hash !== "") {
@@ -22,15 +36,3 @@ window.addEventListener("scroll", function () {
     document.querySelector("#navbar").style.opacity = 1;
   }
 });
-
-function openModal(imgElement) {
-  var modal = document.getElementById("modal");
-  var fullImage = document.getElementById("full-image");
-
-  fullImage.src = imgElement.src;
-  modal.style.display = "flex";
-}
-
-function closeModal() {
-  document.getElementById("modal").style.display = "none";
-}
