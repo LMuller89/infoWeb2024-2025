@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-  <!-- Injetar a cor inline para evitar FOUC (Flash of Unstyled Content) -->
+  <!-- Injetar a cor inline para evitar bug de cores -->
   <style>
     :root {
       --cor-principal: {{ cor_principal }};
@@ -21,13 +21,13 @@
     }
   </style>
   
-  <!-- Armazenar a cor no localStorage para uso futuro -->
+  <!-- Armazena a cor no localStorage para uso futuro -->
   <script>
     window.themeColor = "{{ cor_principal }}";
     localStorage.setItem("corPrincipal", window.themeColor);
   </script>
   
-  <!-- Carregamento assíncrono de CSS não-crítico -->
+  <!-- Carregamento do CSS não-crítico -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v={{ cor_principal }}">
   <link rel="stylesheet" media="screen and (max-width: 768px)" href="{{ url_for('static', filename='css/mobile.css') }}" media="print" onload="this.media='screen and (max-width: 768px)'">
     <meta charset="UTF-8" />
@@ -45,11 +45,6 @@
       const corAtual = "{{ cor_principal }}";
       localStorage.setItem("corPrincipal", corAtual);
     </script>
- 
-    <!-- CSS só é carregado depois que a cor já foi definida corretamente -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v={{ cor_principal }}">
-    <link rel="stylesheet" media="screen and (max-width: 768px)" href="{{ url_for('static', filename='css/mobile.css') }}">
- 
     <title>Studio Florescer</title>
   </head>
   
@@ -178,15 +173,17 @@
         <img src="{{ url_for('static', filename='img/image-6.jpg') }}" alt="" class="gallery-image" onclick="openModal(this)">
       </div>
       
-      <!-- Modal para exibir a imagem em tela cheia -->
+      <!-- exibir a imagem em tela cheia -->
       <div id="modal" class="modal" onclick="closeModal()">
-      <span class="close">&times;</span>
+      <span class="close" onclick="closeModal()">&times;</span>
       <img class="modal-content" id="full-image">
       </div>
 
       <script src="main.js"></script>
     </section>
     <br/><br/><br/><br/>
+
+    <!-- Video slot -->
     <section id="videoslot">
       <div class="headline"></div>
       <div id="video-container" class="video-wireframe">
@@ -255,7 +252,7 @@
     ></script>
 
     <!-- Our JS file -->
-    <script src="js/main.js"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script>
       async function applyThemeColor() {
         try {
