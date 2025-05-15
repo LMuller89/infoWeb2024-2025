@@ -34,7 +34,7 @@ a {
   background: #664c45;
 }
 .headline1 {
-  color: #080707b9;
+  color: #000000;
   padding-top: 50px;
   font-size: 2.2rem;
   text-transform: uppercase;
@@ -232,7 +232,7 @@ a {
 }
 
 .orcamento {
-  color: #100e0eda;
+  color: #000000;
   margin: 20px auto; /* Centraliza e adiciona espaçamento */
   text-align: center;
   font-size: 1.2rem;
@@ -240,7 +240,7 @@ a {
 
 /* Gallery */
 #gallery {
-  color: #0a0909eb;
+  color: #000000;
   width: 90%;
   margin: auto;
   padding-left: 50px;
@@ -332,8 +332,8 @@ a {
 /* Redes Sociais */
 #clients {
   width: 100%;
-  background: #ffdada
-  color: #1f1d1d;
+  background: #e8d8c3;
+  color: #000000;
   padding: 50px;
 }
 
@@ -375,7 +375,7 @@ a {
 
 /*Inserção de dados referente ao contato*/
 #contact {
-  color: #100e0ee0;
+  color: #000000;
   font-size: 1.2rem;
   padding: 50px;
   text-align: center;
@@ -384,15 +384,14 @@ a {
 /* Footer */
 #footer {
   /* background: #ac704c; */
-  color: #eee;
+  color: #0c0c0c;
   padding: 30px;
   text-align: center;
 }
 body {
   background: linear-gradient(
     135deg,
-    #f3eac2,
-    #664c45
+    #e8d8c3 #543b34
   ); /* Gradiente amarelo claro */
 }
 
@@ -402,5 +401,5 @@ body {
 #clients,
 .video-wireframe {
   background: #e8d8c3(255, 250, 235, 0.8); /* Um bege suave e translúcido */
-  color: #a56322; /* Um marrom escuro legível */
+  color: #000000; /* Um marrom escuro legível */
 }
