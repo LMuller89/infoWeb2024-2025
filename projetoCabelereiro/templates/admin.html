@@ -103,6 +103,66 @@
           });
         </script>
 
+        <!-- Substitua a seção gallery-admin-section por: -->
+        <section id="gallery-admin-section">
+          <h3>Gerenciar Galeria</h3>
+          {% for i in range(1,7) %}
+          <div class="gallery-admin-item">
+            <label>Posição {{ i }}:</label>
+            <input
+              type="file"
+              accept="image/png, image/jpeg"
+              class="image-upload-input"
+              data-image-id="image-{{ i }}"
+            />
+            <img
+              src="{{ gallery_images.get('image-' ~ i, '') }}"
+              class="image-preview"
+            />
+            <div class="upload-status"></div>
+          </div>
+          {% endfor %}
+        </section>
+
+        <script>
+          document.querySelectorAll(".image-upload-input").forEach((input) => {
+            input.addEventListener("change", async function (e) {
+              const file = e.target.files[0];
+              const imageId = this.dataset.imageId;
+              const preview =
+                this.parentElement.querySelector(".image-preview"); // Selecionar corretamente
+              const status = this.parentElement.querySelector(".upload-status");
+
+              if (!file) return;
+
+              const formData = new FormData();
+              formData.append("image", file);
+              formData.append("image_id", imageId); // Garantir envio do ID
+
+              try {
+                status.textContent = "Enviando...";
+                const response = await fetch("/api/gallery", {
+                  method: "POST",
+                  body: formData,
+                });
+
+                const result = await response.json();
+
+                if (!response.ok)
+                  throw new Error(result.error || "Falha no upload");
+
+                // Atualizar preview com cache-busting
+                preview.src = result.new_url;
+                status.textContent = "✔️ Atualizado!";
+                setTimeout(() => (status.textContent = ""), 2000);
+              } catch (error) {
+                status.textContent = `Erro: ${error.message}`;
+                status.style.color = "red";
+              }
+            });
+          });
+        </script>
+
         {% endif %}
       </div>
     </main>
