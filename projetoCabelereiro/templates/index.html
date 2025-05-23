@@ -203,14 +203,29 @@
     </section>
 
     <section id="clients">
-      <div class="headline">Nossas Redes Sociais</div>
-      <div id="clients-container">
-        <img src="{{ url_for('static', filename='img/smInsta.png') }}" class="client" alt="" />
-        <img src="{{ url_for('static', filename='img/smFace.png') }}" class="client" alt="" />
-        <img src="{{ url_for('static', filename='img/smX.png') }}" class="client" alt="" />
-        <img src="{{ url_for('static', filename='img/smYt.png') }}" class="client" alt="" />
-      </div>
-    </section>
+  <div class="headline">Nossas Redes Sociais</div>
+  <div id="clients-container">
+    <!-- Instagram -->
+    <a href="https://www.instagram.com" target="_blank">
+      <img src="{{ url_for('static', filename='img/smInsta.png') }}" class="client" alt="Instagram" />
+    </a>
+
+    <!-- Facebook -->
+    <a href="https://www.facebook.com" target="_blank">
+      <img src="{{ url_for('static', filename='img/smFace.png') }}" class="client" alt="Facebook" />
+    </a>
+
+    <!-- Twitter/X -->
+    <a href="https://twitter.com" target="_blank">
+      <img src="{{ url_for('static', filename='img/smX.png') }}" class="client" alt="Twitter / X" />
+    </a>
+
+    <!-- YouTube -->
+    <a href="https://www.youtube.com" target="_blank">
+      <img src="{{ url_for('static', filename='img/smYt.png') }}" class="client" alt="YouTube" />
+    </a>
+  </div>
+</section>
 
     <!-- Inserção de dados referente ao contato -->
     <section class="localizacao">

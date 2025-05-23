@@ -18,22 +18,13 @@
 }
 
 .btn-logout {
-  /*background: #004297; Retirado*/
   color: #0a0a0a;
-  /*padding: 5px 10px; Retirado*/
   font-size: 1rem;
   text-transform: uppercase;
   border: none;
-  /*border-radius: 5px; Retirado*/
   text-decoration: none;
-  /*transition: background 300ms ease; Retirado*/
   cursor: pointer;
 }
-
-/* Retirei para o botão de sair ficar limpo.
-.btn-logout:hover {
-  background: #022e68;
-}*/
 
 /* Corpo da área admin */
 .admin-main {
@@ -50,7 +41,6 @@
 
 /* Área de loguin */
 #login-section {
-  /*#dashboard-section*/
   background: #fff;
   padding: 30px;
   border-radius: 5px;
@@ -85,35 +75,14 @@
   outline: none;
 }
 
-/*.form-group label {
-  display: block;
-  margin-bottom: 10px;
-  font-weight: bold;
-}
-
-.form-group {
-  width: 500%; /* Faz com que a barra de login e a barra cor de fundo mudar de tamanho/
-  padding: 15px;
-  border-radius: 4px;
-}
-
-.form-group input {
-  width: 23%; /* Faz com que a barra de login e a barra cor de fundo mudar de tamanho/
-  padding: 15px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}*/
-
 .btn {
   display: block;
-  width: 100%;
-  /*margin: 10px;*/
+  width: 70%;
   background-color: #0564c9;
   color: white;
-  padding: 12px;
+  padding: 10px;
   border: none;
   border-radius: 4px;
-  /*cursor: pointer;*/
   font-size: 16px;
   transition: background-color 0.3s ease;
   margin-top: 10px;
@@ -127,19 +96,6 @@
   text-align: center;
   margin-bottom: 30px;
 }
-
-/*#dashboard-section .btn1 {
-  margin-top: 20px;
-  text-align: center;
-  padding: 10px 20px;
-  font-size: 1.1rem;
-  text-transform: uppercase;
-  background: #004297;
-  color: #ffffff;
-  border-radius: 5px;
-  transition: background 500ms ease;
-  display: inline-block;
-}*/
 
 /* Estilo dos cards do dashboard */
 .dashboard-cards {
@@ -187,3 +143,4 @@
   padding: 0;
   cursor: pointer;
 }
+/* Teste */
