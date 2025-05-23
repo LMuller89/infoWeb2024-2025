@@ -20,19 +20,8 @@
 }
 
 .container h2 {
-  color: #6e463b;
+  color: #000000;
 }
-
-/* tirei por que nao ta fazendo nada
-#login-section,
-#dashboard-section {
-  background: #1406db;
-  padding: 30px;
-  border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(7, 224, 80, 0.1);
-  max-width: 400px;
-  margin: 0 auto;
-}*/
 
 .form-group {
   margin-bottom: 20px;
@@ -63,18 +52,3 @@
   font-weight: bold;
   cursor: pointer;
 }
-
-/*transition: background 0.3s ease-in-out;*/
-/* terei pois nao esta servindo pra nada no momento
-.btn:hover {
-    background-color: #140d11;
-}*/
-
-/* Estilo dos cards do dashboard 
-.dashboard-cards {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    margin-top: 30px;
-    justify-content: center;
-}*/
