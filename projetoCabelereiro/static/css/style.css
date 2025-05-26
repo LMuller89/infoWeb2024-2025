@@ -337,12 +337,6 @@ a {
   opacity: 0.8;
 }
 
-/* Redes Sociais */
-#clients .headline {
-  text-align: center;
-  margin-bottom: 30px;
-}
-
 #clients {
   width: 100%;
   background: linear-gradient(
@@ -354,15 +348,33 @@ a {
   /*text-align: center;*/
 }
 
+/* Redes Sociais */
+#clients .headline {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
 #clients-container {
   display: grid;
   grid-template-columns: repeat(4, 1fr); /* 4 colunas iguais */
-  justify-items: center; /* centraliza cada item na célula */
-  align-items: center;
-  gap: 100px;
+  justify-items: center; /*centraliza cada item na célula */
+  gap: 20px; /* Reduz o espaçamento entre colunas e linhas*/
   max-width: 1000px;
   margin: 0 auto;
-  padding-bottom: 70px;
+  padding-bottom: 30px;
+}
+
+.client {
+  width: 90px;
+  height: auto;
+}
+
+.client img {
+  display: block;
+  width: 30px;
+  height: auto;
+  margin: 0;
+  padding: 0;
 }
 
 #clients-container a {
@@ -371,12 +383,6 @@ a {
 
 #clients-container a:hover {
   transform: scale(1.1);
-}
-
-.client {
-  display: inline-block;
-  width: 50%;
-  height: auto;
 }
 
 /* Responsivo para tablets nao sera util por enquanto
