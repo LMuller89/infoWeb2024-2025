@@ -4,6 +4,7 @@
   background-color: #d9f3e5;
   padding: 10px 0;
   font-size: 1.2rem;
+  font-family: "Calibri", "Arial", "Calibri Light", sans-serif;
 }
 
 .admin-header .h1 {
@@ -24,6 +25,7 @@
   border: none;
   text-decoration: none;
   cursor: pointer;
+  font-family: "Calibri", "Arial", "Calibri Light", sans-serif;
 }
 
 /* Corpo da área admin */
@@ -31,12 +33,14 @@
   padding: 40px 0;
   background-color: #edf7f7;
   min-height: 80vh;
+  font-family: "Calibri", "Arial", "Calibri Light", sans-serif;
 }
 
 .container {
   width: 90%;
   max-width: 1200px;
   margin: 0 auto;
+  font-family: "Calibri", "Arial", "Calibri Light", sans-serif;
 }
 
 /* Área de loguin */
@@ -47,6 +51,7 @@
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   max-width: 400px;
   margin: auto;
+  font-family: "Calibri", "Arial", "Calibri Light", sans-serif;
 }
 
 #login-section .form-group {
@@ -58,6 +63,7 @@
   margin-bottom: 8px;
   font-weight: bold;
   color: #333;
+  font-family: "Calibri", "Arial", "Calibri Light", sans-serif;
 }
 
 #login-section input {
@@ -68,6 +74,7 @@
   font-size: 15px;
   box-sizing: border-box;
   transition: border-color 0.3s;
+  font-family: "Calibri", "Arial", "Calibri Light", sans-serif;
 }
 
 #loguin-section input:focus {
@@ -86,6 +93,7 @@
   font-size: 16px;
   transition: background-color 0.3s ease;
   margin-top: 10px;
+  font-family: "Calibri", "Arial", "Calibri Light", sans-serif;
 }
 
 .btn:hover {
@@ -114,6 +122,7 @@
   width: 280px;
   text-align: center;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  font-family: "Calibri", "Arial", "Calibri Light", sans-serif;
 }
 
 #theme-section {
@@ -124,6 +133,7 @@
   max-width: 400px;
   margin-left: auto;
   margin-right: auto;
+  font-family: "Calibri", "Arial", "Calibri Light", sans-serif;
 }
 
 #theme-section .form-group {
@@ -142,6 +152,7 @@
   border: none;
   padding: 0;
   cursor: pointer;
+  font-family: "Calibri", "Arial", "Calibri Light", sans-serif;
 }
 
 #gallery-admin-section {
@@ -153,6 +164,7 @@
   max-width: 800px; /* Largura máxima */
   margin-left: auto;
   margin-right: auto;
+  font-family: "Calibri", "Arial", "Calibri Light", sans-serif;
 }
 
 .gallery-admin-item {
@@ -162,6 +174,8 @@
   border-radius: 8px;
   width: 100%;
   box-sizing: border-box;
+
+  font-family: "Calibri", "Arial", "Calibri Light", sans-serif;
 }
 
 .image-upload-input {
@@ -195,4 +209,8 @@
 .upload-status {
   font-size: 0.9rem;
   margin-top: 5px;
+}
+
+.admin-text {
+  font-family: "Calibri", "Arial", "Calibri Light", sans-serif;
 }
