@@ -18,40 +18,37 @@ supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 # Configure o bucket do Supabase
 BUCKET_NAME = "gallery"
 
-# Cache com expiração
+# Cache para duas cores de tema
 theme_cache = {
-    "color": None,
+    "section_color": None,  # cor de features/footer/.testimonial
+    "body_color": None,     # cor do body
     "timestamp": 0,
-    "ttl": 5  # 30 segundos para teste
+    "ttl": 5                # em segundos
 }
 
-def get_cached_theme_color(force_refresh=False):
-    """Obter a cor do tema, possivelmente do cache"""
-    current_time = time.time()
-    
-    # Verificar se precisa atualizar o cache
-    if (force_refresh or 
-        theme_cache["color"] is None or 
-        (current_time - theme_cache["timestamp"] > theme_cache["ttl"])):
-        
+def get_cached_theme(force_refresh=False):
+    """Retorna um dict {'section':..., 'body':...} possivelmente em cache."""
+    now = time.time()
+    # se cache expirou ou não existe
+    if force_refresh or theme_cache["section_color"] is None or now - theme_cache["timestamp"] > theme_cache["ttl"]:
         try:
-            # Buscar do banco de dados
-            response = supabase.table('theme_config').select('*').limit(1).execute()
-            data = response.data
+            resp = supabase.table('theme_config').select('*').limit(1).execute()
+            data = resp.data
             if data:
-                theme_cache["color"] = data[0]['background_color']
+                row = data[0]
+                theme_cache["section_color"] = row.get('background_color', '#ffffff')
+                theme_cache["body_color"]    = row.get('body_color', '#ffffff')
             else:
-                theme_cache["color"] = "#ffffff"
-            
-            # Atualizar timestamp
-            theme_cache["timestamp"] = current_time
-            
+                theme_cache["section_color"] = theme_cache["body_color"] = '#ffffff'
+            theme_cache["timestamp"] = now
         except Exception as e:
-            print(f"Erro ao buscar cor do tema: {e}")
-            if theme_cache["color"] is None:
-                theme_cache["color"] = "#ffffff"
-    
-    return theme_cache["color"]
+            print(f"Erro ao buscar cores: {e}")
+            if theme_cache["section_color"] is None:
+                theme_cache["section_color"] = theme_cache["body_color"] = '#ffffff'
+    return {
+        'section': theme_cache["section_color"],
+        'body':    theme_cache["body_color"]
+    }
 
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', 'mysecretkey')  # Recomendação: usar variável de ambiente
@@ -64,26 +61,30 @@ def redirect_to_home():
 # Rota principal
 @app.route('/home')
 def index():
-    cor_principal = get_cached_theme_color()
+    # Usa a nova função para pegar ambas as cores em cache
+    tema = get_cached_theme()
+    cor_principal = tema['section']
+    cor_body      = tema['body']
 
     try:
-        # Corrigido: Buscar diretamente da TABELA, não do bucket
+        # Buscar galeria normalmente
         response = supabase.table('gallery_images').select('*').execute()
-        data = response.data if response.data else []
-
-        # Montar o dicionário com os IDs corretos
+        data = response.data or []
         gallery_images = {img['image_id']: img['image_url'] for img in data}
 
-        # DEBUG opcional: ver no terminal o que está vindo
+        # DEBUG opcional
         print("DEBUG: gallery_images =", gallery_images)
-
     except Exception as e:
-        print(f"Erro ao buscar imagens: {str(e)}")
+        print(f"Erro ao buscar imagens: {e}")
         gallery_images = {}
 
-    return render_template('index.html',
-                         cor_principal=cor_principal,
-                         gallery_images=gallery_images)
+    return render_template(
+        'index.html',
+        cor_principal=cor_principal,
+        cor_body=cor_body,
+        gallery_images=gallery_images
+    )
+
 
 # Página de registro
 @app.route('/register', methods=['GET', 'POST'])
@@ -159,28 +160,56 @@ def login():
     flash('Email ou senha inválidos.', 'danger')
     return redirect(url_for('admin'))
 
-# Rota para obter a cor do tema
+# Rota GET unificada
 @app.route('/api/theme', methods=['GET'])
-def get_theme_color():
+def get_theme():
     try:
-        color = get_cached_theme_color()
-        return jsonify({'color': color})
-    except Exception as e:
-        return jsonify({'color': '#ffffff'}), 200  # Retornar status 200 mesmo com erro
+        t = get_cached_theme()
+        return jsonify({
+            'section_color': t['section'],
+            'body_color':    t['body']
+        })
+    except Exception:
+        # mesmo em erro, retorna 200 com cores padrão
+        return jsonify({
+            'section_color': '#ffffff',
+            'body_color':    '#ffffff'
+        }), 200
 
-# Rota para atualizar a cor do tema
-@app.route('/api/theme', methods=['POST'])
-def update_theme_color():
+# Rota POST para atualizar section_color
+@app.route('/api/theme/section', methods=['POST'])
+def update_section_color():
     try:
         new_color = request.json.get('color')
+        current   = get_cached_theme()
+        # grava no DB mantendo body_color atual
         supabase.table('theme_config').delete().neq('id', 0).execute()
-        supabase.table('theme_config').insert({'background_color': new_color}).execute()
-        theme_cache["valor"] = new_color  # atualiza o cache aqui
-        return jsonify({'message': 'Cor atualizada com sucesso'})
+        supabase.table('theme_config').insert({
+            'background_color': new_color,
+            'body_color':       current['body']
+        }).execute()
+        theme_cache["section_color"] = new_color
+        return jsonify({'message': 'Seção atualizada com sucesso'})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# Nova rota POST para atualizar body_color
+@app.route('/api/theme/body', methods=['POST'])
+def update_body_color():
+    try:
+        new_color = request.json.get('color')
+        current   = get_cached_theme()
+        # grava no DB mantendo section_color atual
+        supabase.table('theme_config').delete().neq('id', 0).execute()
+        supabase.table('theme_config').insert({
+            'background_color': current['section'],
+            'body_color':       new_color
+        }).execute()
+        theme_cache["body_color"] = new_color
+        return jsonify({'message': 'Body atualizado com sucesso'})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
     
-
 # Rota para obter imagens
 @app.route('/api/gallery', methods=['GET'])
 def get_gallery_images():
@@ -219,6 +248,15 @@ def update_gallery_image():
 
         new_filename = f"{image_id}.{file_ext}"
 
+        # 🧹 Deletar todas versões anteriores com diferentes extensões
+        possible_extensions = ['jpg', 'jpeg', 'png']
+        filenames_to_delete = [f"{image_id}.{ext}" for ext in possible_extensions]
+
+        try:
+            supabase.storage.from_(BUCKET_NAME).remove(filenames_to_delete)
+        except Exception as del_err:
+            print(f"Aviso: falha ao deletar imagens antigas: {del_err}")
+
         # Criar arquivo temporário
         with tempfile.NamedTemporaryFile(delete=False, suffix=f".{file_ext}") as temp:
             file.save(temp.name)
@@ -237,7 +275,7 @@ def update_gallery_image():
         # Obter URL pública
         image_url = supabase.storage.from_(BUCKET_NAME).get_public_url(new_filename)
 
-        # ✅ Usar o ID correto enviado pelo HTML
+        # Atualizar/inserir no banco
         supabase.table('gallery_images').upsert({
             'image_id': image_id,
             'image_url': image_url
@@ -248,6 +286,8 @@ def update_gallery_image():
     except Exception as e:
         print(f"ERRO GERAL: {str(e)}")
         return jsonify({'error': f"Erro no upload: {str(e)}"}), 500
+
+
     
 if __name__ == '__main__':
     app.run(debug=True)

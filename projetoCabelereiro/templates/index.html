@@ -283,36 +283,30 @@
     <script>
       async function applyThemeColor() {
         try {
-          const response = await fetch('/api/theme');
-          const data = await response.json();
-          const color = data.color || '#ffffff';
-    
-          // Pega todos os elementos
-          const singleElements = [
-            document.getElementById('features'),
-            document.getElementById('footer')
-          ];
-    
-          // Aplica a cor nos elementos únicos
-          singleElements.forEach(el => {
-            if (el) {
-              el.style.backgroundColor = color;
-            }
+          const res  = await fetch('/api/theme');
+          const data = await res.json();
+          const secColor  = data.section_color || '#ffffff';
+          const bodyColor = data.body_color    || '#ffffff';
+
+          // Aplica cor da seção
+          ['features', 'footer'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.style.backgroundColor = secColor;
           });
-    
-          // Aplica a cor em TODOS os .testimonial
-          const testimonials = document.querySelectorAll('.testimonial');
-          testimonials.forEach(el => {
-            el.style.backgroundColor = color;
+          document.querySelectorAll('.testimonial').forEach(el => {
+            el.style.backgroundColor = secColor;
           });
-    
+
+          // Aplica cor do body
+          document.body.style.backgroundColor = bodyColor;
+
         } catch (err) {
           console.error('Erro ao aplicar tema:', err);
         }
       }
-    
+
       document.addEventListener('DOMContentLoaded', applyThemeColor);
-    </script>    
+    </script> 
   </body>
 </html>
 

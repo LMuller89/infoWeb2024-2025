@@ -116,6 +116,8 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+/* CONTAINER DE TROCA DE COR SECTION */
+
 #theme-section {
   background: #fff;
   margin-top: 40px;
@@ -137,6 +139,36 @@
 }
 
 #theme-section input[type="color"] {
+  width: 60px;
+  height: 40px;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+/* CONTAINER DE TROCA DE COR BODY */
+
+#body-section {
+  background: #fff;
+  margin-top: 40px;
+  padding: 20px;
+  border-radius: 6px;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#body-section .form-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+#body-section label {
+  font-weight: bold;
+}
+
+#body-section input[type="color"] {
   width: 60px;
   height: 40px;
   border: none;
