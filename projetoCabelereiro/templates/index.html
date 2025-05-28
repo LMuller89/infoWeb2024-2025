@@ -218,22 +218,22 @@
       <div class="headline">Nossas Redes Sociais</div>
       <div id="clients-container">
         <!-- Instagram -->
-        <a href="https://www.instagram.com" target="_blank">
+        <a href="{{ social_links.instagram }}" target="_blank">
           <img src="{{ url_for('static', filename='img/smInsta.png') }}" class="client" alt="Instagram" />
         </a>
       
         <!-- Facebook -->
-        <a href="https://www.facebook.com" target="_blank">
+        <a href="{{ social_links.facebook }}" target="_blank">
           <img src="{{ url_for('static', filename='img/smFace.png') }}" class="client" alt="Facebook" />
         </a>
       
         <!-- Twitter/X -->
-        <a href="https://twitter.com" target="_blank">
+        <a href="{{ social_links.x }}" target="_blank">
           <img src="{{ url_for('static', filename='img/smX.png') }}" class="client" alt="Twitter / X" />
         </a>
       
         <!-- YouTube -->
-        <a href="https://www.youtube.com" target="_blank">
+        <a href="{{ social_links.youtube }}" target="_blank">
           <img src="{{ url_for('static', filename='img/smYt.png') }}" class="client" alt="YouTube" />
         </a>
       </div>
