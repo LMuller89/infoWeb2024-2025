@@ -195,6 +195,82 @@
           });
         </script>
 
+        <section id="social-links-section">
+          <div class="headline">Gerenciar Redes Sociais</div>
+          <div class="form-group">
+            <label for="insta-link">Instagram</label>
+            <input
+              type="url"
+              id="insta-link"
+              placeholder="https://www.instagram.com/seuperfil"
+            />
+          </div>
+          <div class="form-group">
+            <label for="face-link">Facebook</label>
+            <input
+              type="url"
+              id="face-link"
+              placeholder="https://www.facebook.com/seupagina"
+            />
+          </div>
+          <div class="form-group">
+            <label for="x-link">Twitter / X</label>
+            <input
+              type="url"
+              id="x-link"
+              placeholder="https://twitter.com/seuperfil"
+            />
+          </div>
+          <div class="form-group">
+            <label for="yt-link">YouTube</label>
+            <input
+              type="url"
+              id="yt-link"
+              placeholder="https://www.youtube.com/seucanal"
+            />
+          </div>
+          <button id="save-links-btn">Salvar Links</button>
+        </section>
+
+        <script>
+          document
+            .getElementById("save-links-btn")
+            .addEventListener("click", async () => {
+              const links = {
+                instagram: document.getElementById("insta-link").value,
+                facebook: document.getElementById("face-link").value,
+                x: document.getElementById("x-link").value,
+                youtube: document.getElementById("yt-link").value,
+              };
+
+              const res = await fetch("/api/social-links", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(links),
+              });
+
+              const data = await res.json();
+              if (data.message) {
+                alert("Links atualizados com sucesso!");
+              } else {
+                alert("Erro: " + data.error);
+              }
+            });
+
+          // Carregar os links existentes
+          window.addEventListener("DOMContentLoaded", async () => {
+            const res = await fetch("/api/social-links");
+            const data = await res.json();
+            if (data) {
+              document.getElementById("insta-link").value =
+                data.instagram || "";
+              document.getElementById("face-link").value = data.facebook || "";
+              document.getElementById("x-link").value = data.x || "";
+              document.getElementById("yt-link").value = data.youtube || "";
+            }
+          });
+        </script>
+
         {% endif %}
       </div>
     </main>

@@ -9,6 +9,9 @@ from io import BytesIO
 from werkzeug.utils import secure_filename
 from supabase import create_client
 import tempfile
+from flask import Flask, render_template, request, jsonify, redirect, url_for
+from datetime import datetime
+from uuid import uuid4
 
 SUPABASE_URL = "https://vuvuiddlnpppzsyrhmff.supabase.co"
 SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ1dnVpZGRsbnBwcHpzeXJobWZmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NTg2ODQ4NiwiZXhwIjoyMDYxNDQ0NDg2fQ.NLxj4Vbi-EdvQaxlqc6qhRQZ7YpSWXQkGB7m-rRrSJ8"  # use a chave correta aqui
@@ -78,13 +81,34 @@ def index():
         print(f"Erro ao buscar imagens: {e}")
         gallery_images = {}
 
+    # Buscar links sociais
+    try:
+        response = supabase.table('social_links').select('*').limit(1).execute()
+        if response.data:
+            social_links = response.data[0]
+        else:
+            social_links = {
+                'instagram': '#',
+                'facebook': '#',
+                'x': '#',
+                'youtube': '#'
+            }
+    except Exception as e:
+        print(f"Erro ao buscar links sociais: {e}")
+        social_links = {
+            'instagram': '#',
+            'facebook': '#',
+            'x': '#',
+            'youtube': '#'
+        }
+
     return render_template(
         'index.html',
         cor_principal=cor_principal,
         cor_body=cor_body,
-        gallery_images=gallery_images
+        gallery_images=gallery_images,
+        social_links=social_links
     )
-
 
 # Página de registro
 @app.route('/register', methods=['GET', 'POST'])
@@ -286,6 +310,52 @@ def update_gallery_image():
     except Exception as e:
         print(f"ERRO GERAL: {str(e)}")
         return jsonify({'error': f"Erro no upload: {str(e)}"}), 500
+    
+@app.route('/api/social-links', methods=['GET', 'POST'])
+def social_links():
+    if request.method == 'GET':
+        result = supabase.table('social_links').select('*').limit(1).execute()
+        if result.data:
+            return jsonify(result.data[0])
+        else:
+            return jsonify({
+                'instagram': '',
+                'facebook': '',
+                'x': '',
+                'youtube': ''
+            })
+
+    elif request.method == 'POST':
+        try:
+            data = request.get_json()
+
+            # Buscar o ID da única linha existente
+            result = supabase.table('social_links').select('id').limit(1).execute()
+            if result.data:
+                row_id = result.data[0]['id']
+                supabase.table('social_links').update({
+                    'instagram': data.get('instagram', ''),
+                    'facebook': data.get('facebook', ''),
+                    'x': data.get('x', ''),
+                    'youtube': data.get('youtube', ''),
+                    'updated_at': datetime.now().isoformat()  # ✅ Correto
+                }).eq('id', row_id).execute()
+                return jsonify({'message': 'Links atualizados com sucesso!'})
+            else:
+                # Caso não exista ainda, inserir novo
+                supabase.table('social_links').insert([{
+                    'id': str(uuid4()),
+                    'instagram': data.get('instagram', ''),
+                    'facebook': data.get('facebook', ''),
+                    'x': data.get('x', ''),
+                    'youtube': data.get('youtube', ''),
+                    'updated_at': datetime.now().isoformat()  # ✅ Correto
+                }]).execute()
+                return jsonify({'message': 'Links criados com sucesso!'})
+
+        except Exception as e:
+            print(f"Erro no POST /api/social-links: {e}")
+            return jsonify({'error': str(e)}), 500
 
 
     
