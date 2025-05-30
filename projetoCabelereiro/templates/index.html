@@ -214,6 +214,7 @@
       </div>
     </section>
 
+    {% if section_visibility.get('clients') != True %}
     <section id="clients">
       <div class="headline">Nossas Redes Sociais</div>
       <div id="clients-container">
@@ -221,23 +222,27 @@
         <a href="{{ social_links.instagram }}" target="_blank">
           <img src="{{ url_for('static', filename='img/smInsta.png') }}" class="client" alt="Instagram" />
         </a>
-      
+
         <!-- Facebook -->
         <a href="{{ social_links.facebook }}" target="_blank">
           <img src="{{ url_for('static', filename='img/smFace.png') }}" class="client" alt="Facebook" />
         </a>
-      
+
         <!-- Twitter/X -->
         <a href="{{ social_links.x }}" target="_blank">
           <img src="{{ url_for('static', filename='img/smX.png') }}" class="client" alt="Twitter / X" />
         </a>
-      
+
         <!-- YouTube -->
         <a href="{{ social_links.youtube }}" target="_blank">
           <img src="{{ url_for('static', filename='img/smYt.png') }}" class="client" alt="YouTube" />
         </a>
       </div>
     </section>
+    {% endif %}
+
+
+
 
     <!-- Inserção de dados referente ao contato -->
     <section class="localizacao">

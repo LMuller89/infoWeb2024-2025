@@ -64,19 +64,16 @@ def redirect_to_home():
 # Rota principal
 @app.route('/home')
 def index():
-    # Usa a nova função para pegar ambas as cores em cache
+    # Buscar cores do tema
     tema = get_cached_theme()
     cor_principal = tema['section']
     cor_body      = tema['body']
 
+    # Buscar imagens da galeria
     try:
-        # Buscar galeria normalmente
         response = supabase.table('gallery_images').select('*').execute()
         data = response.data or []
         gallery_images = {img['image_id']: img['image_url'] for img in data}
-
-        # DEBUG opcional
-        print("DEBUG: gallery_images =", gallery_images)
     except Exception as e:
         print(f"Erro ao buscar imagens: {e}")
         gallery_images = {}
@@ -84,15 +81,12 @@ def index():
     # Buscar links sociais
     try:
         response = supabase.table('social_links').select('*').limit(1).execute()
-        if response.data:
-            social_links = response.data[0]
-        else:
-            social_links = {
-                'instagram': '#',
-                'facebook': '#',
-                'x': '#',
-                'youtube': '#'
-            }
+        social_links = response.data[0] if response.data else {
+            'instagram': '#',
+            'facebook': '#',
+            'x': '#',
+            'youtube': '#'
+        }
     except Exception as e:
         print(f"Erro ao buscar links sociais: {e}")
         social_links = {
@@ -102,13 +96,28 @@ def index():
             'youtube': '#'
         }
 
+    # Buscar visibilidade de seções
+    try:
+        response = supabase.table('hidden_sections').select('*').execute()
+        section_visibility_rows = response.data or []
+        section_visibility = {row['id']: row['hidden'] for row in section_visibility_rows}
+        print("DEBUG section_visibility:", section_visibility)
+    except Exception as e:
+        print(f"Erro ao buscar visibilidade: {e}")
+        section_visibility = {}
+
+
     return render_template(
         'index.html',
         cor_principal=cor_principal,
         cor_body=cor_body,
         gallery_images=gallery_images,
-        social_links=social_links
+        social_links=social_links,
+        section_visibility=section_visibility  # <-- importante!
     )
+
+
+
 
 # Página de registro
 @app.route('/register', methods=['GET', 'POST'])
@@ -357,6 +366,33 @@ def social_links():
             print(f"Erro no POST /api/social-links: {e}")
             return jsonify({'error': str(e)}), 500
 
+@app.route('/api/section-visibility', methods=['GET', 'POST'])
+def section_visibility():
+    if request.method == 'GET':
+        try:
+            result = supabase.table('hidden_sections').select('*').execute()
+            if result.data:
+                visibility = {row['id']: row['hidden'] for row in result.data}
+            else:
+                visibility = {}
+            return jsonify(visibility)
+        except Exception as e:
+            print(f"Erro ao buscar visibilidade: {e}")
+            return jsonify({}), 500
+
+    elif request.method == 'POST':
+        try:
+            data = request.get_json()
+            for section_id, hidden in data.items():
+                supabase.table('hidden_sections').upsert({
+                    'id': section_id,
+                    'hidden': hidden,
+                    'updated_at': datetime.now().isoformat()
+                }).execute()
+            return jsonify({'message': 'Visibilidade atualizada!'})
+        except Exception as e:
+            print(f"Erro ao atualizar visibilidade: {e}")
+            return jsonify({'error': str(e)}), 500
 
     
 if __name__ == '__main__':

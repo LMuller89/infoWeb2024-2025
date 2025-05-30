@@ -197,6 +197,7 @@
 
         <section id="social-links-section">
           <div class="headline">Gerenciar Redes Sociais</div>
+
           <div class="form-group">
             <label for="insta-link">Instagram</label>
             <input
@@ -205,6 +206,7 @@
               placeholder="https://www.instagram.com/seuperfil"
             />
           </div>
+
           <div class="form-group">
             <label for="face-link">Facebook</label>
             <input
@@ -213,6 +215,7 @@
               placeholder="https://www.facebook.com/seupagina"
             />
           </div>
+
           <div class="form-group">
             <label for="x-link">Twitter / X</label>
             <input
@@ -221,6 +224,7 @@
               placeholder="https://twitter.com/seuperfil"
             />
           </div>
+
           <div class="form-group">
             <label for="yt-link">YouTube</label>
             <input
@@ -229,10 +233,19 @@
               placeholder="https://www.youtube.com/seucanal"
             />
           </div>
+
+          <div class="form-group">
+            <label>
+              <input type="checkbox" id="toggle-clients" />
+              Esconder Seção
+            </label>
+          </div>
+
           <button id="save-links-btn">Salvar Links</button>
         </section>
 
         <script>
+          // Salvar os links das redes sociais
           document
             .getElementById("save-links-btn")
             .addEventListener("click", async () => {
@@ -257,18 +270,41 @@
               }
             });
 
-          // Carregar os links existentes
+          // Carregar links e visibilidade ao abrir a página
           window.addEventListener("DOMContentLoaded", async () => {
-            const res = await fetch("/api/social-links");
-            const data = await res.json();
-            if (data) {
-              document.getElementById("insta-link").value =
-                data.instagram || "";
-              document.getElementById("face-link").value = data.facebook || "";
-              document.getElementById("x-link").value = data.x || "";
-              document.getElementById("yt-link").value = data.youtube || "";
+            try {
+              const resLinks = await fetch("/api/social-links");
+              const dataLinks = await resLinks.json();
+              if (dataLinks) {
+                document.getElementById("insta-link").value =
+                  dataLinks.instagram || "";
+                document.getElementById("face-link").value =
+                  dataLinks.facebook || "";
+                document.getElementById("x-link").value = dataLinks.x || "";
+                document.getElementById("yt-link").value =
+                  dataLinks.youtube || "";
+              }
+
+              const visRes = await fetch("/api/section-visibility");
+              const visData = await visRes.json();
+              document.getElementById("toggle-clients").checked =
+                visData.clients === true;
+            } catch (err) {
+              console.error("Erro ao carregar dados:", err);
             }
           });
+
+          // Atualizar visibilidade da seção ao marcar/desmarcar
+          document
+            .getElementById("toggle-clients")
+            .addEventListener("change", async (e) => {
+              const updated = { clients: e.target.checked };
+              await fetch("/api/section-visibility", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(updated),
+              });
+            });
         </script>
 
         {% endif %}
