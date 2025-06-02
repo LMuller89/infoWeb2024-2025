@@ -292,3 +292,62 @@
 #save-links-btn:hover {
   background-color: #333;
 }
+
+/* ============================
+   Estilos para o container que edita o Google Maps
+   ============================ */
+.map-config-container {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1.5rem;
+  max-width: 600px; /* largura máxima menor que antes */
+  width: 90%; /* responsivo, ocupa até 90% do pai */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  margin: 2rem auto; /* top/bottom 2rem e centralizado horizontalmente */
+}
+
+.map-config-container h2 {
+  margin-top: 0;
+  font-size: 1.25rem;
+  color: #333;
+}
+
+.map-config-container label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+  color: #555;
+}
+
+/* Input de texto para a URL */
+.map-config-container input#map_url {
+  width: 100%;
+  font-family: monospace;
+  font-size: 0.9rem;
+  padding: 0.5rem;
+  border: 1px solid #bbb;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+
+  /* Forçar truncamento em uma única linha */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Botão de salvar */
+.map-config-container button {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.map-config-container button:hover {
+  background-color: #0056b3;
+}

@@ -254,16 +254,22 @@
     <!-- Inserção de dados referente ao contato -->
     <section class="localizacao">
       <div class="mapa">
-        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3628.8976439762773!2d-54.07716702382809!3d-24.558198978127873!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94f3800de3558881%3A0xc56e603befd6fe31!2sR.%20Santa%20Catarina%2C%205736%20-%20Vila%20Ga%C3%BAcha%2C%20Mal.%20C%C3%A2ndido%20Rondon%20-%20PR%2C%2085960-000!5e0!3m2!1spt-BR!2sbr!4v1740765858801!5m2!1spt-BR!2sbr"
-          width="854"
-          height="540"
-          style="border:0;"
-          allowfullscreen=""
-          loading="lazy"
-          referrerpolicy="no-referrer-when-downgrade">
-        </iframe>
+        {% if map_url %}
+          <iframe
+            src="{{ map_url }}"
+            width="854"
+            height="540"
+            style="border:0;"
+            allowfullscreen=""
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade">
+          </iframe>
+        {% else %}
+          <p>Mapa não configurado.</p>
+        {% endif %}
       </div>
     </section>
+
   
     <section id="contact">
       <div class="headline">Entre em Contato</div>

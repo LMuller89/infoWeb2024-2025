@@ -367,6 +367,26 @@
             });
         </script>
 
+        <!-- ======================
+     Container para editar a URL do Google Maps
+     ====================== -->
+        <!-- Dentro do admin.html, no local onde você quer que apareça o container -->
+        <div class="map-config-container">
+          <h2>Configurar Google Maps</h2>
+          <form action="{{ url_for('admin_map') }}" method="post">
+            <label for="map_url">URL do Iframe do Google Maps:</label>
+            <input
+              type="text"
+              name="map_url"
+              id="map_url"
+              value="{{ map_url_atual }}"
+              placeholder="Cole aqui a URL completa do iframe..."
+              required
+            />
+            <button type="submit">Salvar novo mapa</button>
+          </form>
+        </div>
+
         {% endif %}
       </div>
     </main>

@@ -57,19 +57,22 @@ app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', 'mysecretkey')  # Recomendação: usar variável de ambiente
 
 # Redirecionamento da raiz para /home
+
+# Redirecionamento da raiz para /home
 @app.route('/')
 def redirect_to_home():
     return redirect(url_for('index'))
+
 
 # Rota principal
 @app.route('/home')
 def index():
     # 1) Buscar cores do tema (sem alterações)
-    tema = get_cached_theme()
+    tema = get_cached_theme()            # <-- sua função existente
     cor_principal = tema['section']
     cor_body      = tema['body']
 
-    # 2) Buscar imagens da galeria (igual ao que já estava)
+    # 2) Buscar imagens da galeria
     try:
         response = supabase.table('gallery_images').select('*').execute()
         data = response.data or []
@@ -78,7 +81,7 @@ def index():
         print(f"Erro ao buscar imagens: {e}")
         gallery_images = {}
 
-    # 3) Buscar links sociais (igual ao que já estava)
+    # 3) Buscar links sociais
     try:
         response = supabase.table('social_links').select('*').limit(1).execute()
         social_links = response.data[0] if response.data else {
@@ -101,43 +104,48 @@ def index():
         response = supabase.table('hidden_sections').select('*').execute()
         rows = response.data or []
 
-        # Vamos montar um dicionário com as duas chaves:
-        #   section_visibility['clients'] = <boolean>
-        #   section_visibility['gallery'] = <'none'|'partial'|'full'>
-        section_visibility = {
-            'clients': False,   # padrão, caso não exista no banco
-            'gallery': 'full'   # padrão, caso não exista no banco
-        }
-
-        for row in rows:
-            sid = row.get('id')
-            if sid == 'clients':
-                # Se existir row['hidden'], ou false se não veio
-                section_visibility['clients'] = bool(row.get('hidden', False))
-            elif sid == 'gallery':
-                # Se existir row['gallery_visibility'], usa‑o; senão, 'full'
-                section_visibility['gallery'] = row.get('gallery_visibility') or 'full'
-
-        print("DEBUG section_visibility:", section_visibility)
-
-    except Exception as e:
-        print(f"Erro ao buscar visibilidade: {e}")
-        # Se der erro, continua com os valores padrão
         section_visibility = {
             'clients': False,
             'gallery': 'full'
         }
 
-    # 5) Renderiza o template passando tudo
+        for row in rows:
+            sid = row.get('id')
+            if sid == 'clients':
+                section_visibility['clients'] = bool(row.get('hidden', False))
+            elif sid == 'gallery':
+                section_visibility['gallery'] = row.get('gallery_visibility') or 'full'
+
+        print("DEBUG section_visibility:", section_visibility)
+    except Exception as e:
+        print(f"Erro ao buscar visibilidade: {e}")
+        section_visibility = {
+            'clients': False,
+            'gallery': 'full'
+        }
+
+    # 5) Buscar o map_url na tabela settingsmap
+    try:
+        resp_map = supabase.table('settingsmap').select('map_url').eq('id', 1).execute()
+        data_map = resp_map.data
+        if data_map and len(data_map) > 0:
+            map_url = data_map[0]['map_url']
+        else:
+            map_url = ""
+    except Exception as e:
+        print(f"Erro ao buscar map_url: {e}")
+        map_url = ""
+
+    # 6) Renderiza o template passando tudo
     return render_template(
         'index.html',
         cor_principal=cor_principal,
         cor_body=cor_body,
         gallery_images=gallery_images,
         social_links=social_links,
-        section_visibility=section_visibility
+        section_visibility=section_visibility,
+        map_url=map_url
     )
-
 
 # Admin protegida
 @app.route('/admin')
@@ -458,6 +466,62 @@ def section_visibility():
         except Exception as e:
             print(f"Erro ao atualizar visibilidade: {e}")
             return jsonify({'error': str(e)}), 500
+        
+# --- INÍCIO: rota separada /admin/map para editar o Google Maps --- #
+@app.route('/admin/map', methods=['GET', 'POST'])
+def admin_map():
+    # (1) Mesmo critério de autenticação que /admin
+    logged_in = 'user_id' in session
+
+    # (2) Se veio via POST, atualiza o map_url
+    if request.method == 'POST':
+        nova_url = request.form.get("map_url", "").strip()
+        if nova_url:
+            try:
+                supabase.table("settingsmap") \
+                    .update({"map_url": nova_url}) \
+                    .eq("id", 1) \
+                    .execute()
+                print("DEBUG: map_url atualizado para:", nova_url)
+            except Exception as e:
+                print(f"Erro ao atualizar map_url: {e}")
+        # Redireciona de volta para a mesma tela em GET
+        return redirect(url_for('admin_map'))
+
+    # (3) Se for GET, buscamos primeiro os gallery_images (igual /admin)
+    try:
+        response = supabase.table('gallery_images').select('*').execute()
+        data = response.data or []
+        gallery_images = {img['image_id']: img['image_url'] for img in data}
+    except Exception as e:
+        print(f"Erro ao buscar imagens no admin_map: {e}")
+        gallery_images = {}
+
+    # (4) Agora buscamos o map_url atual na tabela settingsmap
+    try:
+        resp_map = supabase.table("settingsmap") \
+            .select("map_url") \
+            .eq("id", 1) \
+            .execute()
+        data_map = resp_map.data
+        print("DEBUG: data_map retornado pelo Supabase:", data_map)
+        if data_map and len(data_map) > 0:
+            map_url_atual = data_map[0]["map_url"] or ""
+        else:
+            map_url_atual = ""
+    except Exception as e:
+        print(f"Erro ao buscar map_url no admin_map (GET): {e}")
+        map_url_atual = ""
+
+    # (5) Passa EXATAMENTE as mesmas variáveis de /admin, mais map_url_atual
+    return render_template(
+        'admin.html',
+        logged_in=logged_in,
+        gallery_images=gallery_images,
+        map_url_atual=map_url_atual
+    )
+
+
 
 
     
