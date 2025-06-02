@@ -12,9 +12,6 @@ import tempfile
 from flask import Flask, render_template, request, jsonify, redirect, url_for
 from datetime import datetime
 from uuid import uuid4
-from flask import Flask, request, jsonify, render_template
-from supabase import create_client, Client
-from datetime import datetime
 
 SUPABASE_URL = "https://vuvuiddlnpppzsyrhmff.supabase.co"
 SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ1dnVpZGRsbnBwcHpzeXJobWZmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NTg2ODQ4NiwiZXhwIjoyMDYxNDQ0NDg2fQ.NLxj4Vbi-EdvQaxlqc6qhRQZ7YpSWXQkGB7m-rRrSJ8"  # use a chave correta aqui
