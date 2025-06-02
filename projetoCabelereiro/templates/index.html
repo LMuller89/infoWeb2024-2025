@@ -167,10 +167,15 @@
     </div>
     <div class="orcamento"><h3>Faça seu orçamento sem compromisso!</h3></div>
 
-      <section id="gallery">
-        <div class="headline">Galeria</div>
-        <div id="gallery-container">
-        {% for i in range(1,7) %}
+    {% if section_visibility.get('gallery') != 'none' %}
+    <section id="gallery">
+      <div class="headline">Galeria</div>
+      <div id="gallery-container">
+        {% set max_images = 6 %}
+        {% if section_visibility.get('gallery') == 'partial' %}
+          {% set max_images = 3 %}
+        {% endif %}
+        {% for i in range(1, max_images + 1) %}
           {% set url = gallery_images['image-' ~ i] %}
           {% if url %}
             <img src="{{ url }}"
@@ -182,8 +187,10 @@
             <div class="empty-image-placeholder"></div>
           {% endif %}
         {% endfor %}
-        </div>
-      </section>
+      </div>
+    </section>
+    {% endif %}
+
       
       <!-- exibir a imagem em tela cheia -->
       <div id="modal" class="modal" onclick="closeModal()">

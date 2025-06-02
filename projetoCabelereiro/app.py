@@ -64,12 +64,12 @@ def redirect_to_home():
 # Rota principal
 @app.route('/home')
 def index():
-    # Buscar cores do tema
+    # 1) Buscar cores do tema (sem alterações)
     tema = get_cached_theme()
     cor_principal = tema['section']
     cor_body      = tema['body']
 
-    # Buscar imagens da galeria
+    # 2) Buscar imagens da galeria (igual ao que já estava)
     try:
         response = supabase.table('gallery_images').select('*').execute()
         data = response.data or []
@@ -78,7 +78,7 @@ def index():
         print(f"Erro ao buscar imagens: {e}")
         gallery_images = {}
 
-    # Buscar links sociais
+    # 3) Buscar links sociais (igual ao que já estava)
     try:
         response = supabase.table('social_links').select('*').limit(1).execute()
         social_links = response.data[0] if response.data else {
@@ -96,28 +96,70 @@ def index():
             'youtube': '#'
         }
 
-    # Buscar visibilidade de seções
+    # 4) Buscar visibilidade de seções (clients e gallery)
     try:
         response = supabase.table('hidden_sections').select('*').execute()
-        section_visibility_rows = response.data or []
-        section_visibility = {row['id']: row['hidden'] for row in section_visibility_rows}
+        rows = response.data or []
+
+        # Vamos montar um dicionário com as duas chaves:
+        #   section_visibility['clients'] = <boolean>
+        #   section_visibility['gallery'] = <'none'|'partial'|'full'>
+        section_visibility = {
+            'clients': False,   # padrão, caso não exista no banco
+            'gallery': 'full'   # padrão, caso não exista no banco
+        }
+
+        for row in rows:
+            sid = row.get('id')
+            if sid == 'clients':
+                # Se existir row['hidden'], ou false se não veio
+                section_visibility['clients'] = bool(row.get('hidden', False))
+            elif sid == 'gallery':
+                # Se existir row['gallery_visibility'], usa‑o; senão, 'full'
+                section_visibility['gallery'] = row.get('gallery_visibility') or 'full'
+
         print("DEBUG section_visibility:", section_visibility)
+
     except Exception as e:
         print(f"Erro ao buscar visibilidade: {e}")
-        section_visibility = {}
+        # Se der erro, continua com os valores padrão
+        section_visibility = {
+            'clients': False,
+            'gallery': 'full'
+        }
 
-
+    # 5) Renderiza o template passando tudo
     return render_template(
         'index.html',
         cor_principal=cor_principal,
         cor_body=cor_body,
         gallery_images=gallery_images,
         social_links=social_links,
-        section_visibility=section_visibility  # <-- importante!
+        section_visibility=section_visibility
     )
 
 
+# Admin protegida
+@app.route('/admin')
+def admin():
+    print("Session data:", session)
+    logged_in = 'user_id' in session
 
+    try:
+        # Buscar dados da tabela gallery_images com image_id e image_url
+        response = supabase.table('gallery_images').select('*').execute()
+        data = response.data if response.data else []
+
+        # Mapear corretamente pelo ID (ex: 'image-1', 'image-2', etc.)
+        gallery_images = {img['image_id']: img['image_url'] for img in data}
+
+    except Exception as e:
+        print(f"Erro ao buscar imagens: {str(e)}")
+        gallery_images = {}
+
+    return render_template('admin.html',
+                           logged_in=logged_in,
+                           gallery_images=gallery_images)
 
 # Página de registro
 @app.route('/register', methods=['GET', 'POST'])
@@ -142,29 +184,6 @@ def register():
     
     # Se for GET, exibe a página de registro
     return render_template('register.html')
-
-# Admin protegida
-@app.route('/admin')
-def admin():
-    print("Session data:", session)
-    logged_in = 'user_id' in session
-
-    try:
-        # Buscar dados da tabela gallery_images com image_id e image_url
-        response = supabase.table('gallery_images').select('*').execute()
-        data = response.data if response.data else []
-
-        # Mapear corretamente pelo ID (ex: 'image-1', 'image-2', etc.)
-        gallery_images = {img['image_id']: img['image_url'] for img in data}
-
-    except Exception as e:
-        print(f"Erro ao buscar imagens: {str(e)}")
-        gallery_images = {}
-
-    return render_template('admin.html',
-                           logged_in=logged_in,
-                           gallery_images=gallery_images)
-
 
 # Logout
 @app.route('/logout')
@@ -368,31 +387,78 @@ def social_links():
 
 @app.route('/api/section-visibility', methods=['GET', 'POST'])
 def section_visibility():
+    # retorna estado atual de *clients* e *gallery*
+
     if request.method == 'GET':
         try:
             result = supabase.table('hidden_sections').select('*').execute()
+            vis = {}
             if result.data:
-                visibility = {row['id']: row['hidden'] for row in result.data}
+                for row in result.data:
+                    section_id = row.get('id')
+                    # Se for clients, devolve o booleano de 'hidden'
+                    if section_id == 'clients':
+                        vis['clients'] = bool(row.get('hidden', False))
+                    # Se for gallery, devolve a string de 'gallery_visibility'
+                    elif section_id == 'gallery':
+                        # Se estiver nulo, retornar valor padrão 'full'
+                        vis['gallery'] = row.get('gallery_visibility') or 'full'
+                # Se não existir linha para 'clients' ou 'gallery', adiciona valores padrão:
+                if 'clients' not in vis:
+                    vis['clients'] = False
+                if 'gallery' not in vis:
+                    vis['gallery'] = 'full'
             else:
-                visibility = {}
-            return jsonify(visibility)
+                # Se a tabela estiver vazia, assume clientes visível e galeria em 'full'
+                vis = {
+                    'clients': False,
+                    'gallery': 'full'
+                }
+            return jsonify(vis)
         except Exception as e:
             print(f"Erro ao buscar visibilidade: {e}")
             return jsonify({}), 500
 
+    # atualiza *clients* e/ou *gallery* JSON de entrada pode ter: { "clients": <true|false> } e/ou { "gallery": "<none|partial|full>" }
+    
     elif request.method == 'POST':
         try:
-            data = request.get_json()
-            for section_id, hidden in data.items():
+            data = request.get_json() or {}
+            # No mínimo deve haver a chave 'clients' ou 'gallery' no JSON
+            if not any(key in data for key in ('clients', 'gallery')):
+                return jsonify({'error': "Envie 'clients' ou 'gallery' no corpo."}), 400
+
+            # 2.1) Se vier valor para clients, faz upsert em hidden
+            if 'clients' in data:
+                valor_clients = data['clients']
+                try:
+                    ocultar = bool(valor_clients)
+                except:
+                    return jsonify({'error': "Valor inválido para 'clients' (deve ser true/false)."}), 400
+
                 supabase.table('hidden_sections').upsert({
-                    'id': section_id,
-                    'hidden': hidden,
+                    'id': 'clients',
+                    'hidden': ocultar,
                     'updated_at': datetime.now().isoformat()
-                }).execute()
+                }, on_conflict='id').execute()
+
+            # 2.2) Se vier valor para gallery, faz upsert em gallery_visibility
+            if 'gallery' in data:
+                modo = data['gallery']
+                if modo not in ('none', 'partial', 'full'):
+                    return jsonify({'error': "Valor inválido para 'gallery' (use 'none', 'partial' ou 'full')."}), 400
+
+                supabase.table('hidden_sections').upsert({
+                    'id': 'gallery',
+                    'gallery_visibility': modo,
+                    'updated_at': datetime.now().isoformat()
+                }, on_conflict='id').execute()
+
             return jsonify({'message': 'Visibilidade atualizada!'})
         except Exception as e:
             print(f"Erro ao atualizar visibilidade: {e}")
             return jsonify({'error': str(e)}), 500
+
 
     
 if __name__ == '__main__':

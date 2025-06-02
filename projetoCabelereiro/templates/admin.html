@@ -135,9 +135,26 @@
             });
         </script>
 
-        <!-- Substitua a seção gallery-admin-section por: -->
         <section id="gallery-admin-section">
-          <h3>Gerenciar Galeria</h3>
+          <div style="display: flex; align-items: center; gap: 16px">
+            <h3>Gerenciar Galeria</h3>
+
+            <label>
+              <input type="radio" name="gallery-visibility" value="none" />
+              Esconder Seção
+            </label>
+
+            <label>
+              <input type="radio" name="gallery-visibility" value="partial" />
+              Mostrar 3 imagens
+            </label>
+
+            <label>
+              <input type="radio" name="gallery-visibility" value="full" />
+              Mostrar todas
+            </label>
+          </div>
+
           {% for i in range(1,7) %}
           <div class="gallery-admin-item">
             <label>Posição {{ i }}:</label>
@@ -162,14 +179,14 @@
               const file = e.target.files[0];
               const imageId = this.dataset.imageId;
               const preview =
-                this.parentElement.querySelector(".image-preview"); // Selecionar corretamente
+                this.parentElement.querySelector(".image-preview");
               const status = this.parentElement.querySelector(".upload-status");
 
               if (!file) return;
 
               const formData = new FormData();
               formData.append("image", file);
-              formData.append("image_id", imageId); // Garantir envio do ID
+              formData.append("image_id", imageId);
 
               try {
                 status.textContent = "Enviando...";
@@ -183,15 +200,58 @@
                 if (!response.ok)
                   throw new Error(result.error || "Falha no upload");
 
-                // Atualizar preview com cache-busting
+                // Atualizar preview com cache‐busting
                 preview.src = result.new_url;
                 status.textContent = "✔️ Atualizado!";
                 setTimeout(() => (status.textContent = ""), 2000);
               } catch (error) {
+                // 👇 Aqui a correção: usar crases para template literal
                 status.textContent = `Erro: ${error.message}`;
                 status.style.color = "red";
               }
             });
+          });
+
+          // Atualizar visibilidade da galeria
+          document
+            .querySelectorAll("input[name='gallery-visibility']")
+            .forEach((radio) => {
+              radio.addEventListener("change", async (e) => {
+                const visibility = e.target.value; // 'none' | 'partial' | 'full'
+                try {
+                  const response = await fetch("/api/section-visibility", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ gallery: visibility }),
+                  });
+                  if (!response.ok) {
+                    const erro = await response.json();
+                    console.error("Erro ao atualizar gallery:", erro);
+                  }
+                } catch (err) {
+                  console.error(
+                    "Falha ao chamar /api/section-visibility:",
+                    err
+                  );
+                }
+              });
+            });
+          // Carregar visibilidade ao abrir a página
+          window.addEventListener("DOMContentLoaded", async () => {
+            try {
+              const visRes = await fetch("/api/section-visibility");
+              const visData = await visRes.json();
+              const currentGalleryVis = visData.gallery || "full";
+
+              const radios = document.querySelectorAll(
+                "input[name='gallery-visibility']"
+              );
+              radios.forEach((radio) => {
+                radio.checked = radio.value === currentGalleryVis;
+              });
+            } catch (err) {
+              console.error("Erro ao carregar visibilidade:", err);
+            }
           });
         </script>
 
