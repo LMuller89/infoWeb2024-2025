@@ -251,24 +251,27 @@
 
 
 
-    <!-- Inserção de dados referente ao contato -->
-    <section class="localizacao">
-      <div class="mapa">
-        {% if map_url %}
-          <iframe
-            src="{{ map_url }}"
-            width="854"
-            height="540"
-            style="border:0;"
-            allowfullscreen=""
-            loading="lazy"
-            referrerpolicy="no-referrer-when-downgrade">
-          </iframe>
-        {% else %}
-          <p>Mapa não configurado.</p>
-        {% endif %}
-      </div>
-    </section>
+    {% if not section_visibility.localizacao %}
+      <!-- Inserção de dados referente ao contato -->
+      <section class="localizacao">
+        <div class="mapa">
+          {% if map_url %}
+            <iframe
+              src="{{ map_url }}"
+              width="854"
+              height="540"
+              style="border:0;"
+              allowfullscreen=""
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
+          {% else %}
+            <p>Mapa não configurado.</p>
+          {% endif %}
+        </div>
+      </section>
+    {% endif %}
+
 
   
     <section id="contact">

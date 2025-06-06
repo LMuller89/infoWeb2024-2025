@@ -65,6 +65,7 @@ def redirect_to_home():
 
 
 # Rota principal
+# Rota principal
 @app.route('/home')
 def index():
     # 1) Buscar cores do tema (sem alterações)
@@ -99,14 +100,15 @@ def index():
             'youtube': '#'
         }
 
-    # 4) Buscar visibilidade de seções (clients e gallery)
+    # 4) Buscar visibilidade de seções (clients, gallery, localizacao)
     try:
         response = supabase.table('hidden_sections').select('*').execute()
         rows = response.data or []
 
         section_visibility = {
             'clients': False,
-            'gallery': 'full'
+            'gallery': 'full',
+            'localizacao': False
         }
 
         for row in rows:
@@ -115,13 +117,16 @@ def index():
                 section_visibility['clients'] = bool(row.get('hidden', False))
             elif sid == 'gallery':
                 section_visibility['gallery'] = row.get('gallery_visibility') or 'full'
+            elif sid == 'localizacao':
+                section_visibility['localizacao'] = bool(row.get('hidden', False))
 
         print("DEBUG section_visibility:", section_visibility)
     except Exception as e:
         print(f"Erro ao buscar visibilidade: {e}")
         section_visibility = {
             'clients': False,
-            'gallery': 'full'
+            'gallery': 'full',
+            'localizacao': False
         }
 
     # 5) Buscar o map_url na tabela settingsmap
@@ -144,8 +149,10 @@ def index():
         gallery_images=gallery_images,
         social_links=social_links,
         section_visibility=section_visibility,
-        map_url=map_url
+        map_url=map_url,
+        localizacao_hidden=section_visibility.get('localizacao', False)
     )
+
 
 # Admin protegida
 @app.route('/admin')
@@ -404,18 +411,20 @@ def section_visibility():
             if result.data:
                 for row in result.data:
                     section_id = row.get('id')
-                    # Se for clients, devolve o booleano de 'hidden'
                     if section_id == 'clients':
                         vis['clients'] = bool(row.get('hidden', False))
-                    # Se for gallery, devolve a string de 'gallery_visibility'
                     elif section_id == 'gallery':
-                        # Se estiver nulo, retornar valor padrão 'full'
                         vis['gallery'] = row.get('gallery_visibility') or 'full'
-                # Se não existir linha para 'clients' ou 'gallery', adiciona valores padrão:
+                    elif section_id == 'localizacao':
+                        vis['localizacao'] = bool(row.get('hidden', False))
+
                 if 'clients' not in vis:
                     vis['clients'] = False
                 if 'gallery' not in vis:
                     vis['gallery'] = 'full'
+                if 'localizacao' not in vis:
+                    vis['localizacao'] = False
+
             else:
                 # Se a tabela estiver vazia, assume clientes visível e galeria em 'full'
                 vis = {
@@ -432,9 +441,10 @@ def section_visibility():
     elif request.method == 'POST':
         try:
             data = request.get_json() or {}
-            # No mínimo deve haver a chave 'clients' ou 'gallery' no JSON
-            if not any(key in data for key in ('clients', 'gallery')):
-                return jsonify({'error': "Envie 'clients' ou 'gallery' no corpo."}), 400
+            # No mínimo deve haver a chave 'clients', 'gallery' ou 'localizacao' no JSON
+            if not any(key in data for key in ('clients', 'gallery', 'localizacao')):
+                return jsonify({'error': "Envie 'clients', 'gallery' ou 'localizacao' no corpo."}), 400
+
 
             # 2.1) Se vier valor para clients, faz upsert em hidden
             if 'clients' in data:
@@ -461,6 +471,22 @@ def section_visibility():
                     'gallery_visibility': modo,
                     'updated_at': datetime.now().isoformat()
                 }, on_conflict='id').execute()
+
+            # 2.3) Se vier valor para localizacao, faz upsert em hidden
+            if 'localizacao' in data:
+                valor_loc = data['localizacao']
+                try:
+                    ocultar = bool(valor_loc)
+                except:
+                    return jsonify({'error': "Valor inválido para 'localizacao' (deve ser true/false)."}), 400
+
+                supabase.table('hidden_sections').upsert({
+                    'id': 'localizacao',
+                    'hidden': ocultar,
+                    'updated_at': datetime.now().isoformat()
+                }, on_conflict='id').execute()
+
+
 
             return jsonify({'message': 'Visibilidade atualizada!'})
         except Exception as e:
