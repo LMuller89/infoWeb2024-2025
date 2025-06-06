@@ -367,13 +367,10 @@
             });
         </script>
 
-        <!-- ======================
-     Container para editar a URL do Google Maps
-     ====================== -->
-        <!-- Dentro do admin.html, no local onde você quer que apareça o container -->
+        <!-- Container para editar a URL do Google Maps -->
         <div class="map-config-container">
           <h2>Configurar Google Maps</h2>
-          <form action="{{ url_for('admin_map') }}" method="post">
+          <form id="map-form" action="{{ url_for('admin_map') }}" method="post">
             <label for="map_url">URL do Iframe do Google Maps:</label>
             <input
               type="text"
@@ -383,9 +380,63 @@
               placeholder="Cole aqui a URL completa do iframe..."
               required
             />
+
+            <!-- Nova checkbox para esconder a seção -->
+            <label
+              style="
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                margin-top: 10px;
+              "
+            >
+              <input
+                type="checkbox"
+                id="hide-localizacao"
+                name="hide_localizacao"
+              />
+              Esconder Seção
+            </label>
+
             <button type="submit">Salvar novo mapa</button>
           </form>
         </div>
+
+        <script>
+          // Quando a página carregar, marca checkbox conforme visibilidade atual
+          window.addEventListener("DOMContentLoaded", async () => {
+            try {
+              const visRes = await fetch("/api/section-visibility");
+              const visData = await visRes.json();
+              document.getElementById("hide-localizacao").checked =
+                visData.localizacao === true;
+            } catch (err) {
+              console.error("Erro ao carregar visibilidade:", err);
+            }
+          });
+
+          // Atualiza a visibilidade quando o checkbox mudar
+          document
+            .getElementById("hide-localizacao")
+            .addEventListener("change", async (e) => {
+              const updated = { localizacao: e.target.checked };
+              try {
+                const res = await fetch("/api/section-visibility", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify(updated),
+                });
+                if (!res.ok) {
+                  console.error(
+                    "Erro ao atualizar visibilidade:",
+                    await res.text()
+                  );
+                }
+              } catch (err) {
+                console.error("Erro na requisição:", err);
+              }
+            });
+        </script>
 
         {% endif %}
       </div>
