@@ -112,60 +112,26 @@
     </section>
 
     <!-- Inserido novo modelo de lista -->
-    <div id="testimonials">
-      <div class="headline1">Nossos Serviços</div>
-      <div id="testimonials-container">
-        <div class="testimonial">
-          <img src="{{ url_for('static', filename='img/person-1.jpeg') }}" alt="" class="testimonial-image" />
-          <span class="testimonial-title">Tratamentos Capilares</span>
-          <div class="testimonial-info">
-            <ul>
-              <li>Escova</li>
-              <li>Corte</li>
-              <li>Mechas</li>
-              <li>Luzes</li>
-              <li>Botox</li>
-              <li>Progressiva</li>
-              <li>Penteados</li>
-            </ul>
-            <ul>
-              <li>Selagem</li>
-              <li>Cauterização</li>
-              <li>Tintura</li>
-              <li>Reconstrução</li>
-              <li>Descoloração</li>
-              <li>Desintoxicação capilar</li>
-              <li>Corte e Barba (Barba terapia)</li>
-            </ul>
-          </div>
-        </div>
-        <div class="testimonial">
-          <img src="{{ url_for('static', filename='img/person-1.jpeg') }}" alt="" class="testimonial-image" />
-          <span class="testimonial-title">Tratamentos Capilares</span>
-          <div class="testimonial-info">
-            <ul>
-              <li>Escova</li>
-              <li>Corte</li>
-              <li>Mechas</li>
-              <li>Luzes</li>
-              <li>Botox</li>
-              <li>Progressiva</li>
-              <li>Penteados</li>
-            </ul>
-            <ul>
-              <li>Selagem</li>
-              <li>Cauterização</li>
-              <li>Tintura</li>
-              <li>Reconstrução</li>
-              <li>Descoloração</li>
-              <li>Desintoxicação capilar</li>
-              <li>Corte e Barba (Barba terapia)</li>
-            </ul>
-          </div>
+<div id="testimonials">
+  <div class="headline1">Nossos Serviços</div>
+  <div id="testimonials-container">
+    {% for f in funcionarios %}
+      <div class="testimonial">
+        <img src="{{ f.foto_url }}" alt="" class="testimonial-image" />
+        <h4 style="margin-top: 5px;">{{ f.nome }}</h4>
+        <div class="testimonial-info">
+          <ul>
+            {% for item in f.servicos %}
+              <li>{{ servicos_lookup[item.servico_id] }} — R$ {{ '%.2f'|format(item.preco) }}</li>
+            {% endfor %}
+          </ul>
         </div>
       </div>
-    </div>
-    <div class="orcamento"><h3>Faça seu orçamento sem compromisso!</h3></div>
+    {% endfor %}
+  </div>
+</div>
+
+
 
     {% if section_visibility.get('gallery') != 'none' %}
     <section id="gallery">
