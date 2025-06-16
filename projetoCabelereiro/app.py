@@ -12,6 +12,9 @@ import tempfile
 from flask import Flask, render_template, request, jsonify, redirect, url_for
 from datetime import datetime
 from uuid import uuid4
+import uuid
+import re
+import json
 
 SUPABASE_URL = "https://vuvuiddlnpppzsyrhmff.supabase.co"
 SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ1dnVpZGRsbnBwcHpzeXJobWZmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NTg2ODQ4NiwiZXhwIjoyMDYxNDQ0NDg2fQ.NLxj4Vbi-EdvQaxlqc6qhRQZ7YpSWXQkGB7m-rRrSJ8"  # use a chave correta aqui
@@ -69,7 +72,7 @@ def redirect_to_home():
 @app.route('/home')
 def index():
     # 1) Buscar cores do tema (sem alterações)
-    tema = get_cached_theme()            # <-- sua função existente
+    tema = get_cached_theme()
     cor_principal = tema['section']
     cor_body      = tema['body']
 
@@ -141,7 +144,24 @@ def index():
         print(f"Erro ao buscar map_url: {e}")
         map_url = ""
 
-    # 6) Renderiza o template passando tudo
+    # 6) Buscar funcionários e serviços (funcionarios_servicos)
+    try:
+        response = supabase.table('funcionarios_servicos').select('*').limit(6).execute()
+        funcionarios = response.data or []
+    except Exception as e:
+        print(f"Erro ao buscar funcionários: {e}")
+        funcionarios = []
+
+    # 7) Buscar lista de serviços para montar lookup
+    try:
+        resp_servicos = supabase.table('servicos').select('id, nome').execute()
+        servicos = resp_servicos.data or []
+        servicos_lookup = {s['id']: s['nome'] for s in servicos}
+    except Exception as e:
+        print(f"Erro ao buscar serviços: {e}")
+        servicos_lookup = {}
+
+    # 8) Renderiza o template passando tudo
     return render_template(
         'index.html',
         cor_principal=cor_principal,
@@ -150,8 +170,11 @@ def index():
         social_links=social_links,
         section_visibility=section_visibility,
         map_url=map_url,
-        localizacao_hidden=section_visibility.get('localizacao', False)
+        localizacao_hidden=section_visibility.get('localizacao', False),
+        funcionarios=funcionarios,
+        servicos_lookup=servicos_lookup  # <-- PASSAR para o template
     )
+
 
 
 # Admin protegida
@@ -548,6 +571,115 @@ def admin_map():
     )
 
 
+# GERENCIAMENTO NOSSOS SERVIÇOS
+# ROTA DE ADD (ajustada)
+@app.route('/admin/add-funcionario', methods=['POST'])
+def add_funcionario():
+    try:
+        nome = request.form.get('nome', '').strip()
+
+        # Receber os serviços com preços via JSON (string)
+        servicos_json = request.form.get('servicos', '[]')
+        servicos = json.loads(servicos_json)  # lista de dicts [{servico_id, preco}, ...]
+
+        foto = request.files.get('foto')
+        foto_url = None
+        if foto and foto.filename:
+            bucket = 'funcionarios'
+            ext = foto.filename.rsplit('.', 1)[-1]
+            key = f"{uuid.uuid4()}.{ext}"
+
+            file_bytes = foto.read()
+            supabase.storage.from_(bucket).upload(key, file_bytes, {
+                "content-type": foto.content_type
+            })
+
+            foto_url = supabase.storage.from_(bucket).get_public_url(key)
+
+        payload = {
+            'nome': nome or None,
+            'servicos': servicos,  # salvar como JSON
+            'foto_url': foto_url
+        }
+
+        supabase.table('funcionarios_servicos').insert(payload).execute()
+        return jsonify({'success': True}), 200
+
+    except Exception as e:
+        print("Erro ao adicionar funcionário:", e)
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/admin/listar-funcionarios', methods=['GET'])
+def listar_funcionarios():
+    try:
+        response = supabase \
+            .table('funcionarios_servicos') \
+            .select('*') \
+            .order('created_at', desc=True) \
+            .limit(6) \
+            .execute()
+
+        # response.data já é uma lista de dicts
+        return jsonify(response.data), 200
+    except Exception as e:
+        print("Erro ao listar funcionários:", e)
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/admin/remover-funcionario/<int:funcionario_id>', methods=['DELETE'])
+def remover_funcionario(funcionario_id):
+    try:
+        bucket = 'funcionarios'
+
+        # 1) Buscar foto_url
+        resp = supabase \
+            .table('funcionarios_servicos') \
+            .select('foto_url') \
+            .eq('id', funcionario_id) \
+            .single() \
+            .execute()
+
+        data = resp.data
+        if not data:
+            return jsonify({'success': False, 'error': 'Funcionário não encontrado'}), 404
+
+        foto_url = data.get('foto_url')
+
+        # 2) Se houver foto, remove do Storage
+        if foto_url:
+            prefix = f"https://{SUPABASE_URL.split('//')[1]}/storage/v1/object/public/{bucket}/"
+            if foto_url.startswith(prefix):
+                key = foto_url[len(prefix):].split('?')[0]  # ← aqui corrigido
+                print(f"[INFO] Removendo do Storage: {key}")
+                remove_response = supabase.storage.from_(bucket).remove([key])
+                if hasattr(remove_response, 'error') and remove_response.error:
+                    print("[ERRO] Falha ao remover imagem do Storage:", remove_response.error)
+                else:
+                    print("[OK] Imagem removida do Storage com sucesso.")
+            else:
+                print("[ERRO] Não foi possível extrair a chave da imagem:", foto_url)
+
+
+        # 3) Remove do banco
+        supabase \
+            .table('funcionarios_servicos') \
+            .delete() \
+            .eq('id', funcionario_id) \
+            .execute()
+
+        return jsonify({'success': True}), 200
+
+    except Exception as e:
+        print("Erro ao remover funcionário:", e)
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/admin/listar-servicos', methods=['GET'])
+def listar_servicos():
+    try:
+        response = supabase.table('servicos').select('*').order('nome').execute()
+        return jsonify(response.data), 200
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 
     
