@@ -576,11 +576,29 @@ def admin_map():
 @app.route('/admin/add-funcionario', methods=['POST'])
 def add_funcionario():
     try:
+        # 1. Verifica quantidade atual de funcionários
+        response = supabase \
+            .table('funcionarios_servicos') \
+            .select('id') \
+            .execute()
+
+        if response.data and len(response.data) >= 6:
+            return jsonify({
+                'success': False,
+                'error': 'Limite de 6 funcionários atingido. Remova um antes de adicionar outro.'
+            }), 400
+
+        # 2. Continua com a lógica atual
         nome = request.form.get('nome', '').strip()
 
-        # Receber os serviços com preços via JSON (string)
         servicos_json = request.form.get('servicos', '[]')
-        servicos = json.loads(servicos_json)  # lista de dicts [{servico_id, preco}, ...]
+        servicos = json.loads(servicos_json)
+
+        if len(servicos) > 8:
+            return jsonify({
+                'success': False,
+                'error': 'Limite de 8 serviços por funcionário excedido.'
+            }), 400
 
         foto = request.files.get('foto')
         foto_url = None
@@ -598,7 +616,7 @@ def add_funcionario():
 
         payload = {
             'nome': nome or None,
-            'servicos': servicos,  # salvar como JSON
+            'servicos': servicos,
             'foto_url': foto_url
         }
 
