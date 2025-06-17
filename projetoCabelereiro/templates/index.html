@@ -1,51 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <title>Studio Florescer</title>
   <!-- Injetar a cor inline para evitar bug de cores -->
-  <style>
-    :root {
-      --cor-principal: {{ cor_principal }};
-      --cor-texto: #333333;
-      /* Adicione outras variáveis CSS aqui */
-    }
-    
-    /* Estilos críticos inline para renderização inicial */
-    body, html {
-      background-color: var(--cor-principal);
-      margin: 0;
-      padding: 0;
-    }
-    
-    #features, #footer, .testimonial {
-      background-color: var(--cor-principal);
-    }
-  </style>
-  
-  <!-- Armazena a cor no localStorage para uso futuro -->
-  <script>
-    window.themeColor = "{{ cor_principal }}";
-    localStorage.setItem("corPrincipal", window.themeColor);
-  </script>
-  
-  <!-- Carregamento do CSS não-crítico -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v={{ cor_principal }}">
-  <link rel="stylesheet" media="screen and (max-width: 768px)" href="{{ url_for('static', filename='css/mobile.css') }}" media="print" onload="this.media='screen and (max-width: 768px)'">
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
- 
-    <!-- Define a cor CERTA direto no :root, sem piscar -->
     <style>
       :root {
         --cor-principal: {{ cor_principal }};
+        --cor-texto: #333333;
+        /* Adicione outras variáveis CSS aqui */
+      }
+      
+      /* Estilos críticos inline para renderização inicial */
+      body, html {
+        background-color: var(--cor-principal);
+        margin: 0;
+        padding: 0;
+      }
+      
+      #features, #footer, .testimonial {
+        background-color: var(--cor-principal);
       }
     </style>
- 
+    
+    <!-- Armazena a cor no localStorage para uso futuro -->
     <script>
-      // Atualiza o localStorage com a cor correta DO BANCO
-      const corAtual = "{{ cor_principal }}";
-      localStorage.setItem("corPrincipal", corAtual);
+      window.themeColor = "{{ cor_principal }}";
+      localStorage.setItem("corPrincipal", window.themeColor);
     </script>
-    <title>Studio Florescer</title>
+  
+    <!-- Carregamento do CSS não-crítico -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v={{ cor_principal }}">
+    <link rel="stylesheet" media="screen and (max-width: 768px)" href="{{ url_for('static', filename='css/mobile.css') }}" media="print" onload="this.media='screen and (max-width: 768px)'">
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+      <!-- Define a cor CERTA direto no :root, sem piscar -->
+      <style>
+        :root {
+          --cor-principal: {{ cor_principal }};
+        }
+      </style>
+  
+      <script>
+        // Atualiza o localStorage com a cor correta DO BANCO
+        const corAtual = "{{ cor_principal }}";
+        localStorage.setItem("corPrincipal", corAtual);
+      </script>
+      
+    <!-- JS do .testimonial para dividir a lista em duas colunas se tiver mais de 4 itens -->
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll('.testimonial-info').forEach(infoContainer => {
+          const ul = infoContainer.querySelector('ul');
+          const items = Array.from(ul.querySelectorAll('li'));
+
+          if (items.length > 4) {
+            const col1 = document.createElement('ul');
+            const col2 = document.createElement('ul');
+
+            items.forEach((item, index) => {
+              if (index < 4) {
+                col1.appendChild(item);
+              } else {
+                col2.appendChild(item);
+              }
+            });
+
+            infoContainer.innerHTML = ''; // Limpa a ul original
+            infoContainer.appendChild(col1);
+            infoContainer.appendChild(col2);
+          }
+        });
+      });
+    </script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Seu script existente para dividir em colunas continua aqui (já tem)
+
+        // Novo do .testimonial script para adicionar classe cards-N no container
+        const container = document.getElementById('testimonials-container');
+        if (container) {
+          const count = container.querySelectorAll('.testimonial').length;
+          container.classList.add('cards-' + count);
+        }
+      });
+    </script>
   </head>
   
     <body>
@@ -112,26 +151,24 @@
     </section>
 
     <!-- Inserido novo modelo de lista -->
-<div id="testimonials">
-  <div class="headline1">Nossos Serviços</div>
-  <div id="testimonials-container">
-    {% for f in funcionarios %}
-      <div class="testimonial">
-        <img src="{{ f.foto_url }}" alt="" class="testimonial-image" />
-        <h4 style="margin-top: 5px;">{{ f.nome }}</h4>
-        <div class="testimonial-info">
-          <ul>
-            {% for item in f.servicos %}
-              <li>{{ servicos_lookup[item.servico_id] }} — R$ {{ '%.2f'|format(item.preco) }}</li>
-            {% endfor %}
-          </ul>
-        </div>
+    <div id="testimonials">
+      <div class="headline1">Nossos Serviços</div>
+      <div id="testimonials-container" class="cards-{{ funcionarios|length }}">
+        {% for f in funcionarios %}
+          <div class="testimonial">
+            <img src="{{ f.foto_url }}" alt="" class="testimonial-image" />
+            <h4 style="margin-top: 5px;">{{ f.nome }}</h4>
+            <div class="testimonial-info">
+              <ul>
+                {% for item in f.servicos %}
+                  <li>{{ servicos_lookup[item.servico_id] }} — R$ {{ '%.2f'|format(item.preco) }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+        {% endfor %}
       </div>
-    {% endfor %}
-  </div>
-</div>
-
-
+    </div>
 
     {% if section_visibility.get('gallery') != 'none' %}
     <section id="gallery">

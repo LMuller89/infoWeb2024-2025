@@ -185,58 +185,168 @@ a {
 
 /* Testimonials */
 #testimonials-container {
-  width: 80%; /* Ajuste a largura conforme necessário */
+  width: 80%;
   margin: auto;
   display: flex;
-  justify-content: space-between;
+  flex-wrap: wrap;
+  justify-content: space-between; /* padrão pra 2, 4, 6 cards */
   align-items: flex-start;
-  flex-wrap: wrap; /* Adicionado para responsividade */
+  box-sizing: border-box;
 }
 
-.testimonial {
-  width: 48%; /* Ajuste a largura conforme necessário */
-  display: flex;
-  flex-direction: column; /* Alinha os itens verticalmente */
-  align-items: center; /* Centraliza os itens horizontalmente */
-  font-size: 1.2rem;
-  padding: 15px;
+/* Classes para ajustar layout conforme número de cards */
+
+/* 1 card: centraliza */
+#testimonials-container.cards-1 {
+  justify-content: center;
+}
+#testimonials-container.cards-1 .testimonial {
+  width: 50%; /* Pode ajustar se quiser maior */
+}
+
+/* 2 cards: padrão já com space-between (igual seu original) */
+#testimonials-container.cards-2 {
+  justify-content: space-between;
+}
+
+/* 3 cards: 2 em cima, 1 embaixo centralizado */
+#testimonials-container.cards-3 {
+  justify-content: flex-start;
+  position: relative;
+  gap: 15px;
+}
+
+#testimonials-container.cards-3 .testimonial:nth-child(3) {
+  width: 48%;
+  margin: 15px auto 0 auto; /* centraliza 3º card */
+  order: 3;
+}
+
+/* 4 cards: padrão, 2x2 com space-between */
+#testimonials-container.cards-4 {
+  justify-content: space-between;
+}
+
+/* 5 cards: 2 + 2 em cima, 1 embaixo centralizado */
+#testimonials-container.cards-5 {
+  justify-content: flex-start;
+  position: relative;
+  gap: 15px;
+}
+#testimonials-container.cards-5 .testimonial:nth-child(n + 5) {
+  width: 48%;
+  margin: 15px auto 0 auto; /* centraliza 5º card */
+  order: 5;
+}
+
+/* Para 6 cards: manter 2 colunas por linha, 3 linhas */
+#testimonials-container.cards-6 {
+  justify-content: space-between; /* mantém espaçamento normal */
+}
+
+#testimonials-container.cards-6 .testimonial {
+  width: 48%; /* mantém 2 por linha */
   margin: 15px 0;
-  padding: 20px; /* Aumentado o padding para melhor espaçamento */
+}
+
+/* Mantendo seu estilo original dos cards */
+.testimonial {
+  width: 48%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 1.2rem;
+  padding: 20px;
+  margin: 15px 0;
   border-radius: 10px;
-  margin-bottom: 20px;
-  color: #eee; /* Adicionado para cor do texto */
+  color: #000;
+  min-height: 330px;
+  position: relative;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+}
+
+.testimonial::before {
+  content: "";
+  position: absolute;
+  top: 120px;
+  width: 60%;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .testimonial .testimonial-image {
   height: 100px;
-  width: 100px; /* Ajustado para manter a proporção */
+  width: 100px;
   border-radius: 50%;
-  margin-bottom: 10px; /* Adicionado espaçamento abaixo da imagem */
+  margin-bottom: 10px;
+  border: 3px solid #fff;
+  object-fit: cover;
 }
 
 .testimonial .testimonial-title {
   font-size: 1.4rem;
   font-weight: bold;
-  margin-bottom: 10px; /* Adicionado espaçamento abaixo do título */
-  text-align: center; /* Centraliza o título */
+  margin-bottom: 10px;
+  text-align: center;
+  color: #ffffff;
 }
 
-.testimonial .testimonial-info {
-  margin: 10px 0; /* Reduzido o espaçamento */
-  width: 100%; /* Garante que as listas ocupem toda a largura */
+/* CENTRALIZAÇÃO da lista na parte inferior */
+.testimonial-info {
+  flex: 1;
+  width: 100%;
   display: flex;
-  justify-content: space-around; /* Distribui as listas igualmente */
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 10px;
+  margin-top: auto;
+  margin-bottom: auto;
+  min-height: 130px; /* controla a altura da área de serviços */
+  display: flex;
 }
 
-.testimonial .testimonial-info ul {
+/* Distribuição em colunas (aplicado dinamicamente pelo JS) */
+.testimonial-info.multi-col {
+  justify-content: space-around;
+}
+
+/* Estilo da UL */
+.testimonial-info ul {
   list-style-type: none;
   padding: 5px;
   margin: 0;
-  text-align: left; /* Alinha os itens da lista à esquerda */
+  text-align: left;
 }
 
-.testimonial .testimonial-info ul li {
-  margin: 5px 0; /* Adicionado espaçamento entre os itens da lista */
+.testimonial-info ul li {
+  margin: 5px 0;
+  padding-left: 12px;
+  position: relative;
+}
+
+.testimonial-info ul li::before {
+  content: "–";
+  position: absolute;
+  left: 0;
+  color: #fff;
+  font-weight: bold;
+}
+
+.testimonial button {
+  margin-top: 15px;
+  padding: 7px 15px;
+  border: none;
+  border-radius: 6px;
+  background-color: #fff;
+  color: #000;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.testimonial button:hover {
+  background-color: #f2f2f2;
+  transform: scale(1.03);
 }
 
 .orcamento {
