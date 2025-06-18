@@ -627,7 +627,6 @@ def add_funcionario():
         print("Erro ao adicionar funcionário:", e)
         return jsonify({'success': False, 'error': str(e)}), 500
 
-
 @app.route('/admin/listar-funcionarios', methods=['GET'])
 def listar_funcionarios():
     try:

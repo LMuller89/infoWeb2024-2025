@@ -189,62 +189,149 @@
 
 /* index.css container "Nossos Serviços" */
 
-/* Container flex igual ao do index */
+/* Container flex simplificado */
+/* Container flex simplificado */
 #funcionarios-admin-container {
   width: 80%;
   margin: auto;
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
   flex-wrap: wrap;
+  justify-content: center; /* Centralizado por padrão */
+  align-items: flex-start;
+  box-sizing: border-box;
+  gap: 15px; /* Espaçamento consistente */
 }
 
-/* Cada card */
-.testimonial {
-  width: 48%;
-  background: #e3a96c; /* cor de fundo */
-  color: #000; /* texto escuro */
-  padding: 20px;
-  margin-bottom: 20px;
-  border-radius: 10px;
+/* Remoção de todas as classes específicas de contagem - não são mais necessárias */
+
+/* Estilo do card - mais flexível */
+/* Container flex - corrigido para layout responsivo */
+#funcionarios-admin-container {
+  width: 80%;
+  margin: 2rem auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start; /* Alinhamento à esquerda */
+  align-items: stretch; /* Cards com mesma altura */
   box-sizing: border-box;
+  gap: 20px; /* Espaçamento uniforme */
+}
+
+/* Estilo do card - corrigido para 2 colunas */
+.testimonial {
+  flex: 0 1 calc(50% - 10px); /* 2 colunas com espaçamento */
   display: flex;
   flex-direction: column;
   align-items: center;
+  font-size: 1.2rem;
+  padding: 20px;
+  border-radius: 10px;
+  background: #e3a96c;
+  color: #000;
+  min-height: 330px;
+  position: relative;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+  box-sizing: border-box;
+  transition: transform 0.3s ease;
 }
 
-/* Imagem */
+/* Media query para telas menores */
+@media (max-width: 768px) {
+  .testimonial {
+    flex: 0 1 100%; /* 1 coluna em telas pequenas */
+  }
+}
+
+.testimonial:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.testimonial::before {
+  content: "";
+  position: absolute;
+  top: 120px;
+  width: 60%;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
 .testimonial .testimonial-image {
   height: 100px;
   width: 100px;
   border-radius: 50%;
   margin-bottom: 10px;
+  border: 3px solid #fff;
+  object-fit: cover;
+  background: #d99a5f; /* Cor de fundo se não tiver imagem */
 }
 
-/* Título */
 .testimonial .testimonial-title {
   font-size: 1.4rem;
   font-weight: bold;
+  margin-bottom: 10px;
   text-align: center;
-  margin-bottom: 5px;
+  color: #ffffff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
-/* Serviços */
-.testimonial .testimonial-info {
+.testimonial-info {
+  flex: 1;
   width: 100%;
   display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 0;
+  margin-top: auto;
+  margin-bottom: auto;
+  min-height: 130px;
+}
+
+.testimonial-info.multi-col {
   justify-content: space-around;
-  margin-top: 10px;
 }
 
-.testimonial .testimonial-info ul {
-  list-style: none;
-  padding: 0;
+.testimonial-info ul {
+  list-style-type: none;
+  padding: 5px;
   margin: 0;
+  text-align: left;
+  width: 100%;
 }
 
-.testimonial .testimonial-info ul li {
-  margin: 4px 0;
+.testimonial-info ul li {
+  margin: 8px 0;
+  padding-left: 12px;
+  position: relative;
+  font-size: 1.1rem;
+}
+
+.testimonial-info ul li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: #fff;
+  font-weight: bold;
+  font-size: 1.3rem;
+}
+
+.testimonial button {
+  margin-top: 15px;
+  padding: 8px 20px;
+  border: none;
+  border-radius: 6px;
+  background-color: #fff;
+  color: #d99a5f;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.testimonial button:hover {
+  background-color: #f8f8f8;
+  transform: scale(1.05);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
 }
 
 /*gallery section*/
@@ -354,9 +441,7 @@
   background-color: #333;
 }
 
-/* ============================
-   Estilos para o container que edita o Google Maps
-   ============================ */
+/* Estilos para o container que edita o Google Maps */
 .map-config-container {
   background-color: #fff;
   border: 1px solid #ddd;

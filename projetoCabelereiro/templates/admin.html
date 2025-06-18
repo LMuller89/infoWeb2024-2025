@@ -8,6 +8,410 @@
       rel="stylesheet"
       href="{{ url_for('static', filename='css/admin.css') }}"
     />
+
+    <!-- CODIGOS JS -->
+
+    <!-- JS testimonials -->
+
+    <script>
+      document.addEventListener("DOMContentLoaded", async () => {
+        const servicosContainer = document.getElementById("servicos-container");
+        let servicos = [];
+
+        try {
+          const res = await fetch("/admin/listar-servicos");
+          if (!res.ok) throw new Error("Erro ao carregar serviços");
+          servicos = await res.json();
+        } catch (e) {
+          console.error(e);
+          servicosContainer.innerHTML = "<p>Erro ao carregar serviços.</p>";
+          return;
+        }
+
+        function criarLinhaServico() {
+          const div = document.createElement("div");
+          div.className = "linha-servico";
+          div.style.display = "flex";
+          div.style.alignItems = "center";
+          div.style.gap = "10px";
+          div.style.marginBottom = "10px";
+
+          const select = document.createElement("select");
+          select.name = "servico_id";
+          select.required = true;
+          select.style.flex = "2";
+          select.style.padding = "12px";
+          select.style.fontSize = "16px";
+          select.style.borderRadius = "6px";
+          select.style.border = "1px solid #ccc";
+
+          const optionDefault = document.createElement("option");
+          optionDefault.value = "";
+          optionDefault.textContent = "-- Selecione um serviço --";
+          select.appendChild(optionDefault);
+
+          servicos.forEach((s) => {
+            const option = document.createElement("option");
+            option.value = s.id;
+            option.textContent = s.nome;
+            select.appendChild(option);
+          });
+
+          const inputPreco = document.createElement("input");
+          inputPreco.type = "number";
+          inputPreco.name = "preco";
+          inputPreco.min = "0";
+          inputPreco.step = "0.01";
+          inputPreco.placeholder = "Preço (R$)";
+          inputPreco.required = true;
+          inputPreco.style.flex = "1";
+          inputPreco.style.padding = "12px";
+          inputPreco.style.fontSize = "16px";
+          inputPreco.style.borderRadius = "6px";
+          inputPreco.style.border = "1px solid #ccc";
+
+          const btnAdd = document.createElement("button");
+          btnAdd.type = "button";
+          btnAdd.textContent = "+";
+          btnAdd.title = "Adicionar novo serviço";
+          btnAdd.style.padding = "12px 16px";
+          btnAdd.style.fontSize = "20px";
+          btnAdd.style.backgroundColor = "#28a745";
+          btnAdd.style.color = "white";
+          btnAdd.style.border = "none";
+          btnAdd.style.borderRadius = "6px";
+          btnAdd.style.cursor = "pointer";
+          btnAdd.onclick = () =>
+            servicosContainer.appendChild(criarLinhaServico());
+
+          const btnRemove = document.createElement("button");
+          btnRemove.type = "button";
+          btnRemove.textContent = "×";
+          btnRemove.title = "Remover este serviço";
+          btnRemove.style.padding = "12px 16px";
+          btnRemove.style.fontSize = "20px";
+          btnRemove.style.backgroundColor = "#dc3545";
+          btnRemove.style.color = "white";
+          btnRemove.style.border = "none";
+          btnRemove.style.borderRadius = "6px";
+          btnRemove.style.cursor = "pointer";
+          btnRemove.onclick = () => div.remove();
+
+          div.appendChild(select);
+          div.appendChild(inputPreco);
+          div.appendChild(btnAdd);
+          div.appendChild(btnRemove);
+
+          return div;
+        }
+
+        // Inicializa com uma linha vazia
+        servicosContainer.appendChild(criarLinhaServico());
+
+        // Função para carregar funcionários e montar cards (já existente)
+        async function loadFuncionarios() {
+          const container = document.getElementById(
+            "funcionarios-admin-container"
+          );
+          container.innerHTML = "";
+
+          try {
+            const res = await fetch("/admin/listar-funcionarios");
+            if (!res.ok) throw new Error("Erro ao carregar funcionários");
+            const list = await res.json();
+
+            [...list].reverse().forEach((f) => {
+              const card = document.createElement("div");
+              card.className = "testimonial";
+
+              const servicosFuncionario = f.servicos || [];
+              const servicosHtml = servicosFuncionario
+                .map((s) => {
+                  const nomeServico =
+                    servicos.find((srv) => srv.id === s.servico_id)?.nome ||
+                    `ID ${s.servico_id}`;
+                  return `<li>${nomeServico}: R$ ${s.preco.toFixed(2)}</li>`;
+                })
+                .join("");
+
+              card.innerHTML = `
+              ${
+                f.foto_url
+                  ? `<img src="${f.foto_url}" class="testimonial-image"/>`
+                  : `<div class="testimonial-image" style="background:#444;">Sem foto</div>`
+              }
+              <h4>${f.nome || "—"}</h4>
+              <div class="testimonial-info">
+                <ul>${servicosHtml}</ul>
+              </div>
+              <button class="btn-remover" data-id="${f.id}">Remover</button>
+            `;
+
+              container.appendChild(card);
+            });
+
+            // ✅ DIVIDE os serviços em 2 colunas, se necessário
+            container
+              .querySelectorAll(".testimonial-info")
+              .forEach((infoContainer) => {
+                const ul = infoContainer.querySelector("ul");
+                if (!ul) return;
+
+                const items = Array.from(ul.querySelectorAll("li"));
+                if (items.length > 4) {
+                  const col1 = document.createElement("ul");
+                  const col2 = document.createElement("ul");
+
+                  items.forEach((item, index) => {
+                    if (index < 4) col1.appendChild(item);
+                    else col2.appendChild(item);
+                  });
+
+                  infoContainer.innerHTML = "";
+                  infoContainer.appendChild(col1);
+                  infoContainer.appendChild(col2);
+                }
+              });
+
+            // Lógica de remover
+            container.querySelectorAll(".btn-remover").forEach((btn) => {
+              btn.addEventListener("click", async () => {
+                const id = btn.dataset.id;
+                if (confirm("Confirma remover este funcionário?")) {
+                  try {
+                    const res = await fetch(
+                      `/admin/remover-funcionario/${id}`,
+                      {
+                        method: "DELETE",
+                      }
+                    );
+                    const json = await res.json();
+                    if (json.success) {
+                      alert("Funcionário removido!");
+                      loadFuncionarios();
+                    } else {
+                      alert("Erro: " + json.error);
+                    }
+                  } catch (e) {
+                    alert("Erro na requisição: " + e.message);
+                  }
+                }
+              });
+            });
+          } catch (e) {
+            console.error(e);
+            container.innerHTML = "<p>Erro ao carregar funcionários.</p>";
+          }
+        }
+
+        // Submissão do formulário
+        document
+          .getElementById("add-funcionario-form")
+          .addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const form = e.target;
+
+            // Montar array servicos [{servico_id, preco}]
+            const servicosSelecionados = [];
+            const linhas = servicosContainer.querySelectorAll(".linha-servico");
+
+            try {
+              linhas.forEach((linha) => {
+                const select = linha.querySelector("select");
+                const inputPreco = linha.querySelector("input[name=preco]");
+                if (select.value !== "" && inputPreco.value !== "") {
+                  const servico_id = parseInt(select.value);
+                  const preco = parseFloat(inputPreco.value);
+
+                  if (isNaN(preco) || preco < 0) {
+                    throw new Error(
+                      `Preço inválido para o serviço selecionado.`
+                    );
+                  }
+
+                  servicosSelecionados.push({ servico_id, preco });
+                }
+              });
+
+              if (servicosSelecionados.length === 0) {
+                alert("Por favor, adicione pelo menos um serviço com preço.");
+                return;
+              }
+
+              const fd = new FormData(form);
+
+              fd.delete("servicos_col1");
+              fd.delete("servicos_col2");
+
+              fd.append("servicos", JSON.stringify(servicosSelecionados));
+
+              const res = await fetch("/admin/add-funcionario", {
+                method: "POST",
+                body: fd,
+              });
+              const json = await res.json();
+
+              if (json.success) {
+                alert("Funcionário adicionado com sucesso!");
+                form.reset();
+                servicosContainer.innerHTML = "";
+                servicosContainer.appendChild(criarLinhaServico());
+                loadFuncionarios();
+              } else {
+                alert("Erro: " + json.error);
+              }
+            } catch (error) {
+              alert("Erro: " + error.message);
+            }
+          });
+
+        loadFuncionarios();
+      });
+    </script>
+
+    <!-- JS GALLERY -->
+
+    <script>
+      document.querySelectorAll(".image-upload-input").forEach((input) => {
+        input.addEventListener("change", async function (e) {
+          const file = e.target.files[0];
+          const imageId = this.dataset.imageId;
+          const preview = this.parentElement.querySelector(".image-preview");
+          const status = this.parentElement.querySelector(".upload-status");
+
+          if (!file) return;
+
+          const formData = new FormData();
+          formData.append("image", file);
+          formData.append("image_id", imageId);
+
+          try {
+            status.textContent = "Enviando...";
+            const response = await fetch("/api/gallery", {
+              method: "POST",
+              body: formData,
+            });
+
+            const result = await response.json();
+
+            if (!response.ok)
+              throw new Error(result.error || "Falha no upload");
+
+            // Atualizar preview com cache‐busting
+            preview.src = result.new_url;
+            status.textContent = "✔️ Atualizado!";
+            setTimeout(() => (status.textContent = ""), 2000);
+          } catch (error) {
+            // 👇 Aqui a correção: usar crases para template literal
+            status.textContent = `Erro: ${error.message}`;
+            status.style.color = "red";
+          }
+        });
+      });
+
+      // Atualizar visibilidade da galeria
+      document
+        .querySelectorAll("input[name='gallery-visibility']")
+        .forEach((radio) => {
+          radio.addEventListener("change", async (e) => {
+            const visibility = e.target.value; // 'none' | 'partial' | 'full'
+            try {
+              const response = await fetch("/api/section-visibility", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ gallery: visibility }),
+              });
+              if (!response.ok) {
+                const erro = await response.json();
+                console.error("Erro ao atualizar gallery:", erro);
+              }
+            } catch (err) {
+              console.error("Falha ao chamar /api/section-visibility:", err);
+            }
+          });
+        });
+      // Carregar visibilidade ao abrir a página
+      window.addEventListener("DOMContentLoaded", async () => {
+        try {
+          const visRes = await fetch("/api/section-visibility");
+          const visData = await visRes.json();
+          const currentGalleryVis = visData.gallery || "full";
+
+          const radios = document.querySelectorAll(
+            "input[name='gallery-visibility']"
+          );
+          radios.forEach((radio) => {
+            radio.checked = radio.value === currentGalleryVis;
+          });
+        } catch (err) {
+          console.error("Erro ao carregar visibilidade:", err);
+        }
+      });
+    </script>
+
+    <!-- JS REDES SOCIAIS -->
+
+    <script>
+      // Salvar os links das redes sociais
+      document
+        .getElementById("save-links-btn")
+        .addEventListener("click", async () => {
+          const links = {
+            instagram: document.getElementById("insta-link").value,
+            facebook: document.getElementById("face-link").value,
+            x: document.getElementById("x-link").value,
+            youtube: document.getElementById("yt-link").value,
+          };
+
+          const res = await fetch("/api/social-links", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(links),
+          });
+
+          const data = await res.json();
+          if (data.message) {
+            alert("Links atualizados com sucesso!");
+          } else {
+            alert("Erro: " + data.error);
+          }
+        });
+
+      // Carregar links e visibilidade ao abrir a página
+      window.addEventListener("DOMContentLoaded", async () => {
+        try {
+          const resLinks = await fetch("/api/social-links");
+          const dataLinks = await resLinks.json();
+          if (dataLinks) {
+            document.getElementById("insta-link").value =
+              dataLinks.instagram || "";
+            document.getElementById("face-link").value =
+              dataLinks.facebook || "";
+            document.getElementById("x-link").value = dataLinks.x || "";
+            document.getElementById("yt-link").value = dataLinks.youtube || "";
+          }
+
+          const visRes = await fetch("/api/section-visibility");
+          const visData = await visRes.json();
+          document.getElementById("toggle-clients").checked =
+            visData.clients === true;
+        } catch (err) {
+          console.error("Erro ao carregar dados:", err);
+        }
+      });
+
+      // Atualizar visibilidade da seção ao marcar/desmarcar
+      document
+        .getElementById("toggle-clients")
+        .addEventListener("change", async (e) => {
+          const updated = { clients: e.target.checked };
+          await fetch("/api/section-visibility", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(updated),
+          });
+        });
+    </script>
   </head>
   <body>
     <header class="admin-header">
@@ -135,262 +539,84 @@
             });
         </script>
 
+        <!-- TESTIMONIALS -->
         <div id="servicos-funcionarios-admin">
-          <h3>Gerenciar Funcionários</h3>
-
+          <h3 style="font-size: 28px; font-weight: bold">
+            Gerenciar Funcionários
+          </h3>
           <form id="add-funcionario-form" enctype="multipart/form-data">
-            <input
-              type="text"
-              name="nome"
-              placeholder="Nome do funcionário"
-              required
-            />
+            <!-- Linha dos inputs -->
+            <div
+              style="
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+                align-items: center;
+                margin-bottom: 20px;
+              "
+            >
+              <input
+                type="text"
+                name="nome"
+                placeholder="Nome do funcionário"
+                required
+                style="
+                  flex: 2;
+                  padding: 12px;
+                  font-size: 16px;
+                  border-radius: 6px;
+                  border: 1px solid #ccc;
+                "
+              />
 
-            <label>Serviços e preços:</label>
-            <div id="servicos-container"></div>
+              <input
+                type="file"
+                name="foto"
+                accept="image/*"
+                style="
+                  flex: 2;
+                  padding: 8px;
+                  font-size: 16px;
+                  border-radius: 6px;
+                  border: 1px solid #ccc;
+                "
+              />
+            </div>
 
-            <input type="file" name="foto" accept="image/*" />
+            <!-- Serviços dinâmicos -->
+            <div id="servicos-container" style="margin-bottom: 20px"></div>
 
-            <button type="submit">Adicionar Funcionário</button>
+            <!-- Botão centralizado com espaço abaixo -->
+            <div style="text-align: center; margin-bottom: 40px">
+              <button
+                type="submit"
+                style="
+                  padding: 12px 20px;
+                  font-size: 16px;
+                  border-radius: 6px;
+                  background-color: #007bff;
+                  color: white;
+                  border: none;
+                  cursor: pointer;
+                "
+              >
+                Adicionar Funcionário
+              </button>
+            </div>
           </form>
 
+          <div id="testimonials-admin">
+            <div class="headline1" style="font-size: 28px; font-weight: bold">
+              Funcionários Cadastrados
+            </div>
+            <br />
+          </div>
+
+          <!-- Container onde os cards serão inseridos -->
           <div id="funcionarios-admin-container"></div>
         </div>
 
-        <script>
-          document.addEventListener("DOMContentLoaded", async () => {
-            const servicosContainer =
-              document.getElementById("servicos-container");
-
-            // Buscar serviços do backend para popular selects
-            let servicos = [];
-            try {
-              const res = await fetch("/admin/listar-servicos");
-              if (!res.ok) throw new Error("Erro ao carregar serviços");
-              servicos = await res.json();
-            } catch (e) {
-              console.error(e);
-              servicosContainer.innerHTML = "<p>Erro ao carregar serviços.</p>";
-              return;
-            }
-
-            // Cria uma linha nova de serviço+preço
-            function criarLinhaServico() {
-              const div = document.createElement("div");
-              div.className = "linha-servico";
-              div.style.marginBottom = "10px";
-
-              const select = document.createElement("select");
-              select.name = "servico_id";
-              select.required = true;
-
-              const optionDefault = document.createElement("option");
-              optionDefault.value = "";
-              optionDefault.textContent = "-- Selecione um serviço --";
-              select.appendChild(optionDefault);
-
-              servicos.forEach((s) => {
-                const option = document.createElement("option");
-                option.value = s.id;
-                option.textContent = s.nome;
-                select.appendChild(option);
-              });
-
-              const inputPreco = document.createElement("input");
-              inputPreco.type = "number";
-              inputPreco.name = "preco";
-              inputPreco.min = "0";
-              inputPreco.step = "0.01";
-              inputPreco.placeholder = "Preço (R$)";
-              inputPreco.required = true;
-              inputPreco.style.marginLeft = "8px";
-
-              // Botão remover linha (X vermelho)
-              const btnRemover = document.createElement("button");
-              btnRemover.type = "button";
-              btnRemover.textContent = "×";
-              btnRemover.title = "Remover este serviço";
-              btnRemover.style.marginLeft = "8px";
-              btnRemover.style.color = "red";
-              btnRemover.style.fontWeight = "bold";
-              btnRemover.style.border = "none";
-              btnRemover.style.background = "transparent";
-              btnRemover.style.cursor = "pointer";
-
-              btnRemover.addEventListener("click", () => {
-                div.remove();
-              });
-
-              // Botão adicionar linha (+ verde)
-              const btnAdd = document.createElement("button");
-              btnAdd.type = "button";
-              btnAdd.textContent = "+";
-              btnAdd.title = "Adicionar novo serviço";
-              btnAdd.style.marginLeft = "8px";
-              btnAdd.style.color = "green";
-              btnAdd.style.fontWeight = "bold";
-              btnAdd.style.border = "none";
-              btnAdd.style.background = "transparent";
-              btnAdd.style.cursor = "pointer";
-
-              btnAdd.addEventListener("click", () => {
-                const novaLinha = criarLinhaServico();
-                servicosContainer.insertBefore(novaLinha, div.nextSibling);
-              });
-
-              div.appendChild(select);
-              div.appendChild(inputPreco);
-              div.appendChild(btnRemover);
-              div.appendChild(btnAdd);
-
-              return div;
-            }
-
-            // Inicializa com uma linha vazia
-            servicosContainer.appendChild(criarLinhaServico());
-
-            // Função para carregar funcionários e montar cards (já existente)
-            async function loadFuncionarios() {
-              const container = document.getElementById(
-                "funcionarios-admin-container"
-              );
-              container.innerHTML = "";
-
-              try {
-                const res = await fetch("/admin/listar-funcionarios");
-                if (!res.ok) throw new Error("Erro ao carregar funcionários");
-                const list = await res.json();
-
-                list.forEach((f) => {
-                  const card = document.createElement("div");
-                  card.className = "testimonial";
-
-                  const servicosFuncionario = f.servicos || [];
-                  const servicosHtml = servicosFuncionario
-                    .map((s) => {
-                      const nomeServico =
-                        servicos.find((srv) => srv.id === s.servico_id)?.nome ||
-                        `ID ${s.servico_id}`;
-                      return `<li>${nomeServico}: R$ ${s.preco.toFixed(
-                        2
-                      )}</li>`;
-                    })
-                    .join("");
-
-                  card.innerHTML = `
-        ${
-          f.foto_url
-            ? `<img src="${f.foto_url}" class="testimonial-image"/>`
-            : `<div class="testimonial-image" style="background:#444;">Sem foto</div>`
-        }
-        <h4>${f.nome || "—"}</h4>
-        <div>
-          <strong>Serviços e preços:</strong>
-          <ul>${servicosHtml}</ul>
-        </div>
-        <button class="btn-remover" data-id="${f.id}">Remover</button>
-      `;
-
-                  container.appendChild(card);
-                });
-
-                container.querySelectorAll(".btn-remover").forEach((btn) => {
-                  btn.addEventListener("click", async () => {
-                    const id = btn.dataset.id;
-                    if (confirm("Confirma remover este funcionário?")) {
-                      try {
-                        const res = await fetch(
-                          `/admin/remover-funcionario/${id}`,
-                          {
-                            method: "DELETE",
-                          }
-                        );
-                        const json = await res.json();
-                        if (json.success) {
-                          alert("Funcionário removido!");
-                          loadFuncionarios();
-                        } else {
-                          alert("Erro: " + json.error);
-                        }
-                      } catch (e) {
-                        alert("Erro na requisição: " + e.message);
-                      }
-                    }
-                  });
-                });
-              } catch (e) {
-                console.error(e);
-                container.innerHTML = "<p>Erro ao carregar funcionários.</p>";
-              }
-            }
-
-            // Submissão do formulário
-            document
-              .getElementById("add-funcionario-form")
-              .addEventListener("submit", async (e) => {
-                e.preventDefault();
-                const form = e.target;
-
-                // Montar array servicos [{servico_id, preco}]
-                const servicosSelecionados = [];
-                const linhas =
-                  servicosContainer.querySelectorAll(".linha-servico");
-
-                try {
-                  linhas.forEach((linha) => {
-                    const select = linha.querySelector("select");
-                    const inputPreco = linha.querySelector("input[name=preco]");
-                    if (select.value !== "" && inputPreco.value !== "") {
-                      const servico_id = parseInt(select.value);
-                      const preco = parseFloat(inputPreco.value);
-
-                      if (isNaN(preco) || preco < 0) {
-                        throw new Error(
-                          `Preço inválido para o serviço selecionado.`
-                        );
-                      }
-
-                      servicosSelecionados.push({ servico_id, preco });
-                    }
-                  });
-
-                  if (servicosSelecionados.length === 0) {
-                    alert(
-                      "Por favor, adicione pelo menos um serviço com preço."
-                    );
-                    return;
-                  }
-
-                  const fd = new FormData(form);
-
-                  fd.delete("servicos_col1");
-                  fd.delete("servicos_col2");
-
-                  fd.append("servicos", JSON.stringify(servicosSelecionados));
-
-                  const res = await fetch("/admin/add-funcionario", {
-                    method: "POST",
-                    body: fd,
-                  });
-                  const json = await res.json();
-
-                  if (json.success) {
-                    alert("Funcionário adicionado com sucesso!");
-                    form.reset();
-                    servicosContainer.innerHTML = "";
-                    servicosContainer.appendChild(criarLinhaServico());
-                    loadFuncionarios();
-                  } else {
-                    alert("Erro: " + json.error);
-                  }
-                } catch (error) {
-                  alert("Erro: " + error.message);
-                }
-              });
-
-            loadFuncionarios();
-          });
-        </script>
+        <!-- gallery -->
 
         <section id="gallery-admin-section">
           <div style="display: flex; align-items: center; gap: 16px">
@@ -430,87 +656,7 @@
           {% endfor %}
         </section>
 
-        <script>
-          document.querySelectorAll(".image-upload-input").forEach((input) => {
-            input.addEventListener("change", async function (e) {
-              const file = e.target.files[0];
-              const imageId = this.dataset.imageId;
-              const preview =
-                this.parentElement.querySelector(".image-preview");
-              const status = this.parentElement.querySelector(".upload-status");
-
-              if (!file) return;
-
-              const formData = new FormData();
-              formData.append("image", file);
-              formData.append("image_id", imageId);
-
-              try {
-                status.textContent = "Enviando...";
-                const response = await fetch("/api/gallery", {
-                  method: "POST",
-                  body: formData,
-                });
-
-                const result = await response.json();
-
-                if (!response.ok)
-                  throw new Error(result.error || "Falha no upload");
-
-                // Atualizar preview com cache‐busting
-                preview.src = result.new_url;
-                status.textContent = "✔️ Atualizado!";
-                setTimeout(() => (status.textContent = ""), 2000);
-              } catch (error) {
-                // 👇 Aqui a correção: usar crases para template literal
-                status.textContent = `Erro: ${error.message}`;
-                status.style.color = "red";
-              }
-            });
-          });
-
-          // Atualizar visibilidade da galeria
-          document
-            .querySelectorAll("input[name='gallery-visibility']")
-            .forEach((radio) => {
-              radio.addEventListener("change", async (e) => {
-                const visibility = e.target.value; // 'none' | 'partial' | 'full'
-                try {
-                  const response = await fetch("/api/section-visibility", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ gallery: visibility }),
-                  });
-                  if (!response.ok) {
-                    const erro = await response.json();
-                    console.error("Erro ao atualizar gallery:", erro);
-                  }
-                } catch (err) {
-                  console.error(
-                    "Falha ao chamar /api/section-visibility:",
-                    err
-                  );
-                }
-              });
-            });
-          // Carregar visibilidade ao abrir a página
-          window.addEventListener("DOMContentLoaded", async () => {
-            try {
-              const visRes = await fetch("/api/section-visibility");
-              const visData = await visRes.json();
-              const currentGalleryVis = visData.gallery || "full";
-
-              const radios = document.querySelectorAll(
-                "input[name='gallery-visibility']"
-              );
-              radios.forEach((radio) => {
-                radio.checked = radio.value === currentGalleryVis;
-              });
-            } catch (err) {
-              console.error("Erro ao carregar visibilidade:", err);
-            }
-          });
-        </script>
+        <!-- REDES SOCIAIS -->
 
         <section id="social-links-section">
           <div class="headline">Gerenciar Redes Sociais</div>
@@ -560,69 +706,6 @@
 
           <button id="save-links-btn">Salvar Links</button>
         </section>
-
-        <script>
-          // Salvar os links das redes sociais
-          document
-            .getElementById("save-links-btn")
-            .addEventListener("click", async () => {
-              const links = {
-                instagram: document.getElementById("insta-link").value,
-                facebook: document.getElementById("face-link").value,
-                x: document.getElementById("x-link").value,
-                youtube: document.getElementById("yt-link").value,
-              };
-
-              const res = await fetch("/api/social-links", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(links),
-              });
-
-              const data = await res.json();
-              if (data.message) {
-                alert("Links atualizados com sucesso!");
-              } else {
-                alert("Erro: " + data.error);
-              }
-            });
-
-          // Carregar links e visibilidade ao abrir a página
-          window.addEventListener("DOMContentLoaded", async () => {
-            try {
-              const resLinks = await fetch("/api/social-links");
-              const dataLinks = await resLinks.json();
-              if (dataLinks) {
-                document.getElementById("insta-link").value =
-                  dataLinks.instagram || "";
-                document.getElementById("face-link").value =
-                  dataLinks.facebook || "";
-                document.getElementById("x-link").value = dataLinks.x || "";
-                document.getElementById("yt-link").value =
-                  dataLinks.youtube || "";
-              }
-
-              const visRes = await fetch("/api/section-visibility");
-              const visData = await visRes.json();
-              document.getElementById("toggle-clients").checked =
-                visData.clients === true;
-            } catch (err) {
-              console.error("Erro ao carregar dados:", err);
-            }
-          });
-
-          // Atualizar visibilidade da seção ao marcar/desmarcar
-          document
-            .getElementById("toggle-clients")
-            .addEventListener("change", async (e) => {
-              const updated = { clients: e.target.checked };
-              await fetch("/api/section-visibility", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(updated),
-              });
-            });
-        </script>
 
         <!-- Container para editar a URL do Google Maps -->
         <div class="map-config-container">

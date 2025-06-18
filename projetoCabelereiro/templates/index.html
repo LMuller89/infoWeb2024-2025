@@ -22,6 +22,38 @@
       }
     </style>
     
+    <!-- CODIGOS JS -->
+
+  <!-- JS theme -->
+
+    <script>
+      async function applyThemeColor() {
+        try {
+          const res  = await fetch('/api/theme');
+          const data = await res.json();
+          const secColor  = data.section_color || '#ffffff';
+          const bodyColor = data.body_color    || '#ffffff';
+
+          // Aplica cor da seção
+          ['features', 'footer'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.style.backgroundColor = secColor;
+          });
+          document.querySelectorAll('.testimonial').forEach(el => {
+            el.style.backgroundColor = secColor;
+          });
+
+          // Aplica cor do body
+          document.body.style.backgroundColor = bodyColor;
+
+        } catch (err) {
+          console.error('Erro ao aplicar tema:', err);
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', applyThemeColor);
+    </script>
+
     <!-- Armazena a cor no localStorage para uso futuro -->
     <script>
       window.themeColor = "{{ cor_principal }}";
@@ -304,33 +336,7 @@
 
     <!-- Our JS file -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-    <script>
-      async function applyThemeColor() {
-        try {
-          const res  = await fetch('/api/theme');
-          const data = await res.json();
-          const secColor  = data.section_color || '#ffffff';
-          const bodyColor = data.body_color    || '#ffffff';
-
-          // Aplica cor da seção
-          ['features', 'footer'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.style.backgroundColor = secColor;
-          });
-          document.querySelectorAll('.testimonial').forEach(el => {
-            el.style.backgroundColor = secColor;
-          });
-
-          // Aplica cor do body
-          document.body.style.backgroundColor = bodyColor;
-
-        } catch (err) {
-          console.error('Erro ao aplicar tema:', err);
-        }
-      }
-
-      document.addEventListener('DOMContentLoaded', applyThemeColor);
-    </script> 
+ 
   </body>
 </html>
 
