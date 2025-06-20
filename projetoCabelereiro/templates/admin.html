@@ -269,6 +269,62 @@
       });
     </script>
 
+    <!-- Script para exibir o form do .testimonial -->
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const btnMostrar = document.getElementById("btn-mostrar-form");
+        const form = document.getElementById("add-funcionario-form");
+
+        btnMostrar.addEventListener("click", () => {
+          form.style.display = "block";      // Mostra o formulário
+          btnMostrar.style.display = "none"; // Esconde o botão de mostrar
+        });
+      });
+    </script>
+
+    <!-- Script para atualizar visibilidade do .testimonial -->
+      <script>
+        window.addEventListener("DOMContentLoaded", () => {
+          const checkbox = document.getElementById("hide-testimonials");
+          if (!checkbox) {
+            console.error("Checkbox #hide-testimonials não encontrado no DOM");
+            return;
+          }
+
+          // 1) carregar o estado salvo
+          fetch("/api/section-visibility")
+            .then((res) => res.json())
+            .then((data) => {
+              checkbox.checked = data.testimonials === true;
+            })
+            .catch((err) => console.error("Erro ao carregar visibilidade testimonials:", err));
+
+          // 2) enviar atualização ao mudar checkbox
+          checkbox.addEventListener("change", (e) => {
+            const payload = { testimonials: e.target.checked };
+
+            fetch("/api/section-visibility", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+            })
+              .then((res) => {
+                if (!res.ok) return res.text().then(text => Promise.reject(text));
+                return res.json();
+              })
+              .then((json) => {
+                console.log("Visibilidade testimonials atualizada:", json);
+              })
+              .catch((err) => {
+                console.error("Erro ao atualizar testimonials:", err);
+              });
+          });
+        });
+      </script>
+
+
+
     <!-- JS GALLERY -->
 
     <script>
@@ -330,6 +386,7 @@
             }
           });
         });
+
       // Carregar visibilidade ao abrir a página
       window.addEventListener("DOMContentLoaded", async () => {
         try {
@@ -400,7 +457,7 @@
         }
       });
 
-      // Atualizar visibilidade da seção ao marcar/desmarcar
+      // Atualizar visibilidade da seção clients ao marcar/desmarcar
       document
         .getElementById("toggle-clients")
         .addEventListener("change", async (e) => {
@@ -541,10 +598,44 @@
 
         <!-- TESTIMONIALS -->
         <div id="servicos-funcionarios-admin">
-          <h3 style="font-size: 28px; font-weight: bold">
-            Gerenciar Funcionários
-          </h3>
-          <form id="add-funcionario-form" enctype="multipart/form-data">
+        <div style="display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap;">
+          <h3 style="font-size: 28px; font-weight: bold; margin: 0;">Gerenciar Funcionários</h3>
+
+          <!-- Checkbox para esconder a seção testimonials -->
+          <label style="display: flex; align-items: center; gap: 6px; font-size: 14px;">
+            <input
+              type="checkbox"
+              id="hide-testimonials"
+              name="hide_testimonials"
+            />
+            Esconder Seção
+          </label>
+        </div>
+
+          <!-- Botão de exibir o formulário -->
+          <div style="text-align: center; margin-bottom: 20px;">
+            <button
+              id="btn-mostrar-form"
+              style="
+                padding: 12px 20px;
+                font-size: 16px;
+                border-radius: 6px;
+                background-color: #007bff;
+                color: white;
+                border: none;
+                cursor: pointer;
+              "
+            >
+              Adicionar Funcionário
+            </button>
+          </div>
+
+          <!-- Formulário oculto inicialmente -->
+          <form
+            id="add-funcionario-form"
+            enctype="multipart/form-data"
+            style="display: none;"
+          >
             <!-- Linha dos inputs -->
             <div
               style="
@@ -586,7 +677,7 @@
             <!-- Serviços dinâmicos -->
             <div id="servicos-container" style="margin-bottom: 20px"></div>
 
-            <!-- Botão centralizado com espaço abaixo -->
+            <!-- Botão de envio -->
             <div style="text-align: center; margin-bottom: 40px">
               <button
                 type="submit"
@@ -600,17 +691,12 @@
                   cursor: pointer;
                 "
               >
-                Adicionar Funcionário
+                Salvar Funcionário
               </button>
             </div>
           </form>
+         </div>
 
-          <div id="testimonials-admin">
-            <div class="headline1" style="font-size: 28px; font-weight: bold">
-              Funcionários Cadastrados
-            </div>
-            <br />
-          </div>
 
           <!-- Container onde os cards serão inseridos -->
           <div id="funcionarios-admin-container"></div>

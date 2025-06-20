@@ -66,8 +66,6 @@ app.secret_key = os.getenv('SECRET_KEY', 'mysecretkey')  # Recomendação: usar 
 def redirect_to_home():
     return redirect(url_for('index'))
 
-
-# Rota principal
 # Rota principal
 @app.route('/home')
 def index():
@@ -111,7 +109,8 @@ def index():
         section_visibility = {
             'clients': False,
             'gallery': 'full',
-            'localizacao': False
+            'localizacao': False,
+            'testimonials': False
         }
 
         for row in rows:
@@ -122,6 +121,8 @@ def index():
                 section_visibility['gallery'] = row.get('gallery_visibility') or 'full'
             elif sid == 'localizacao':
                 section_visibility['localizacao'] = bool(row.get('hidden', False))
+            elif sid == 'testimonials':
+                section_visibility['testimonials'] = bool(row.get('hidden', False))
 
         print("DEBUG section_visibility:", section_visibility)
     except Exception as e:
@@ -440,6 +441,8 @@ def section_visibility():
                         vis['gallery'] = row.get('gallery_visibility') or 'full'
                     elif section_id == 'localizacao':
                         vis['localizacao'] = bool(row.get('hidden', False))
+                    elif section_id == 'testimonials':
+                        vis['testimonials'] = bool(row.get('hidden', False))
 
                 if 'clients' not in vis:
                     vis['clients'] = False
@@ -447,13 +450,18 @@ def section_visibility():
                     vis['gallery'] = 'full'
                 if 'localizacao' not in vis:
                     vis['localizacao'] = False
+                if 'testimonials' not in vis:
+                    vis['testimonials'] = False
 
             else:
                 # Se a tabela estiver vazia, assume clientes visível e galeria em 'full'
                 vis = {
                     'clients': False,
-                    'gallery': 'full'
+                    'gallery': 'full',
+                    'localizacao': False,
+                    'testimonials': False
                 }
+                
             return jsonify(vis)
         except Exception as e:
             print(f"Erro ao buscar visibilidade: {e}")
@@ -465,8 +473,9 @@ def section_visibility():
         try:
             data = request.get_json() or {}
             # No mínimo deve haver a chave 'clients', 'gallery' ou 'localizacao' no JSON
-            if not any(key in data for key in ('clients', 'gallery', 'localizacao')):
-                return jsonify({'error': "Envie 'clients', 'gallery' ou 'localizacao' no corpo."}), 400
+            if not any(key in data for key in ('clients', 'gallery', 'localizacao', 'testimonials')):
+                return jsonify({'error': "Envie 'clients', 'gallery', 'localizacao' ou 'testimonials' no corpo."}), 400
+
 
 
             # 2.1) Se vier valor para clients, faz upsert em hidden
@@ -508,8 +517,19 @@ def section_visibility():
                     'hidden': ocultar,
                     'updated_at': datetime.now().isoformat()
                 }, on_conflict='id').execute()
+            
+            if 'testimonials' in data:
+                valor_test = data['testimonials']
+                try:
+                    ocultar = bool(valor_test)
+                except:
+                    return jsonify({'error': "Valor inválido para 'testimonials' (deve ser true/false)."}), 400
 
-
+                supabase.table('hidden_sections').upsert({
+                    'id': 'testimonials',
+                    'hidden': ocultar,
+                    'updated_at': datetime.now().isoformat()
+                }, on_conflict='id').execute()
 
             return jsonify({'message': 'Visibilidade atualizada!'})
         except Exception as e:
