@@ -118,7 +118,11 @@
       });
     </script>
   </head>
+<!-- ^^^^^^^^^^^^^^^^^ -->
   
+
+<!--  HTML  -->
+<!-- NAVBAR -->
     <body>
       <nav id="navbar">
         <div id="navbar-container">
@@ -135,7 +139,7 @@
       </nav>
     </body>
 
-
+<!-- SHOWCASE -->
     <header id="showcase">
       <div id="showcase-container">
         <h2>Nada muda mais um visual do que um bom corte!</h2>
@@ -144,6 +148,7 @@
       </div>
     </header>
 
+<!-- FEATURES -->
     <section id="features">
       <div class="headline">Como atuamos</div>
       <div id="features-container">
@@ -182,7 +187,8 @@
       </div>
     </section>
 
-    <!-- Inserido novo modelo de lista -->
+    <!-- testimonial -->
+    {% if not section_visibility.get('testimonials', False) %}
     <div id="testimonials">
       <div class="headline1">Nossos Serviços</div>
       <div id="testimonials-container" class="cards-{{ funcionarios|length }}">
@@ -201,7 +207,9 @@
         {% endfor %}
       </div>
     </div>
+    {% endif %}
 
+    <!-- Gallery -->
     {% if section_visibility.get('gallery') != 'none' %}
     <section id="gallery">
       <div class="headline">Galeria</div>
