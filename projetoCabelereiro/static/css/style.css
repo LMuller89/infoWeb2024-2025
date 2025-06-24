@@ -450,10 +450,6 @@ a {
 
 #clients {
   width: 100%;
-  background: linear-gradient(
-    135deg,
-    #e8d8c3 #543b34
-  ); /* Gradiente amarelo claro */
   color: #000000;
   padding: 0px 50px 0px;
   /*text-align: center;*/
@@ -550,13 +546,6 @@ a {
   color: #0c0c0c;
   padding: 30px;
   text-align: center;
-}
-
-body {
-  background: linear-gradient(
-    135deg,
-    #e8d8c3 #543b34
-  ); /* Gradiente amarelo claro */
 }
 
 #features,

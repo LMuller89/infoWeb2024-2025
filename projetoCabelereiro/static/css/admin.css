@@ -127,7 +127,7 @@
 
 /* CONTAINER DE TROCA DE COR SECTION */
 
-#theme-section {
+.theme-form {
   background: #fff;
   margin-top: 40px;
   padding: 20px;
@@ -138,48 +138,19 @@
   font-family: "Calibri", "Arial", "Calibri Light", sans-serif;
 }
 
-#theme-section .form-group {
+.theme-form .form-group {
   display: flex;
   align-items: center;
   gap: 10px;
+  margin-bottom: 15px;
 }
 
-#theme-section label {
+.theme-form label {
   font-weight: bold;
+  white-space: nowrap;
 }
 
-#theme-section input[type="color"] {
-  width: 60px;
-  height: 40px;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  font-family: "Calibri", "Arial", "Calibri Light", sans-serif;
-}
-
-/* CONTAINER DE TROCA DE COR BODY */
-
-#body-section {
-  background: #fff;
-  margin-top: 40px;
-  padding: 20px;
-  border-radius: 6px;
-  max-width: 400px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-#body-section .form-group {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-#body-section label {
-  font-weight: bold;
-}
-
-#body-section input[type="color"] {
+.theme-form input[type="color"] {
   width: 60px;
   height: 40px;
   border: none;

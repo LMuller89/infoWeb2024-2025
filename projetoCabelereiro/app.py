@@ -33,27 +33,53 @@ theme_cache = {
 }
 
 def get_cached_theme(force_refresh=False):
-    """Retorna um dict {'section':..., 'body':...} possivelmente em cache."""
+    """Retorna um dict com todas as cores de tema, inclusive fontes."""
     now = time.time()
-    # se cache expirou ou não existe
-    if force_refresh or theme_cache["section_color"] is None or now - theme_cache["timestamp"] > theme_cache["ttl"]:
+    
+    # TTL padrão em segundos (você pode ajustar)
+    TTL = theme_cache.get("ttl", 60)
+
+    # Verifica se o cache deve ser renovado (não existe, expirou ou forçado)
+    if (
+        force_refresh
+        or theme_cache.get("section_color") is None
+        or now - theme_cache.get("timestamp", 0) > TTL
+    ):
         try:
             resp = supabase.table('theme_config').select('*').limit(1).execute()
             data = resp.data
-            if data:
+            if data and len(data) > 0:
                 row = data[0]
+                # Atualiza o cache com TODAS as cores/fonte JUNTAS
                 theme_cache["section_color"] = row.get('background_color', '#ffffff')
-                theme_cache["body_color"]    = row.get('body_color', '#ffffff')
+                theme_cache["body_color"] = row.get('body_color', '#ffffff')
+                theme_cache["body_font_color"] = row.get('body_font_color', '#000000')
+                theme_cache["section_font_color"] = row.get('section_font_color', '#000000')
             else:
-                theme_cache["section_color"] = theme_cache["body_color"] = '#ffffff'
+                # Valores padrão caso tabela esteja vazia
+                theme_cache["section_color"] = '#ffffff'
+                theme_cache["body_color"] = '#ffffff'
+                theme_cache["body_font_color"] = '#000000'
+                theme_cache["section_font_color"] = '#000000'
+            
+            # Atualiza o timestamp após atualizar o cache
             theme_cache["timestamp"] = now
+
         except Exception as e:
             print(f"Erro ao buscar cores: {e}")
-            if theme_cache["section_color"] is None:
-                theme_cache["section_color"] = theme_cache["body_color"] = '#ffffff'
+            # Se cache vazio, inicializa com padrão para não quebrar
+            if theme_cache.get("section_color") is None:
+                theme_cache["section_color"] = '#ffffff'
+                theme_cache["body_color"] = '#ffffff'
+                theme_cache["body_font_color"] = '#000000'
+                theme_cache["section_font_color"] = '#000000'
+
+    # Retorna as cores e fontes do cache (sem consultar DB novamente)
     return {
-        'section': theme_cache["section_color"],
-        'body':    theme_cache["body_color"]
+        'section': theme_cache.get("section_color", '#ffffff'),
+        'body': theme_cache.get("body_color", '#ffffff'),
+        'body_font': theme_cache.get("body_font_color", '#000000'),
+        'section_font': theme_cache.get("section_font_color", '#000000')
     }
 
 app = Flask(__name__)
@@ -69,11 +95,13 @@ def redirect_to_home():
 # Rota principal
 @app.route('/home')
 def index():
-    # 1) Buscar cores do tema (sem alterações)
+    # 1) Buscar cores do tema (com cache)
     tema = get_cached_theme()
-    cor_principal = tema['section']
-    cor_body      = tema['body']
-
+    cor_principal = tema['section']          # cor da seção (features, footer, etc)
+    cor_body = tema['body']                   # cor de fundo do body
+    cor_body_font = tema['body_font']        # cor da fonte do body
+    cor_section_font = tema['section_font']  # cor da fonte da seção
+    
     # 2) Buscar imagens da galeria
     try:
         response = supabase.table('gallery_images').select('*').execute()
@@ -101,7 +129,7 @@ def index():
             'youtube': '#'
         }
 
-    # 4) Buscar visibilidade de seções (clients, gallery, localizacao)
+    # 4) Buscar visibilidade de seções (clients, gallery, localizacao, testimonials)
     try:
         response = supabase.table('hidden_sections').select('*').execute()
         rows = response.data or []
@@ -130,17 +158,15 @@ def index():
         section_visibility = {
             'clients': False,
             'gallery': 'full',
-            'localizacao': False
+            'localizacao': False,
+            'testimonials': False
         }
 
     # 5) Buscar o map_url na tabela settingsmap
     try:
         resp_map = supabase.table('settingsmap').select('map_url').eq('id', 1).execute()
         data_map = resp_map.data
-        if data_map and len(data_map) > 0:
-            map_url = data_map[0]['map_url']
-        else:
-            map_url = ""
+        map_url = data_map[0]['map_url'] if data_map and len(data_map) > 0 else ""
     except Exception as e:
         print(f"Erro ao buscar map_url: {e}")
         map_url = ""
@@ -162,18 +188,20 @@ def index():
         print(f"Erro ao buscar serviços: {e}")
         servicos_lookup = {}
 
-    # 8) Renderiza o template passando tudo
+    # 8) Renderizar template passando todas as variáveis, incluindo cores das fontes
     return render_template(
         'index.html',
         cor_principal=cor_principal,
         cor_body=cor_body,
+        cor_body_font=cor_body_font,
+        cor_section_font=cor_section_font,
         gallery_images=gallery_images,
         social_links=social_links,
         section_visibility=section_visibility,
         map_url=map_url,
         localizacao_hidden=section_visibility.get('localizacao', False),
         funcionarios=funcionarios,
-        servicos_lookup=servicos_lookup  # <-- PASSAR para o template
+        servicos_lookup=servicos_lookup
     )
 
 
@@ -257,15 +285,19 @@ def get_theme():
     try:
         t = get_cached_theme()
         return jsonify({
-            'section_color': t['section'],
-            'body_color':    t['body']
+            'section_color':      t['section'],
+            'body_color':         t['body'],
+            'body_font_color':    t.get('body_font', '#000000'),
+            'section_font_color': t.get('section_font', '#000000')
         })
     except Exception:
-        # mesmo em erro, retorna 200 com cores padrão
         return jsonify({
             'section_color': '#ffffff',
-            'body_color':    '#ffffff'
+            'body_color':    '#ffffff',
+            'body_font_color': '#000000',
+            'section_font_color': '#000000'
         }), 200
+
 
 # Rota POST para atualizar section_color
 @app.route('/api/theme/section', methods=['POST'])
@@ -301,6 +333,40 @@ def update_body_color():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
     
+@app.route('/api/theme/body-font', methods=['POST'])
+def update_body_font_color():
+    try:
+        new_color = request.json.get('color')
+        current = get_cached_theme()
+        supabase.table('theme_config').delete().neq('id', 0).execute()
+        supabase.table('theme_config').insert({
+            'background_color': current['section'],
+            'body_color':       current['body'],
+            'body_font_color':  new_color,
+            'section_font_color': current.get('section_font', '#000000')
+        }).execute()
+        theme_cache["body_font_color"] = new_color
+        return jsonify({'message': 'Fonte do body atualizada com sucesso'})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/theme/section-font', methods=['POST'])
+def update_section_font_color():
+    try:
+        new_color = request.json.get('color')
+        current = get_cached_theme()
+        supabase.table('theme_config').delete().neq('id', 0).execute()
+        supabase.table('theme_config').insert({
+            'background_color': current['section'],
+            'body_color':       current['body'],
+            'body_font_color':  current.get('body_font', '#000000'),
+            'section_font_color': new_color
+        }).execute()
+        theme_cache["section_font_color"] = new_color
+        return jsonify({'message': 'Fonte da seção atualizada com sucesso'})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 # Rota para obter imagens
 @app.route('/api/gallery', methods=['GET'])
 def get_gallery_images():
@@ -475,8 +541,6 @@ def section_visibility():
             # No mínimo deve haver a chave 'clients', 'gallery' ou 'localizacao' no JSON
             if not any(key in data for key in ('clients', 'gallery', 'localizacao', 'testimonials')):
                 return jsonify({'error': "Envie 'clients', 'gallery', 'localizacao' ou 'testimonials' no corpo."}), 400
-
-
 
             # 2.1) Se vier valor para clients, faz upsert em hidden
             if 'clients' in data:

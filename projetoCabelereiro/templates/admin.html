@@ -518,46 +518,66 @@
           </div>
         </section>
 
-        <section id="theme-section">
+        <!-- THEME BUTTONS -->
+
+        <section id="theme-section" class="theme-form">
           <h3>Alterar Cor do Tema (Seção)</h3>
           <div class="form-group">
             <label for="theme-color">Cor de Fundo da Seção:</label>
-            <input
-              type="color"
-              id="theme-color"
-              name="theme-color"
-              value="#ffffff"
-            />
+            <input type="color" id="theme-color" name="theme-color" value="#ffffff" />
             <button id="save-theme-btn" class="btn">Salvar Seção</button>
           </div>
         </section>
 
-        <section id="body-section">
+        <section id="body-section" class="theme-form">
           <h3>Alterar Cor do Fundo (Body)</h3>
           <div class="form-group">
             <label for="body-color">Cor de Fundo do Body:</label>
-            <input
-              type="color"
-              id="body-color"
-              name="body-color"
-              value="#ffffff"
-            />
+            <input type="color" id="body-color" name="body-color" value="#ffffff" />
             <button id="save-body-btn" class="btn">Salvar Body</button>
           </div>
         </section>
+
+        <section id="body-font-section" class="theme-form">
+          <h3>Alterar Cor da Fonte (Body)</h3>
+          <div class="form-group">
+            <label for="body-font-color">Cor da Fonte do Body:</label>
+            <input type="color" id="body-font-color" value="#000000" />
+            <button id="save-body-font-btn" class="btn">Salvar Fonte Body</button>
+          </div>
+        </section>
+
+        <section id="section-font-section" class="theme-form">
+          <h3>Alterar Cor da Fonte (Section)</h3>
+          <div class="form-group">
+            <label for="section-font-color">Cor da Fonte da Section:</label>
+            <input type="color" id="section-font-color" value="#000000" />
+            <button id="save-section-font-btn" class="btn">Salvar Fonte Section</button>
+          </div>
+        </section>
+
+        <!-- SCRIPT JS THEME -->  
 
         <script>
           // ========= Carregar cores atuais ao abrir =========
           window.addEventListener("DOMContentLoaded", async () => {
             const res = await fetch("/api/theme");
             const data = await res.json();
+
             if (data.section_color) {
               document.getElementById("theme-color").value = data.section_color;
             }
             if (data.body_color) {
               document.getElementById("body-color").value = data.body_color;
             }
+            if (data.body_font_color) {
+              document.getElementById("body-font-color").value = data.body_font_color;
+            }
+            if (data.section_font_color) {
+              document.getElementById("section-font-color").value = data.section_font_color;
+            }
           });
+
 
           // ========= Salvar cor da seção =========
           document
@@ -594,7 +614,50 @@
                 alert("Erro: " + data.error);
               }
             });
+
+          // Salvar cor da fonte do body
+            document
+              .getElementById("save-body-font-btn")
+              .addEventListener("click", async () => {
+                console.log("Clique detectado em salvar fonte body");
+                const color = document.getElementById("body-font-color").value;
+                const response = await fetch("/api/theme/body-font", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ color }),
+                });
+
+                const data = await response.json(); // linha que está quebrando
+                console.log("Resposta recebida:", data);
+
+                if (data.message) {
+                  alert("Fonte do body atualizada com sucesso!");
+                } else {
+                  alert("Erro: " + data.error);
+                }
+              });
+
+
+          // Salvar cor da fonte da seção
+          document
+            .getElementById("save-section-font-btn")
+            .addEventListener("click", async () => {
+              const color = document.getElementById("section-font-color").value;
+              const response = await fetch("/api/theme/section-font", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ color }),
+              });
+              const data = await response.json();
+              if (data.message) {
+                alert("Fonte da seção atualizada com sucesso!");
+              } else {
+                alert("Erro: " + data.error);
+              }
+            });
         </script>
+
+        
 
         <!-- TESTIMONIALS -->
         <div id="servicos-funcionarios-admin">
