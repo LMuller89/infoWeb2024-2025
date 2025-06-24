@@ -2,49 +2,105 @@
 <html lang="en">
   <head>
     <title>Studio Florescer</title>
-  <!-- Injetar a cor inline para evitar bug de cores -->
+    <!-- Injetar a cor inline para evitar bug de cores -->
     <style>
       :root {
         --cor-principal: {{ cor_principal }};
-        --cor-texto: #333333;
-        /* Adicione outras variáveis CSS aqui */
+        --cor-body: {{ cor_body }};
+        --cor-body-font: {{ cor_body_font }};
+        --cor-section-font: {{ cor_section_font }};
       }
-      
-      /* Estilos críticos inline para renderização inicial */
-      body, html {
-        background-color: var(--cor-principal);
-        margin: 0;
-        padding: 0;
+
+      body {
+        background-color: var(--cor-body);
+        color: var(--cor-body-font);
       }
-      
-      #features, #footer, .testimonial {
+
+      /* Seções com fundo da seção */
+      #features,
+      #footer,
+      .testimonial {
         background-color: var(--cor-principal);
+        color: var(--cor-section-font);
+      }
+
+      /* Textos que devem seguir a cor da fonte da seção */
+      #features .headline,
+      #features .feature-title,
+      #footer .headline,
+      .testimonial .headline,
+      .headline,
+      .headline1,
+      .feature-title,
+      .testimonial p,
+      .testimonial span {
+        color: var(--cor-section-font);
       }
     </style>
+
+
     
     <!-- CODIGOS JS -->
 
-  <!-- JS theme -->
-
+    <!-- JS theme -->
     <script>
       async function applyThemeColor() {
         try {
           const res  = await fetch('/api/theme');
           const data = await res.json();
-          const secColor  = data.section_color || '#ffffff';
-          const bodyColor = data.body_color    || '#ffffff';
 
-          // Aplica cor da seção
+          const secColor  = data.section_color       || '#ffffff';
+          const bodyColor = data.body_color          || '#ffffff';
+          const secFont   = data.section_font_color  || '#000000';
+          const bodyFont  = data.body_font_color     || '#000000';
+
+          // Aplica fundo e fonte da seção (background + cor texto)
           ['features', 'footer'].forEach(id => {
             const el = document.getElementById(id);
-            if (el) el.style.backgroundColor = secColor;
-          });
-          document.querySelectorAll('.testimonial').forEach(el => {
-            el.style.backgroundColor = secColor;
+            if (el) {
+              el.style.backgroundColor = secColor;
+              el.style.color = secFont;
+            }
           });
 
-          // Aplica cor do body
+          document.querySelectorAll('.testimonial').forEach(el => {
+            el.style.backgroundColor = secColor;
+            el.style.color = secFont;
+          });
+
+          // Aplica background do body
           document.body.style.backgroundColor = bodyColor;
+
+          // Aplica cor do texto body para TODOS os elementos DENTRO do body,
+          // exceto os dentro das seções exclusas (#features, #footer, etc.)
+          document.body.querySelectorAll('*').forEach(el => {
+            if (
+              el.closest('#features') ||
+              el.closest('#footer') ||
+              el.closest('.testimonial') ||
+              el.closest('#navbar') ||
+              el.closest('#showcase')
+            ) return;
+
+            const textTags = ['P', 'SPAN', 'H1', 'H2', 'H3', 'H4', 'LI', 'A', 'BUTTON', 'LABEL', 'DIV'];
+            if (textTags.includes(el.tagName)) {
+              el.style.color = bodyFont;
+            }
+          });
+
+          // Dentro do #features:
+          const features = document.getElementById('features');
+          if (features) {
+            // Títulos principais como .headline → cor da seção
+            features.querySelectorAll('.headline').forEach(el => {
+              el.style.color = secFont;
+            });
+
+            // Outros textos dentro de #features → cor do body
+            features.querySelectorAll('p, span, .feature-title, .texto').forEach(el => {
+              el.style.color = bodyFont;
+            });
+          }
 
         } catch (err) {
           console.error('Erro ao aplicar tema:', err);
@@ -54,30 +110,53 @@
       document.addEventListener('DOMContentLoaded', applyThemeColor);
     </script>
 
-    <!-- Armazena a cor no localStorage para uso futuro -->
+
+
+
+
+
+    <!-- Armazena a cor principal no localStorage para uso futuro -->
     <script>
       window.themeColor = "{{ cor_principal }}";
       localStorage.setItem("corPrincipal", window.themeColor);
     </script>
+
+    <script>
+      // Recebe as cores do Flask via Jinja
+      const corPrincipal = "{{ cor_principal }}";
+      const corBody = "{{ cor_body }}";
+      const corBodyFont = "{{ cor_body_font }}";
+      const corSectionFont = "{{ cor_section_font }}";
+
+      // Armazena tudo no localStorage
+      localStorage.setItem("corPrincipal", corPrincipal);
+      localStorage.setItem("corBody", corBody);
+      localStorage.setItem("corBodyFont", corBodyFont);
+      localStorage.setItem("corSectionFont", corSectionFont);
+    </script>
+
   
     <!-- Carregamento do CSS não-crítico -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v={{ cor_principal }}">
-    <link rel="stylesheet" media="screen and (max-width: 768px)" href="{{ url_for('static', filename='css/mobile.css') }}" media="print" onload="this.media='screen and (max-width: 768px)'">
-      <meta charset="UTF-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-      <!-- Define a cor CERTA direto no :root, sem piscar -->
-      <style>
-        :root {
-          --cor-principal: {{ cor_principal }};
-        }
-      </style>
-  
-      <script>
-        // Atualiza o localStorage com a cor correta DO BANCO
-        const corAtual = "{{ cor_principal }}";
-        localStorage.setItem("corPrincipal", corAtual);
-      </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <style>
+      :root {
+        --cor-principal: {{ cor_principal }};
+        --cor-body: {{ cor_body }};
+        --cor-body-font: {{ cor_body_font }};
+        --cor-section-font: {{ cor_section_font }};
+      }
+    </style>
+
+    <script>
+      localStorage.setItem("corPrincipal", "{{ cor_principal }}");
+      localStorage.setItem("corBody", "{{ cor_body }}");
+      localStorage.setItem("corBodyFont", "{{ cor_body_font }}");
+      localStorage.setItem("corSectionFont", "{{ cor_section_font }}");
+    </script>
+
       
     <!-- JS do .testimonial para dividir a lista em duas colunas se tiver mais de 4 itens -->
     <script>
