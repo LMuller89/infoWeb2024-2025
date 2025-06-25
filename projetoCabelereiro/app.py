@@ -55,12 +55,14 @@ def get_cached_theme(force_refresh=False):
                 theme_cache["body_color"] = row.get('body_color', '#ffffff')
                 theme_cache["body_font_color"] = row.get('body_font_color', '#000000')
                 theme_cache["section_font_color"] = row.get('section_font_color', '#000000')
+                theme_cache["background_font_color"] = row.get('background_font_color', '#000000')
             else:
                 # Valores padrão caso tabela esteja vazia
                 theme_cache["section_color"] = '#ffffff'
                 theme_cache["body_color"] = '#ffffff'
                 theme_cache["body_font_color"] = '#000000'
                 theme_cache["section_font_color"] = '#000000'
+                theme_cache["background_font_color"] = '#000000'
             
             # Atualiza o timestamp após atualizar o cache
             theme_cache["timestamp"] = now
@@ -73,13 +75,15 @@ def get_cached_theme(force_refresh=False):
                 theme_cache["body_color"] = '#ffffff'
                 theme_cache["body_font_color"] = '#000000'
                 theme_cache["section_font_color"] = '#000000'
+                theme_cache["background_font_color"] = '#000000'
 
     # Retorna as cores e fontes do cache (sem consultar DB novamente)
     return {
         'section': theme_cache.get("section_color", '#ffffff'),
         'body': theme_cache.get("body_color", '#ffffff'),
         'body_font': theme_cache.get("body_font_color", '#000000'),
-        'section_font': theme_cache.get("section_font_color", '#000000')
+        'section_font': theme_cache.get("section_font_color", '#000000'),
+        'background_font': theme_cache.get("background_font_color", '#000000')
     }
 
 app = Flask(__name__)
@@ -97,10 +101,11 @@ def redirect_to_home():
 def index():
     # 1) Buscar cores do tema (com cache)
     tema = get_cached_theme()
-    cor_principal = tema['section']          # cor da seção (features, footer, etc)
-    cor_body = tema['body']                   # cor de fundo do body
-    cor_body_font = tema['body_font']        # cor da fonte do body
-    cor_section_font = tema['section_font']  # cor da fonte da seção
+    cor_principal = tema['section']                # cor da seção (features, footer, etc)
+    cor_body = tema['body']                        # cor de fundo do body
+    cor_body_font = tema['body_font']              # cor da fonte do body
+    cor_section_font = tema['section_font']        # cor da fonte da seção
+    cor_background_font = tema['background_font']  # cor da fonte do background
     
     # 2) Buscar imagens da galeria
     try:
@@ -195,6 +200,7 @@ def index():
         cor_body=cor_body,
         cor_body_font=cor_body_font,
         cor_section_font=cor_section_font,
+        cor_background_font=cor_background_font,
         gallery_images=gallery_images,
         social_links=social_links,
         section_visibility=section_visibility,
@@ -285,17 +291,19 @@ def get_theme():
     try:
         t = get_cached_theme()
         return jsonify({
-            'section_color':      t['section'],
-            'body_color':         t['body'],
-            'body_font_color':    t.get('body_font', '#000000'),
-            'section_font_color': t.get('section_font', '#000000')
+            'section_color':          t['section'],
+            'body_color':             t['body'],
+            'body_font_color':        t.get('body_font', '#000000'),
+            'section_font_color':     t.get('section_font', '#000000'),
+            'background_font_color':  t.get('background_font', '#000000')
         })
     except Exception:
         return jsonify({
             'section_color': '#ffffff',
             'body_color':    '#ffffff',
             'body_font_color': '#000000',
-            'section_font_color': '#000000'
+            'section_font_color': '#000000',
+            'background_font_color': '#000000'
         }), 200
 
 
@@ -312,7 +320,7 @@ def update_section_color():
             'body_color':       current['body']
         }).execute()
         theme_cache["section_color"] = new_color
-        return jsonify({'message': 'Seção atualizada com sucesso'})
+        return jsonify({'message': 'Seção atualizada com sucesso!'})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -329,7 +337,7 @@ def update_body_color():
             'body_color':       new_color
         }).execute()
         theme_cache["body_color"] = new_color
-        return jsonify({'message': 'Body atualizado com sucesso'})
+        return jsonify({'message': 'Body atualizado com sucesso!'})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
     
@@ -346,7 +354,7 @@ def update_body_font_color():
             'section_font_color': current.get('section_font', '#000000')
         }).execute()
         theme_cache["body_font_color"] = new_color
-        return jsonify({'message': 'Fonte do body atualizada com sucesso'})
+        return jsonify({'message': 'Fonte do body atualizada com sucesso!'})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -357,15 +365,35 @@ def update_section_font_color():
         current = get_cached_theme()
         supabase.table('theme_config').delete().neq('id', 0).execute()
         supabase.table('theme_config').insert({
-            'background_color': current['section'],
-            'body_color':       current['body'],
-            'body_font_color':  current.get('body_font', '#000000'),
-            'section_font_color': new_color
+            'background_color':      current['section'],
+            'body_color':            current['body'],
+            'body_font_color':       current.get('body_font', '#000000'),
+            'section_font_color':    new_color,
+            'background_font_color': current.get('background_font', '#000000'),
         }).execute()
         theme_cache["section_font_color"] = new_color
-        return jsonify({'message': 'Fonte da seção atualizada com sucesso'})
+        return jsonify({'message': 'Fonte da seção atualizada com sucesso!'})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+    
+@app.route('/api/theme/background-font', methods=['POST'])
+def update_background_font_color():
+    try:
+        new_color = request.json.get('color')
+        current = get_cached_theme()
+        supabase.table('theme_config').delete().neq('id', 0).execute()
+        supabase.table('theme_config').insert({
+            'background_color':      current['section'],
+            'body_color':            current['body'],
+            'body_font_color':       current.get('body_font', '#000000'),
+            'section_font_color':    current.get('section_font', '#000000'),
+            'background_font_color': new_color,
+        }).execute()
+        theme_cache["background_font_color"] = new_color
+        return jsonify({'message': 'Fonte do background atualizada com sucesso!'})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 
 # Rota para obter imagens
 @app.route('/api/gallery', methods=['GET'])
