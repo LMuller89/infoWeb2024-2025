@@ -9,6 +9,7 @@
         --cor-body: {{ cor_body }};
         --cor-body-font: {{ cor_body_font }};
         --cor-section-font: {{ cor_section_font }};
+        --cor-background-font: {{ cor_background_font }};
       }
 
       body {
@@ -16,27 +17,78 @@
         color: var(--cor-body-font);
       }
 
-      /* Seções com fundo da seção */
+      /* Itens da navbar e textos do showcase usam cor_background_font */
+      #navbar-items li a,
+      #showcase,
+      #showcase-container,
+      #showcase-container * {
+        color: var(--cor-background-font);
+        transition: none; /* para evitar piscar */
+      }
+
+      #navbar-items li a:hover {
+        color: var(--cor-principal);
+      }
+      
+      /* Seções com fundo da section */
       #features,
       #footer,
       .testimonial {
         background-color: var(--cor-principal);
+      }
+
+      /* Títulos de seções com fundo escuro */
+      #features .headline,
+      #footer .headline,
+      .testimonial .headline {
         color: var(--cor-section-font);
       }
 
-      /* Textos que devem seguir a cor da fonte da seção */
-      #features .headline,
+      /* Títulos em seções com fundo claro */
+      #gallery .headline,
+      #contact .headline,
+      #clients .headline,
+      #videoslot .headline,
+      #testimonials .headline1 {
+        color: var(--cor-body-font);
+      }
+
+      /* Textos internos de "Como Atuamos" */
       #features .feature-title,
-      #footer .headline,
-      .testimonial .headline,
-      .headline,
-      .headline1,
-      .feature-title,
-      .testimonial p,
-      .testimonial span {
+      #features .texto,
+      #features .texto p,
+      #features span,
+      #features i {
+        color: var(--cor-body-font);
+      }
+
+      /* Testimonials */
+      .testimonial,
+      .testimonial * {
         color: var(--cor-section-font);
       }
+
+      /* Footer */
+      #footer,
+      #footer * {
+        color: var(--cor-section-font);
+      }
+
+      /* Contact */
+      #contact {
+        background-color: var(--cor-body);
+      }
+
+      #contact p,
+      #contact i {
+        color: var(--cor-body-font);
+      }
     </style>
+
+
+
+
+
 
 
     
@@ -49,12 +101,31 @@
           const res  = await fetch('/api/theme');
           const data = await res.json();
 
-          const secColor  = data.section_color       || '#ffffff';
-          const bodyColor = data.body_color          || '#ffffff';
-          const secFont   = data.section_font_color  || '#000000';
-          const bodyFont  = data.body_font_color     || '#000000';
+          const secColor  = data.section_color                   || '#ffffff';
+          const bodyColor = data.body_color                      || '#ffffff';
+          const secFont   = data.section_font_color              || '#000000';
+          const bodyFont  = data.body_font_color                 || '#000000';
+          const backgroundFont = data.background_font_color || '#000000';
 
-          // Aplica fundo e fonte da seção (background + cor texto)
+          // Pinta os itens do menu (links dentro do #navbar-items)
+          const navbarItems = document.getElementById('navbar-items');
+          if (navbarItems) {
+            navbarItems.querySelectorAll('a').forEach(link => {
+              link.style.color = backgroundFont;
+            });
+          }
+
+          // Pinta o #showcase normalmente
+          const showcase = document.getElementById('showcase');
+          if (showcase) {
+            showcase.style.color = backgroundFont;
+            showcase.querySelectorAll('*').forEach(child => {
+              child.style.color = backgroundFont;
+            });
+          }
+
+
+          // Aplica fundo e fonte da seção (SECTION FONT COLOR)
           ['features', 'footer'].forEach(id => {
             const el = document.getElementById(id);
             if (el) {
@@ -68,7 +139,7 @@
             el.style.color = secFont;
           });
 
-          // Aplica background do body
+          // Aplica background do body (BODY FONT COLOR)
           document.body.style.backgroundColor = bodyColor;
 
           // Aplica cor do texto body para TODOS os elementos DENTRO do body,
@@ -110,11 +181,6 @@
       document.addEventListener('DOMContentLoaded', applyThemeColor);
     </script>
 
-
-
-
-
-
     <!-- Armazena a cor principal no localStorage para uso futuro -->
     <script>
       window.themeColor = "{{ cor_principal }}";
@@ -127,35 +193,20 @@
       const corBody = "{{ cor_body }}";
       const corBodyFont = "{{ cor_body_font }}";
       const corSectionFont = "{{ cor_section_font }}";
+      const corBackgroundFont = "{{ cor_background_font }}"
 
       // Armazena tudo no localStorage
       localStorage.setItem("corPrincipal", corPrincipal);
       localStorage.setItem("corBody", corBody);
       localStorage.setItem("corBodyFont", corBodyFont);
       localStorage.setItem("corSectionFont", corSectionFont);
+      localStorage.setItem("corBackgroundFont", "{{ cor_background_font }}");
     </script>
-
   
     <!-- Carregamento do CSS não-crítico -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v={{ cor_principal }}">
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-    <style>
-      :root {
-        --cor-principal: {{ cor_principal }};
-        --cor-body: {{ cor_body }};
-        --cor-body-font: {{ cor_body_font }};
-        --cor-section-font: {{ cor_section_font }};
-      }
-    </style>
-
-    <script>
-      localStorage.setItem("corPrincipal", "{{ cor_principal }}");
-      localStorage.setItem("corBody", "{{ cor_body }}");
-      localStorage.setItem("corBodyFont", "{{ cor_body_font }}");
-      localStorage.setItem("corSectionFont", "{{ cor_section_font }}");
-    </script>
 
       
     <!-- JS do .testimonial para dividir a lista em duas colunas se tiver mais de 4 itens -->
@@ -206,8 +257,8 @@
       <nav id="navbar">
         <div id="navbar-container">
           <h1 class="logo">
-            <img src="static/img/logo.png" alt="Logo Studio Florescer" class="logo-img">
-            Studio Florescer
+            <img src="static/img/logo.png" alt="Logo Studio Florescer" class="logo-img" />
+            <span class="logo-text">Studio Florescer</span>
           </h1>
           <ul id="navbar-items">
             <!-- <li><a href="#showcase">Início</a></li> -->

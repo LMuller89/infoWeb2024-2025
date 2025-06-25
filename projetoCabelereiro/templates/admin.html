@@ -538,6 +538,15 @@
           </div>
         </section>
 
+        <section id="background-font-section" class="theme-form">
+          <h3>Alterar Cor da Fonte (Background)</h3>
+          <div class="form-group">
+            <label for="background-font-color">Cor da Fonte do Background:</label>
+            <input type="color" id="background-font-color" value="#000000" />
+            <button id="save-background-font-btn" class="btn">Salvar Fonte Background</button>
+          </div>
+        </section>
+
         <section id="body-font-section" class="theme-form">
           <h3>Alterar Cor da Fonte (Body)</h3>
           <div class="form-group">
@@ -575,6 +584,9 @@
             }
             if (data.section_font_color) {
               document.getElementById("section-font-color").value = data.section_font_color;
+            }
+            if (data.background_font_color) {
+              document.getElementById("background-font-color").value = data.background_font_color;
             }
           });
 
@@ -614,6 +626,28 @@
                 alert("Erro: " + data.error);
               }
             });
+
+          // Salvar cor da fonte do background
+            document
+              .getElementById("save-background-font-btn")
+              .addEventListener("click", async () => {
+                console.log("Clique detectado em salvar fonte background");
+                const color = document.getElementById("background-font-color").value;
+                const response = await fetch("/api/theme/background-font", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ color }),
+                });
+
+                const data = await response.json(); // linha que está quebrando
+                console.log("Resposta recebida:", data);
+
+                if (data.message) {
+                  alert("Fonte do background atualizada com sucesso!");
+                } else {
+                  alert("Erro: " + data.error);
+                }
+              });
 
           // Salvar cor da fonte do body
             document
