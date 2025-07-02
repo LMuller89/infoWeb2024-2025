@@ -15,6 +15,10 @@ from uuid import uuid4
 import uuid
 import re
 import json
+import os
+from urllib.parse import urlparse
+from PIL import Image
+import io
 
 SUPABASE_URL = "https://vuvuiddlnpppzsyrhmff.supabase.co"
 SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ1dnVpZGRsbnBwcHpzeXJobWZmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NTg2ODQ4NiwiZXhwIjoyMDYxNDQ0NDg2fQ.NLxj4Vbi-EdvQaxlqc6qhRQZ7YpSWXQkGB7m-rRrSJ8"  # use a chave correta aqui
@@ -192,8 +196,23 @@ def index():
     except Exception as e:
         print(f"Erro ao buscar serviços: {e}")
         servicos_lookup = {}
+        
+    # 8) Buscar logo ativa
+    try:
+        resp_logo = supabase.table('logos').select('*').eq('is_active', True).limit(1).execute()
+        logo_data = resp_logo.data[0] if resp_logo.data else {
+            "logo_url": "/static/img/logo.png",
+            "height_px": 120
+        }
+    except Exception as e:
+        print(f"Erro ao buscar logo: {e}")
+        logo_data = {
+            "logo_url": "/static/img/logo.png",
+            "height_px": 120
+        }
 
-    # 8) Renderizar template passando todas as variáveis, incluindo cores das fontes
+
+    # 9) Renderizar template passando todas as variáveis, incluindo cores das fontes
     return render_template(
         'index.html',
         cor_principal=cor_principal,
@@ -207,10 +226,9 @@ def index():
         map_url=map_url,
         localizacao_hidden=section_visibility.get('localizacao', False),
         funcionarios=funcionarios,
-        servicos_lookup=servicos_lookup
+        servicos_lookup=servicos_lookup,
+        logo=logo_data
     )
-
-
 
 # Admin protegida
 @app.route('/admin')
@@ -284,6 +302,144 @@ def login():
 
     flash('Email ou senha inválidos.', 'danger')
     return redirect(url_for('admin'))
+
+@app.route("/upload-logo", methods=["POST"])
+def upload_logo():
+    file = request.files.get("logo")
+    height = request.form.get("height")
+
+    if not file or not height:
+        return jsonify({"success": False, "error": "Arquivo ou altura ausente"})
+
+    try:
+        filename = secure_filename(file.filename)
+        extension = os.path.splitext(filename)[1]
+        unique_name = f"logo-{uuid.uuid4()}{extension}"
+        file_data = file.read()
+
+        # 🧠 Detectar se a imagem é clara
+        is_clara = cor_dominante_e_clara(file_data)
+        bg_contraste = "black" if is_clara else "white"
+
+        # Upload no Supabase
+        try:
+            supabase.storage.from_('logos').upload(unique_name, file_data, {
+                "content-type": file.mimetype
+            })
+        except Exception as e:
+            return jsonify({"success": False, "error": f"Erro no upload: {str(e)}"})
+
+        public_url = supabase.storage.from_('logos').get_public_url(unique_name)
+
+        insert = supabase.table("logos").insert({
+            "nome": filename,
+            "logo_url": public_url,
+            "height_px": int(height),
+            "is_active": False,
+            "bg_contraste": bg_contraste  # ← novo campo
+        }).execute()
+
+        if not insert.data:
+            return jsonify({"success": False, "error": "Erro ao salvar no banco: retorno vazio"})
+
+        return jsonify({"success": True})
+
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)})
+    
+@app.route('/api/listar-logos', methods=['GET'])
+def listar_logos():
+    try:
+        logos_resp = supabase.table('logos').select("*").order("id", desc=False).execute()
+        logos = logos_resp.data if logos_resp.data else []
+        return jsonify({"success": True, "logos": logos})
+    except Exception as e:
+        print("Erro ao listar logos:", e)
+        return jsonify({"success": False, "error": str(e)})
+
+@app.route('/api/ativar-logo', methods=['POST'])
+def ativar_logo():
+    data = request.get_json()
+    logo_id = data.get("id")
+    if not logo_id:
+        return jsonify({"error": "ID da logo não fornecido"}), 400
+
+    try:
+        resp1 = supabase.table('logos').update({"is_active": False}).eq("is_active", True).execute()
+        if not resp1.data:
+            print("Nenhuma logo estava ativa antes, tudo bem")
+
+        resp2 = supabase.table('logos').update({"is_active": True}).eq("id", logo_id).execute()
+        if not resp2.data:
+            return jsonify({"error": "Logo não encontrada para ativar"}), 400
+
+        return jsonify({"success": True})
+    except Exception as e:
+        print("Erro ao ativar logo:", e)
+        return jsonify({"error": "Erro interno"}), 500
+
+@app.route("/api/deletar-logo", methods=["POST"])
+def deletar_logo():
+    data = request.get_json()
+    logo_id = data.get("id")
+    logo_url = data.get("logo_url")
+
+    if not logo_id or not logo_url:
+        return jsonify({"success": False, "error": "ID ou URL da logo ausente"})
+
+    try:
+        # Extrai caminho da URL completa
+        path = urlparse(logo_url).path  # exemplo: /storage/v1/object/public/logos//logo-xxxx.png
+        file_path = path.split("/storage/v1/object/public/logos/")[-1]  # retorna logo-xxxx.png
+
+        print("Tentando remover arquivo do bucket:", file_path)
+
+        # Remove da storage
+        response = supabase.storage.from_('logos').remove([file_path])
+        print("Resposta da remoção:", response)
+
+        if isinstance(response, list):
+            print("Logo removida da storage com sucesso.")
+        elif isinstance(response, dict) and response.get('error'):
+            return jsonify({"success": False, "error": f"Erro na remoção: {response['error']}"})
+        else:
+            print("Resposta inesperada:", response)
+
+        # Remove do banco
+        supabase.table("logos").delete().eq("id", logo_id).execute()
+
+        return jsonify({"success": True})
+
+    except Exception as e:
+        print("Erro ao deletar logo:", e)
+        return jsonify({"success": False, "error": str(e)})
+
+def cor_dominante_e_clara(image_bytes):
+    with Image.open(io.BytesIO(image_bytes)) as img:
+        img = img.convert('RGBA')  # mantém canal alfa
+        img = img.resize((100, 100))
+        pixels = list(img.getdata())
+
+        r_total = g_total = b_total = count = 0
+
+        for r, g, b, a in pixels:
+            if a > 10:  # ignora pixels quase totalmente transparentes
+                r_total += r
+                g_total += g
+                b_total += b
+                count += 1
+
+        if count == 0:
+            return False  # Se todos os pixels forem transparentes, assume imagem escura (ou mude para True)
+
+        avg_r = r_total / count
+        avg_g = g_total / count
+        avg_b = b_total / count
+
+        luminancia = 0.2126 * avg_r + 0.7152 * avg_g + 0.0722 * avg_b
+
+        return luminancia > 160  # Limiar ajustável
+
 
 # Rota GET unificada
 @app.route('/api/theme', methods=['GET'])

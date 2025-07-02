@@ -2,6 +2,7 @@
 <html lang="en">
   <head>
     <title>Studio Florescer</title>
+
     <!-- Injetar a cor inline para evitar bug de cores -->
     <style>
       :root {
@@ -85,13 +86,6 @@
       }
     </style>
 
-
-
-
-
-
-
-    
     <!-- CODIGOS JS -->
 
     <!-- JS theme -->
@@ -256,10 +250,18 @@
     <body>
       <nav id="navbar">
         <div id="navbar-container">
+          {% if logo.logo_url %}
           <h1 class="logo">
-            <img src="static/img/logo.png" alt="Logo Studio Florescer" class="logo-img" />
-            <span class="logo-text">Studio Florescer</span>
+            <img
+              src="{{ logo.logo_url }}"
+              class="logo-img"
+              alt=""
+              style="height: {{ logo.height_px }}px; width: auto;"
+            />
+            <span class="logo-text"></span>
           </h1>
+        {% endif %}
+                
           <ul id="navbar-items">
             <!-- <li><a href="#showcase">Início</a></li> -->
             <li><a href="#testimonials">Serviços</a></li>

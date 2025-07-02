@@ -105,6 +105,34 @@
   margin-bottom: 30px;
 }
 
+/* admin.css */
+
+/* LOGO SECTION CSS */
+
+.logo-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.logo-item img {
+  max-width: 100px;
+  max-height: 100px;
+  object-fit: contain;
+  border: 1px solid #ccc;
+  padding: 5px;
+}
+
+.logo-info {
+  flex-grow: 1;
+}
+
+.logo-actions button {
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
 /* Estilo dos cards do dashboard */
 .dashboard-cards {
   display: flex;

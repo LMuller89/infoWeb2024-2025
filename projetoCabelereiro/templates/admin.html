@@ -518,6 +518,159 @@
           </div>
         </section>
 
+        <!-- LOGO -->
+
+        <h2>Upload de Logo</h2>
+        <form id="logo-upload-form" enctype="multipart/form-data">
+          <input type="file" name="logo" accept="image/*" required />
+          <label for="logo-height">Altura da logo (px):</label>
+          <select name="height">
+            <option value="100">100px</option>
+            <option value="140">140px</option>
+            <option value="160">160px</option>
+          </select>
+          <button type="submit">Enviar</button>
+        </form>
+        <p id="logo-status"></p>
+        
+        <h2>Logos Cadastradas</h2>
+        <div id="logos-list"></div>
+        
+        <script>
+          const status = document.getElementById("logo-status");
+          const logosList = document.getElementById("logos-list");
+        
+          // Função para carregar logos do backend
+          async function loadLogos() {
+            logosList.innerHTML = "Carregando...";
+            try {
+              const res = await fetch("/api/listar-logos");
+              const json = await res.json();
+              if (json.success) {
+                if (!json.logos || json.logos.length === 0) {
+                  logosList.innerHTML = "<p>Nenhuma logo cadastrada.</p>";
+                  return;
+                }
+                logosList.innerHTML = "";
+                json.logos.forEach(logo => {
+                  const div = document.createElement("div");
+                  div.className = "logo-item";
+
+                  // Define cor de fundo com base no campo bg_contraste
+                  const bgColor = logo.bg_contraste === "black" ? "#000000" : "#FFFFFF";
+
+                  div.innerHTML = `
+                    <div style="background-color: ${bgColor}; padding: 10px; display: inline-block; border-radius: 8px;">
+                      <img src="${logo.logo_url}" alt="${logo.nome}" style="max-height: ${logo.height_px}px; max-width: 100%; display: block;" />
+                    </div>
+                    <div class="logo-info">
+                      <div><strong>Nome:</strong> ${logo.nome}</div>
+                      <div><strong>Altura:</strong> ${logo.height_px}px</div>
+                      <div><strong>Status:</strong> 
+                        <span class="${logo.is_active ? 'logo-active' : 'logo-inactive'}">
+                          ${logo.is_active ? 'Ativa' : 'Inativa'}
+                        </span>
+                      </div>
+                      <button ${logo.is_active ? "disabled" : ""} onclick="ativarLogo('${logo.id}')">Ativar</button>
+                      <button onclick="deletarLogo('${logo.id}', '${logo.logo_url}')">Remover</button>
+                    </div>
+                  `;
+                  logosList.appendChild(div);
+                });
+              } else {
+                logosList.innerHTML = `<p>Erro ao carregar logos: ${json.error}</p>`;
+              }
+            } catch (e) {
+              logosList.innerHTML = `<p>Erro de rede ou inesperado: ${e.message}</p>`;
+            }
+          }
+
+        
+          // Função para ativar uma logo
+          async function ativarLogo(id) {
+            try {
+              status.textContent = ""; // limpa mensagens anteriores
+              const res = await fetch('/api/ativar-logo', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({id})
+              });
+              const json = await res.json();
+              if (json.success) {
+                status.textContent = "Logo ativada com sucesso!";
+                loadLogos(); // Atualiza a lista para refletir a mudança
+              } else {
+                status.textContent = "Erro ao ativar logo: " + (json.error || "Erro desconhecido");
+              }
+            } catch (e) {
+              status.textContent = "Erro de rede ou inesperado: " + e.message;
+            }
+          }
+
+          // Função para deletar uma logo
+          async function deletarLogo(id, logo_url) {
+            const confirmacao = confirm("Tem certeza que deseja remover esta logo?");
+            if (!confirmacao) return;
+
+            try {
+              status.textContent = "";
+              const res = await fetch("/api/deletar-logo", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ id, logo_url }),
+              });
+
+              const json = await res.json();
+              if (json.success) {
+                status.textContent = "Logo removida com sucesso!";
+                loadLogos(); // Recarrega lista
+              } else {
+                status.textContent = "Erro ao remover logo: " + (json.error || "Erro desconhecido");
+              }
+            } catch (e) {
+              status.textContent = "Erro de rede ou inesperado: " + e.message;
+            }
+          }
+
+          // Evento do formulário de upload
+          document.getElementById("logo-upload-form").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            status.textContent = "";
+        
+            const form = e.target;
+            const formData = new FormData(form);
+        
+            try {
+              const res = await fetch("/upload-logo", {
+                method: "POST",
+                body: formData,
+              });
+              if (!res.ok) {
+                status.textContent = `Erro HTTP: ${res.status} ${res.statusText}`;
+                return;
+              }
+              const result = await res.json();
+              if (result.success) {
+                status.textContent = "Logo enviada com sucesso!";
+                form.reset();
+                loadLogos(); // Recarrega as logos após upload
+              } else {
+                status.textContent = "Erro: " + (result.error || "Erro desconhecido");
+              }
+            } catch (error) {
+              status.textContent = "Erro de rede ou inesperado: " + error.message;
+            }
+          });
+        
+          // Carrega logos quando a página abrir
+          window.onload = loadLogos;
+        </script>
+        
+        
+        
+        
+
+
         <!-- THEME BUTTONS -->
 
         <section id="theme-section" class="theme-form">
