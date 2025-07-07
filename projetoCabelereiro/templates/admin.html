@@ -520,22 +520,40 @@
 
         <!-- LOGO -->
 
-        <h2>Upload de Logo</h2>
-        <form id="logo-upload-form" enctype="multipart/form-data">
-          <input type="file" name="logo" accept="image/*" required />
-          <label for="logo-height">Altura da logo (px):</label>
-          <select name="height">
-            <option value="100">100px</option>
-            <option value="140">140px</option>
-            <option value="160">160px</option>
-          </select>
-          <button type="submit">Enviar</button>
-        </form>
-        <p id="logo-status"></p>
-        
-        <h2>Logos Cadastradas</h2>
-        <div id="logos-list"></div>
-        
+        <div class="logo-admin-container">
+          <!-- Coluna esquerda: formulário -->
+          <section id="logo-upload-section">
+            <h2>Upload de Logo</h2>
+            <form id="logo-upload-form" enctype="multipart/form-data">
+              <div class="upload-box">
+                <label class="file-label">
+                  Escolher Arquivo
+                  <input type="file" name="logo" accept="image/*" required />
+                </label>
+
+                <label for="logo-height">Altura:</label>
+                <select name="height">
+                  <option value="100">100px</option>
+                  <option value="140">140px</option>
+                  <option value="160">160px</option>
+                </select>
+
+                <button type="submit" class="upload-btn">Enviar Logo</button>
+              </div>
+            </form>
+            <p id="logo-status"></p>
+          </section>
+
+          <!-- Divisor vertical -->
+          <div class="divider"></div>
+
+          <!-- Coluna direita: logos -->
+          <section id="logo-display-section">
+            <h2>Logos Cadastradas</h2>
+            <div id="logos-list"></div>
+          </section>
+        </div>
+
         <script>
           const status = document.getElementById("logo-status");
           const logosList = document.getElementById("logos-list");
@@ -560,19 +578,22 @@
                   const bgColor = logo.bg_contraste === "black" ? "#000000" : "#FFFFFF";
 
                   div.innerHTML = `
-                    <div style="background-color: ${bgColor}; padding: 10px; display: inline-block; border-radius: 8px;">
-                      <img src="${logo.logo_url}" alt="${logo.nome}" style="max-height: ${logo.height_px}px; max-width: 100%; display: block;" />
+                    <div class="logo-preview" style="background-color: ${bgColor};">
+                      <img src="${logo.logo_url}" alt="${logo.nome}" />
                     </div>
                     <div class="logo-info">
-                      <div><strong>Nome:</strong> ${logo.nome}</div>
-                      <div><strong>Altura:</strong> ${logo.height_px}px</div>
-                      <div><strong>Status:</strong> 
+                      <div class="logo-nome" title="${logo.nome}">Nome: ${logo.nome}</div>
+                      <div class="logo-altura">Altura: ${logo.height_px}px</div>
+                      <div class="logo-status">
+                        Status: 
                         <span class="${logo.is_active ? 'logo-active' : 'logo-inactive'}">
                           ${logo.is_active ? 'Ativa' : 'Inativa'}
                         </span>
                       </div>
-                      <button ${logo.is_active ? "disabled" : ""} onclick="ativarLogo('${logo.id}')">Ativar</button>
-                      <button onclick="deletarLogo('${logo.id}', '${logo.logo_url}')">Remover</button>
+                      <div class="logo-actions">
+                        <button ${logo.is_active ? "disabled" : ""} onclick="ativarLogo('${logo.id}')">Ativar</button>
+                        <button onclick="deletarLogo('${logo.id}', '${logo.logo_url}')">Remover</button>
+                      </div>
                     </div>
                   `;
                   logosList.appendChild(div);
@@ -991,6 +1012,44 @@
           </div>
           {% endfor %}
         </section>
+
+        <!-- VIDEO FORM -->
+
+        <h2>Upload de Vídeo</h2>
+        <form id="upload-video-form" enctype="multipart/form-data">
+          <input type="file" name="video" accept="video/mp4" required>
+          <button type="submit">Enviar</button>
+        </form>
+
+        <script>
+          const form = document.getElementById('upload-video-form');
+
+          form.addEventListener('submit', async (e) => {
+            e.preventDefault(); // evita o reload da página
+
+            const formData = new FormData(form);
+
+            try {
+              const response = await fetch('/admin/upload_video', {
+                method: 'POST',
+                body: formData,
+              });
+
+              const result = await response.json();
+
+              if(result.success) {
+                alert('Upload de vídeo foi feito com sucesso!');
+                form.reset(); // limpa o form (se quiser)
+              } else {
+                alert('Erro no upload: ' + (result.error || 'Erro desconhecido'));
+              }
+            } catch (error) {
+              alert('Erro na requisição: ' + error.message);
+            }
+          });
+        </script>
+
+
 
         <!-- REDES SOCIAIS -->
 

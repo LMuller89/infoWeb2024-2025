@@ -260,8 +260,7 @@
             />
             <span class="logo-text"></span>
           </h1>
-        {% endif %}
-                
+        {% endif %}                
           <ul id="navbar-items">
             <!-- <li><a href="#showcase">Início</a></li> -->
             <li><a href="#testimonials">Serviços</a></li>
@@ -391,7 +390,7 @@
           controlsList="nodownload"
           poster="{{ url_for('static', filename='img/capa.png') }}"
         >
-          <source src="{{ url_for('static', filename='img/video.mp4') }}" type="video/mp4" />
+          <source src="{{ video_url }}" type="video/mp4" />
         </video>
       </div>
     </section>
