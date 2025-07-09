@@ -106,10 +106,103 @@
 }
 
 /* admin.css */
+/* VIDEOFORM SECTION */
+.video-upload-title {
+  text-align: center;
+  margin-top: 30px;
+  font-size: 26px;
+  font-weight: bold;
+  color: #333;
+}
+
+.video-upload-container {
+  display: flex;
+  flex-direction: column; /* faz os filhos ficarem em coluna (um embaixo do outro) */
+  justify-content: center;
+  align-items: center;
+  margin-top: 40px;
+  gap: 30px; /* espaço entre o form e o vídeo */
+}
+
+.video-upload-form {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  background: #f9f9f9;
+  padding: 30px 40px;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Botão file selector - mantém seu estilo */
+.video-upload-form input[type="file"]::file-selector-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  font-size: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.video-upload-form input[type="file"]::file-selector-button:hover {
+  background-color: #0056b3;
+}
+
+/* Botão submit normal (cor verde) */
+.video-upload-form button[type="submit"] {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 130px; /* para não encolher muito */
+  background-color: #28a745; /* fundo verde */
+  color: white; /* texto branco */
+  border: none;
+  padding: 14px 28px;
+  font-size: 18px;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+/* Botão submit hover */
+.video-upload-form button[type="submit"]:hover:not(:disabled) {
+  background-color: #218838;
+}
+
+/* Botão submit desabilitado */
+.video-upload-form button[type="submit"]:disabled {
+  background-color: #94d3a2;
+  cursor: not-allowed;
+}
+
+/* Spinner */
+#loading-spinner {
+  border: 3px solid rgba(40, 167, 69, 0.3); /* verde claro translúcido */
+  border-top: 3px solid #28a745; /* verde padrão bootstrap */
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  margin-left: 10px;
+  animation: spin 1s linear infinite;
+  display: none;
+}
+
+/* Animação do spinner */
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
 
 /* LOGO SECTION */
 /* CONTAINER GERAL: formulário + lista de logos lado a lado */
-
 .logo-admin-container {
   display: flex;
   align-items: flex-start;
@@ -129,15 +222,20 @@
 }
 
 .upload-box {
+  margin-top: 115px;
   background: #f0f0f0;
   border-radius: 12px;
-  padding: 20px 30px;
+  padding: 50px 44px;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
   display: flex;
   flex-direction: column;
+  justify-content: center;
   align-items: center;
-  gap: 16px;
+  gap: 24px;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  min-width: 240px;
+  min-height: 280px;
+  box-sizing: border-box;
 }
 
 .upload-box:hover {
@@ -148,14 +246,17 @@
 .file-label {
   background-color: #007bff;
   color: white;
-  padding: 10px 18px;
+  padding: 12px 24px;
   border-radius: 6px;
   cursor: pointer;
   font-weight: 500;
-  transition: background-color 0.3s;
-  font-size: 14px;
+  font-size: 15px;
   position: relative;
   overflow: hidden;
+  text-align: center;
+  width: 100%;
+  display: flex;
+  justify-content: center;
 }
 
 .file-label input[type="file"] {
@@ -168,23 +269,39 @@
   cursor: pointer;
 }
 
-.upload-box select {
-  padding: 8px 12px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
+/* Label "Altura" */
+.upload-box label[for="logo-height"] {
   font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+  margin-top: -8px;
 }
 
+/* Dropdown */
+.upload-box select {
+  padding: 10px 14px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 15px;
+  width: 100%;
+  max-width: 160px;
+  text-align: center;
+}
+
+/* Botão Enviar */
 .upload-btn {
-  padding: 10px 20px;
+  padding: 12px 24px;
   background-color: #28a745;
   color: white;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 15px;
   border: none;
   border-radius: 6px;
   cursor: pointer;
   transition: background-color 0.3s;
+  width: 100%;
+  max-width: 160px;
+  text-align: center;
 }
 
 .upload-btn:hover {
@@ -202,7 +319,7 @@
   width: 2px;
   background: linear-gradient(to bottom, #ccc, #eee);
   height: 100%;
-  min-height: 400px;
+  min-height: 600px; /* AUMENTADO */
   border-radius: 4px;
 }
 
@@ -348,7 +465,6 @@
 }
 
 /* CONTAINER DE TROCA DE COR SECTION */
-
 .theme-form {
   background: #fff;
   margin-top: 40px;

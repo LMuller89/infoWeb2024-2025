@@ -277,53 +277,54 @@
         const form = document.getElementById("add-funcionario-form");
 
         btnMostrar.addEventListener("click", () => {
-          form.style.display = "block";      // Mostra o formulário
+          form.style.display = "block"; // Mostra o formulário
           btnMostrar.style.display = "none"; // Esconde o botão de mostrar
         });
       });
     </script>
 
     <!-- Script para atualizar visibilidade do .testimonial -->
-      <script>
-        window.addEventListener("DOMContentLoaded", () => {
-          const checkbox = document.getElementById("hide-testimonials");
-          if (!checkbox) {
-            console.error("Checkbox #hide-testimonials não encontrado no DOM");
-            return;
-          }
+    <script>
+      window.addEventListener("DOMContentLoaded", () => {
+        const checkbox = document.getElementById("hide-testimonials");
+        if (!checkbox) {
+          console.error("Checkbox #hide-testimonials não encontrado no DOM");
+          return;
+        }
 
-          // 1) carregar o estado salvo
-          fetch("/api/section-visibility")
-            .then((res) => res.json())
-            .then((data) => {
-              checkbox.checked = data.testimonials === true;
+        // 1) carregar o estado salvo
+        fetch("/api/section-visibility")
+          .then((res) => res.json())
+          .then((data) => {
+            checkbox.checked = data.testimonials === true;
+          })
+          .catch((err) =>
+            console.error("Erro ao carregar visibilidade testimonials:", err)
+          );
+
+        // 2) enviar atualização ao mudar checkbox
+        checkbox.addEventListener("change", (e) => {
+          const payload = { testimonials: e.target.checked };
+
+          fetch("/api/section-visibility", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          })
+            .then((res) => {
+              if (!res.ok)
+                return res.text().then((text) => Promise.reject(text));
+              return res.json();
             })
-            .catch((err) => console.error("Erro ao carregar visibilidade testimonials:", err));
-
-          // 2) enviar atualização ao mudar checkbox
-          checkbox.addEventListener("change", (e) => {
-            const payload = { testimonials: e.target.checked };
-
-            fetch("/api/section-visibility", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(payload),
+            .then((json) => {
+              console.log("Visibilidade testimonials atualizada:", json);
             })
-              .then((res) => {
-                if (!res.ok) return res.text().then(text => Promise.reject(text));
-                return res.json();
-              })
-              .then((json) => {
-                console.log("Visibilidade testimonials atualizada:", json);
-              })
-              .catch((err) => {
-                console.error("Erro ao atualizar testimonials:", err);
-              });
-          });
+            .catch((err) => {
+              console.error("Erro ao atualizar testimonials:", err);
+            });
         });
-      </script>
-
-
+      });
+    </script>
 
     <!-- JS GALLERY -->
 
@@ -518,187 +519,17 @@
           </div>
         </section>
 
-        <!-- LOGO -->
-
-        <div class="logo-admin-container">
-          <!-- Coluna esquerda: formulário -->
-          <section id="logo-upload-section">
-            <h2>Upload de Logo</h2>
-            <form id="logo-upload-form" enctype="multipart/form-data">
-              <div class="upload-box">
-                <label class="file-label">
-                  Escolher Arquivo
-                  <input type="file" name="logo" accept="image/*" required />
-                </label>
-
-                <label for="logo-height">Altura:</label>
-                <select name="height">
-                  <option value="100">100px</option>
-                  <option value="140">140px</option>
-                  <option value="160">160px</option>
-                </select>
-
-                <button type="submit" class="upload-btn">Enviar Logo</button>
-              </div>
-            </form>
-            <p id="logo-status"></p>
-          </section>
-
-          <!-- Divisor vertical -->
-          <div class="divider"></div>
-
-          <!-- Coluna direita: logos -->
-          <section id="logo-display-section">
-            <h2>Logos Cadastradas</h2>
-            <div id="logos-list"></div>
-          </section>
-        </div>
-
-        <script>
-          const status = document.getElementById("logo-status");
-          const logosList = document.getElementById("logos-list");
-        
-          // Função para carregar logos do backend
-          async function loadLogos() {
-            logosList.innerHTML = "Carregando...";
-            try {
-              const res = await fetch("/api/listar-logos");
-              const json = await res.json();
-              if (json.success) {
-                if (!json.logos || json.logos.length === 0) {
-                  logosList.innerHTML = "<p>Nenhuma logo cadastrada.</p>";
-                  return;
-                }
-                logosList.innerHTML = "";
-                json.logos.forEach(logo => {
-                  const div = document.createElement("div");
-                  div.className = "logo-item";
-
-                  // Define cor de fundo com base no campo bg_contraste
-                  const bgColor = logo.bg_contraste === "black" ? "#000000" : "#FFFFFF";
-
-                  div.innerHTML = `
-                    <div class="logo-preview" style="background-color: ${bgColor};">
-                      <img src="${logo.logo_url}" alt="${logo.nome}" />
-                    </div>
-                    <div class="logo-info">
-                      <div class="logo-nome" title="${logo.nome}">Nome: ${logo.nome}</div>
-                      <div class="logo-altura">Altura: ${logo.height_px}px</div>
-                      <div class="logo-status">
-                        Status: 
-                        <span class="${logo.is_active ? 'logo-active' : 'logo-inactive'}">
-                          ${logo.is_active ? 'Ativa' : 'Inativa'}
-                        </span>
-                      </div>
-                      <div class="logo-actions">
-                        <button ${logo.is_active ? "disabled" : ""} onclick="ativarLogo('${logo.id}')">Ativar</button>
-                        <button onclick="deletarLogo('${logo.id}', '${logo.logo_url}')">Remover</button>
-                      </div>
-                    </div>
-                  `;
-                  logosList.appendChild(div);
-                });
-              } else {
-                logosList.innerHTML = `<p>Erro ao carregar logos: ${json.error}</p>`;
-              }
-            } catch (e) {
-              logosList.innerHTML = `<p>Erro de rede ou inesperado: ${e.message}</p>`;
-            }
-          }
-
-        
-          // Função para ativar uma logo
-          async function ativarLogo(id) {
-            try {
-              status.textContent = ""; // limpa mensagens anteriores
-              const res = await fetch('/api/ativar-logo', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({id})
-              });
-              const json = await res.json();
-              if (json.success) {
-                status.textContent = "Logo ativada com sucesso!";
-                loadLogos(); // Atualiza a lista para refletir a mudança
-              } else {
-                status.textContent = "Erro ao ativar logo: " + (json.error || "Erro desconhecido");
-              }
-            } catch (e) {
-              status.textContent = "Erro de rede ou inesperado: " + e.message;
-            }
-          }
-
-          // Função para deletar uma logo
-          async function deletarLogo(id, logo_url) {
-            const confirmacao = confirm("Tem certeza que deseja remover esta logo?");
-            if (!confirmacao) return;
-
-            try {
-              status.textContent = "";
-              const res = await fetch("/api/deletar-logo", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ id, logo_url }),
-              });
-
-              const json = await res.json();
-              if (json.success) {
-                status.textContent = "Logo removida com sucesso!";
-                loadLogos(); // Recarrega lista
-              } else {
-                status.textContent = "Erro ao remover logo: " + (json.error || "Erro desconhecido");
-              }
-            } catch (e) {
-              status.textContent = "Erro de rede ou inesperado: " + e.message;
-            }
-          }
-
-          // Evento do formulário de upload
-          document.getElementById("logo-upload-form").addEventListener("submit", async (e) => {
-            e.preventDefault();
-            status.textContent = "";
-        
-            const form = e.target;
-            const formData = new FormData(form);
-        
-            try {
-              const res = await fetch("/upload-logo", {
-                method: "POST",
-                body: formData,
-              });
-              if (!res.ok) {
-                status.textContent = `Erro HTTP: ${res.status} ${res.statusText}`;
-                return;
-              }
-              const result = await res.json();
-              if (result.success) {
-                status.textContent = "Logo enviada com sucesso!";
-                form.reset();
-                loadLogos(); // Recarrega as logos após upload
-              } else {
-                status.textContent = "Erro: " + (result.error || "Erro desconhecido");
-              }
-            } catch (error) {
-              status.textContent = "Erro de rede ou inesperado: " + error.message;
-            }
-          });
-        
-          // Carrega logos quando a página abrir
-          window.onload = loadLogos;
-        </script>
-        
-        
-        
-        
-
-
         <!-- THEME BUTTONS -->
-
         <section id="theme-section" class="theme-form">
           <h3>Alterar Cor do Tema (Seção)</h3>
           <div class="form-group">
             <label for="theme-color">Cor de Fundo da Seção:</label>
-            <input type="color" id="theme-color" name="theme-color" value="#ffffff" />
+            <input
+              type="color"
+              id="theme-color"
+              name="theme-color"
+              value="#ffffff"
+            />
             <button id="save-theme-btn" class="btn">Salvar Seção</button>
           </div>
         </section>
@@ -707,7 +538,12 @@
           <h3>Alterar Cor do Fundo (Body)</h3>
           <div class="form-group">
             <label for="body-color">Cor de Fundo do Body:</label>
-            <input type="color" id="body-color" name="body-color" value="#ffffff" />
+            <input
+              type="color"
+              id="body-color"
+              name="body-color"
+              value="#ffffff"
+            />
             <button id="save-body-btn" class="btn">Salvar Body</button>
           </div>
         </section>
@@ -715,9 +551,13 @@
         <section id="background-font-section" class="theme-form">
           <h3>Alterar Cor da Fonte (Background)</h3>
           <div class="form-group">
-            <label for="background-font-color">Cor da Fonte do Background:</label>
+            <label for="background-font-color"
+              >Cor da Fonte do Background:</label
+            >
             <input type="color" id="background-font-color" value="#000000" />
-            <button id="save-background-font-btn" class="btn">Salvar Fonte Background</button>
+            <button id="save-background-font-btn" class="btn">
+              Salvar Fonte Background
+            </button>
           </div>
         </section>
 
@@ -726,7 +566,9 @@
           <div class="form-group">
             <label for="body-font-color">Cor da Fonte do Body:</label>
             <input type="color" id="body-font-color" value="#000000" />
-            <button id="save-body-font-btn" class="btn">Salvar Fonte Body</button>
+            <button id="save-body-font-btn" class="btn">
+              Salvar Fonte Body
+            </button>
           </div>
         </section>
 
@@ -735,11 +577,13 @@
           <div class="form-group">
             <label for="section-font-color">Cor da Fonte da Section:</label>
             <input type="color" id="section-font-color" value="#000000" />
-            <button id="save-section-font-btn" class="btn">Salvar Fonte Section</button>
+            <button id="save-section-font-btn" class="btn">
+              Salvar Fonte Section
+            </button>
           </div>
         </section>
 
-        <!-- SCRIPT JS THEME -->  
+        <!-- SCRIPT JS THEME -->
 
         <script>
           // ========= Carregar cores atuais ao abrir =========
@@ -754,16 +598,18 @@
               document.getElementById("body-color").value = data.body_color;
             }
             if (data.body_font_color) {
-              document.getElementById("body-font-color").value = data.body_font_color;
+              document.getElementById("body-font-color").value =
+                data.body_font_color;
             }
             if (data.section_font_color) {
-              document.getElementById("section-font-color").value = data.section_font_color;
+              document.getElementById("section-font-color").value =
+                data.section_font_color;
             }
             if (data.background_font_color) {
-              document.getElementById("background-font-color").value = data.background_font_color;
+              document.getElementById("background-font-color").value =
+                data.background_font_color;
             }
           });
-
 
           // ========= Salvar cor da seção =========
           document
@@ -802,49 +648,50 @@
             });
 
           // Salvar cor da fonte do background
-            document
-              .getElementById("save-background-font-btn")
-              .addEventListener("click", async () => {
-                console.log("Clique detectado em salvar fonte background");
-                const color = document.getElementById("background-font-color").value;
-                const response = await fetch("/api/theme/background-font", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ color }),
-                });
-
-                const data = await response.json(); // linha que está quebrando
-                console.log("Resposta recebida:", data);
-
-                if (data.message) {
-                  alert("Fonte do background atualizada com sucesso!");
-                } else {
-                  alert("Erro: " + data.error);
-                }
+          document
+            .getElementById("save-background-font-btn")
+            .addEventListener("click", async () => {
+              console.log("Clique detectado em salvar fonte background");
+              const color = document.getElementById(
+                "background-font-color"
+              ).value;
+              const response = await fetch("/api/theme/background-font", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ color }),
               });
+
+              const data = await response.json(); // linha que está quebrando
+              console.log("Resposta recebida:", data);
+
+              if (data.message) {
+                alert("Fonte do background atualizada com sucesso!");
+              } else {
+                alert("Erro: " + data.error);
+              }
+            });
 
           // Salvar cor da fonte do body
-            document
-              .getElementById("save-body-font-btn")
-              .addEventListener("click", async () => {
-                console.log("Clique detectado em salvar fonte body");
-                const color = document.getElementById("body-font-color").value;
-                const response = await fetch("/api/theme/body-font", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ color }),
-                });
-
-                const data = await response.json(); // linha que está quebrando
-                console.log("Resposta recebida:", data);
-
-                if (data.message) {
-                  alert("Fonte do body atualizada com sucesso!");
-                } else {
-                  alert("Erro: " + data.error);
-                }
+          document
+            .getElementById("save-body-font-btn")
+            .addEventListener("click", async () => {
+              console.log("Clique detectado em salvar fonte body");
+              const color = document.getElementById("body-font-color").value;
+              const response = await fetch("/api/theme/body-font", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ color }),
               });
 
+              const data = await response.json(); // linha que está quebrando
+              console.log("Resposta recebida:", data);
+
+              if (data.message) {
+                alert("Fonte do body atualizada com sucesso!");
+              } else {
+                alert("Erro: " + data.error);
+              }
+            });
 
           // Salvar cor da fonte da seção
           document
@@ -865,93 +712,312 @@
             });
         </script>
 
-        
+        <!-- VIDEO FORM -->
+        <h2 class="video-upload-title">Upload de Vídeo</h2>
 
-        <!-- TESTIMONIALS -->
-        <div id="servicos-funcionarios-admin">
-        <div style="display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap;">
-          <h3 style="font-size: 28px; font-weight: bold; margin: 0;">Gerenciar Funcionários</h3>
-
-          <!-- Checkbox para esconder a seção testimonials -->
-          <label style="display: flex; align-items: center; gap: 6px; font-size: 14px;">
+        <div class="video-upload-container">
+          <form
+            id="upload-video-form"
+            class="video-upload-form"
+            enctype="multipart/form-data"
+          >
             <input
-              type="checkbox"
-              id="hide-testimonials"
-              name="hide_testimonials"
+              type="file"
+              id="video-file"
+              name="video"
+              accept="video/mp4"
+              required
             />
-            Esconder Seção
-          </label>
-        </div>
-
-          <!-- Botão de exibir o formulário -->
-          <div style="text-align: center; margin-bottom: 20px;">
-            <button
-              id="btn-mostrar-form"
-              style="
-                padding: 12px 20px;
-                font-size: 16px;
-                border-radius: 6px;
-                background-color: #007bff;
-                color: white;
-                border: none;
-                cursor: pointer;
-              "
-            >
-              Adicionar Funcionário
+            <button type="submit" id="btn-submit">
+              <span id="btn-text">Enviar</span>
             </button>
+            <span id="loading-spinner"></span>
+          </form>
+
+          {% if video_url %}
+          <div
+            class="video-preview"
+            style="text-align: center; margin-top: 30px"
+          >
+            <video width="600" height="340" controls>
+              <source src="{{ video_url }}" type="video/mp4" />
+              Seu navegador não suporta vídeo.
+            </video>
+          </div>
+          {% else %}
+          <p style="text-align: center; color: #888; font-size: 18px">
+            Nenhum vídeo armazenado.
+          </p>
+          {% endif %}
+        </div> <!-- FECHAMENTO DO CONTAINER -->
+
+        <!-- Agora o script está FORA do container -->
+        <script>
+          document.addEventListener("DOMContentLoaded", () => {
+            const form = document.getElementById("upload-video-form");
+            const btn = document.getElementById("btn-submit");
+            const btnText = document.getElementById("btn-text");
+            const spinner = document.getElementById("loading-spinner");
+
+            form.addEventListener("submit", async (e) => {
+              e.preventDefault();
+              console.log("Submit capturado!"); // DEBUG
+
+              btn.disabled = true;
+              btnText.style.display = "none";
+              spinner.style.display = "inline-block";
+
+              const formData = new FormData(form);
+
+              try {
+                const res = await fetch("/admin/upload_video", {
+                  method: "POST",
+                  body: formData,
+                });
+
+                const result = await res.json();
+
+                if (result.success) {
+                  alert("Upload de vídeo foi feito com sucesso!");
+                  form.reset();
+                  // location.reload();
+                } else {
+                  alert("Erro no upload: " + (result.error || "Erro desconhecido"));
+                }
+              } catch (err) {
+                alert("Erro na requisição: " + err.message);
+              } finally {
+                btn.disabled = false;
+                spinner.style.display = "none";
+                btnText.style.display = "inline";
+              }
+            });
+          });
+        </script>
+
+
+          <!-- LOGO -->
+          <div class="logo-admin-container">
+            <!-- Coluna esquerda: formulário -->
+            <section id="logo-upload-section">
+              <h2>Upload de Logo</h2>
+              <form id="logo-upload-form" enctype="multipart/form-data">
+                <div class="upload-box">
+                  <label class="file-label">
+                    Escolher Arquivo
+                    <input type="file" name="logo" accept="image/*" required />
+                  </label>
+
+                  <label for="logo-height">Altura:</label>
+                  <select name="height">
+                    <option value="100">100px</option>
+                    <option value="140">140px</option>
+                    <option value="160">160px</option>
+                  </select>
+
+                  <button type="submit" class="upload-btn">Enviar Logo</button>
+                </div>
+              </form>
+              <p id="logo-status"></p>
+            </section>
+
+            <!-- Divisor vertical -->
+            <div class="divider"></div>
+
+            <!-- Coluna direita: logos -->
+            <section id="logo-display-section">
+              <h2>Logos Cadastradas</h2>
+              <div id="logos-list"></div>
+            </section>
           </div>
 
-          <!-- Formulário oculto inicialmente -->
-          <form
-            id="add-funcionario-form"
-            enctype="multipart/form-data"
-            style="display: none;"
-          >
-            <!-- Linha dos inputs -->
+          <script>
+            const status = document.getElementById("logo-status");
+            const logosList = document.getElementById("logos-list");
+
+            // Função para carregar logos do backend
+            async function loadLogos() {
+              logosList.innerHTML = "Carregando...";
+              try {
+                const res = await fetch("/api/listar-logos");
+                const json = await res.json();
+                if (json.success) {
+                  if (!json.logos || json.logos.length === 0) {
+                    logosList.innerHTML = "<p>Nenhuma logo cadastrada.</p>";
+                    return;
+                  }
+                  logosList.innerHTML = "";
+                  json.logos.forEach((logo) => {
+                    const div = document.createElement("div");
+                    div.className = "logo-item";
+
+                    // Define cor de fundo com base no campo bg_contraste
+                    const bgColor =
+                      logo.bg_contraste === "black" ? "#000000" : "#FFFFFF";
+
+                    div.innerHTML = `
+                    <div class="logo-preview" style="background-color: ${bgColor};">
+                      <img src="${logo.logo_url}" alt="${logo.nome}" />
+                    </div>
+                    <div class="logo-info">
+                      <div class="logo-nome" title="${logo.nome}">Nome: ${
+                      logo.nome
+                    }</div>
+                      <div class="logo-altura">Altura: ${logo.height_px}px</div>
+                      <div class="logo-status">
+                        Status: 
+                        <span class="${
+                          logo.is_active ? "logo-active" : "logo-inactive"
+                        }">
+                          ${logo.is_active ? "Ativa" : "Inativa"}
+                        </span>
+                      </div>
+                      <div class="logo-actions">
+                        <button ${
+                          logo.is_active ? "disabled" : ""
+                        } onclick="ativarLogo('${logo.id}')">Ativar</button>
+                        <button onclick="deletarLogo('${logo.id}', '${
+                      logo.logo_url
+                    }')">Remover</button>
+                      </div>
+                    </div>
+                  `;
+                    logosList.appendChild(div);
+                  });
+                } else {
+                  logosList.innerHTML = `<p>Erro ao carregar logos: ${json.error}</p>`;
+                }
+              } catch (e) {
+                logosList.innerHTML = `<p>Erro de rede ou inesperado: ${e.message}</p>`;
+              }
+            }
+
+            // Função para ativar uma logo
+            async function ativarLogo(id) {
+              try {
+                status.textContent = ""; // limpa mensagens anteriores
+                const res = await fetch("/api/ativar-logo", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ id }),
+                });
+                const json = await res.json();
+                if (json.success) {
+                  status.textContent = "Logo ativada com sucesso!";
+                  loadLogos(); // Atualiza a lista para refletir a mudança
+                } else {
+                  status.textContent =
+                    "Erro ao ativar logo: " +
+                    (json.error || "Erro desconhecido");
+                }
+              } catch (e) {
+                status.textContent = "Erro de rede ou inesperado: " + e.message;
+              }
+            }
+
+            // Função para deletar uma logo
+            async function deletarLogo(id, logo_url) {
+              const confirmacao = confirm(
+                "Tem certeza que deseja remover esta logo?"
+              );
+              if (!confirmacao) return;
+
+              try {
+                status.textContent = "";
+                const res = await fetch("/api/deletar-logo", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ id, logo_url }),
+                });
+
+                const json = await res.json();
+                if (json.success) {
+                  status.textContent = "Logo removida com sucesso!";
+                  loadLogos(); // Recarrega lista
+                } else {
+                  status.textContent =
+                    "Erro ao remover logo: " +
+                    (json.error || "Erro desconhecido");
+                }
+              } catch (e) {
+                status.textContent = "Erro de rede ou inesperado: " + e.message;
+              }
+            }
+
+            // Evento do formulário de upload
+            document
+              .getElementById("logo-upload-form")
+              .addEventListener("submit", async (e) => {
+                e.preventDefault();
+                status.textContent = "";
+
+                const form = e.target;
+                const formData = new FormData(form);
+
+                try {
+                  const res = await fetch("/upload-logo", {
+                    method: "POST",
+                    body: formData,
+                  });
+                  if (!res.ok) {
+                    status.textContent = `Erro HTTP: ${res.status} ${res.statusText}`;
+                    return;
+                  }
+                  const result = await res.json();
+                  if (result.success) {
+                    status.textContent = "Logo enviada com sucesso!";
+                    form.reset();
+                    loadLogos(); // Recarrega as logos após upload
+                  } else {
+                    status.textContent =
+                      "Erro: " + (result.error || "Erro desconhecido");
+                  }
+                } catch (error) {
+                  status.textContent =
+                    "Erro de rede ou inesperado: " + error.message;
+                }
+              });
+
+            // Carrega logos quando a página abrir
+            window.onload = loadLogos;
+          </script>
+
+          <!-- TESTIMONIALS -->
+          <div id="servicos-funcionarios-admin">
             <div
               style="
                 display: flex;
+                align-items: baseline;
+                gap: 12px;
                 flex-wrap: wrap;
-                gap: 10px;
-                align-items: center;
-                margin-bottom: 20px;
               "
             >
-              <input
-                type="text"
-                name="nome"
-                placeholder="Nome do funcionário"
-                required
-                style="
-                  flex: 2;
-                  padding: 12px;
-                  font-size: 16px;
-                  border-radius: 6px;
-                  border: 1px solid #ccc;
-                "
-              />
+              <h3 style="font-size: 28px; font-weight: bold; margin: 0">
+                Gerenciar Funcionários
+              </h3>
 
-              <input
-                type="file"
-                name="foto"
-                accept="image/*"
+              <!-- Checkbox para esconder a seção testimonials -->
+              <label
                 style="
-                  flex: 2;
-                  padding: 8px;
-                  font-size: 16px;
-                  border-radius: 6px;
-                  border: 1px solid #ccc;
+                  display: flex;
+                  align-items: center;
+                  gap: 6px;
+                  font-size: 14px;
                 "
-              />
+              >
+                <input
+                  type="checkbox"
+                  id="hide-testimonials"
+                  name="hide_testimonials"
+                />
+                Esconder Seção
+              </label>
             </div>
 
-            <!-- Serviços dinâmicos -->
-            <div id="servicos-container" style="margin-bottom: 20px"></div>
-
-            <!-- Botão de envio -->
-            <div style="text-align: center; margin-bottom: 40px">
+            <!-- Botão de exibir o formulário -->
+            <div style="text-align: center; margin-bottom: 20px">
               <button
-                type="submit"
+                id="btn-mostrar-form"
                 style="
                   padding: 12px 20px;
                   font-size: 16px;
@@ -962,12 +1028,76 @@
                   cursor: pointer;
                 "
               >
-                Salvar Funcionário
+                Adicionar Funcionário
               </button>
             </div>
-          </form>
-         </div>
 
+            <!-- Formulário oculto inicialmente -->
+            <form
+              id="add-funcionario-form"
+              enctype="multipart/form-data"
+              style="display: none"
+            >
+              <!-- Linha dos inputs -->
+              <div
+                style="
+                  display: flex;
+                  flex-wrap: wrap;
+                  gap: 10px;
+                  align-items: center;
+                  margin-bottom: 20px;
+                "
+              >
+                <input
+                  type="text"
+                  name="nome"
+                  placeholder="Nome do funcionário"
+                  required
+                  style="
+                    flex: 2;
+                    padding: 12px;
+                    font-size: 16px;
+                    border-radius: 6px;
+                    border: 1px solid #ccc;
+                  "
+                />
+
+                <input
+                  type="file"
+                  name="foto"
+                  accept="image/*"
+                  style="
+                    flex: 2;
+                    padding: 8px;
+                    font-size: 16px;
+                    border-radius: 6px;
+                    border: 1px solid #ccc;
+                  "
+                />
+              </div>
+
+              <!-- Serviços dinâmicos -->
+              <div id="servicos-container" style="margin-bottom: 20px"></div>
+
+              <!-- Botão de envio -->
+              <div style="text-align: center; margin-bottom: 40px">
+                <button
+                  type="submit"
+                  style="
+                    padding: 12px 20px;
+                    font-size: 16px;
+                    border-radius: 6px;
+                    background-color: #007bff;
+                    color: white;
+                    border: none;
+                    cursor: pointer;
+                  "
+                >
+                  Salvar Funcionário
+                </button>
+              </div>
+            </form>
+          </div>
 
           <!-- Container onde os cards serão inseridos -->
           <div id="funcionarios-admin-container"></div>
@@ -1012,44 +1142,6 @@
           </div>
           {% endfor %}
         </section>
-
-        <!-- VIDEO FORM -->
-
-        <h2>Upload de Vídeo</h2>
-        <form id="upload-video-form" enctype="multipart/form-data">
-          <input type="file" name="video" accept="video/mp4" required>
-          <button type="submit">Enviar</button>
-        </form>
-
-        <script>
-          const form = document.getElementById('upload-video-form');
-
-          form.addEventListener('submit', async (e) => {
-            e.preventDefault(); // evita o reload da página
-
-            const formData = new FormData(form);
-
-            try {
-              const response = await fetch('/admin/upload_video', {
-                method: 'POST',
-                body: formData,
-              });
-
-              const result = await response.json();
-
-              if(result.success) {
-                alert('Upload de vídeo foi feito com sucesso!');
-                form.reset(); // limpa o form (se quiser)
-              } else {
-                alert('Erro no upload: ' + (result.error || 'Erro desconhecido'));
-              }
-            } catch (error) {
-              alert('Erro na requisição: ' + error.message);
-            }
-          });
-        </script>
-
-
 
         <!-- REDES SOCIAIS -->
 
