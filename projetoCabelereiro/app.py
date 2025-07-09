@@ -19,6 +19,10 @@ import os
 from urllib.parse import urlparse
 from PIL import Image
 import io
+from flask import request, redirect, render_template_string
+import uuid
+import asyncio
+from flask import Flask, request, render_template_string, redirect
 
 SUPABASE_URL = "https://vuvuiddlnpppzsyrhmff.supabase.co"
 SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ1dnVpZGRsbnBwcHpzeXJobWZmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NTg2ODQ4NiwiZXhwIjoyMDYxNDQ0NDg2fQ.NLxj4Vbi-EdvQaxlqc6qhRQZ7YpSWXQkGB7m-rRrSJ8"  # use a chave correta aqui
@@ -92,8 +96,6 @@ def get_cached_theme(force_refresh=False):
 
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', 'mysecretkey')  # Recomendação: usar variável de ambiente
-
-# Redirecionamento da raiz para /home
 
 # Redirecionamento da raiz para /home
 @app.route('/')
@@ -211,8 +213,16 @@ def index():
             "height_px": 120
         }
 
+    # 9) Buscar logo ativa
+    try:
+        resp_video = supabase.table('videos').select('video_url').eq('id', 1).limit(1).execute()
+        video_data = resp_video.data[0] if resp_video.data else None
+        video_url = video_data['video_url'] if video_data else url_for('static', filename='img/video.mp4')
+    except Exception as e:
+        print(f"Erro ao buscar vídeo: {e}")
+        video_url = url_for('static', filename='img/video.mp4')
 
-    # 9) Renderizar template passando todas as variáveis, incluindo cores das fontes
+    # 10) Renderizar template passando todas as variáveis, incluindo cores das fontes
     return render_template(
         'index.html',
         cor_principal=cor_principal,
@@ -227,30 +237,38 @@ def index():
         localizacao_hidden=section_visibility.get('localizacao', False),
         funcionarios=funcionarios,
         servicos_lookup=servicos_lookup,
-        logo=logo_data
+        logo=logo_data,
+        video_url=video_url
     )
 
-# Admin protegida
 @app.route('/admin')
 def admin():
     print("Session data:", session)
     logged_in = 'user_id' in session
 
     try:
-        # Buscar dados da tabela gallery_images com image_id e image_url
+        # Buscar imagens da galeria
         response = supabase.table('gallery_images').select('*').execute()
         data = response.data if response.data else []
-
-        # Mapear corretamente pelo ID (ex: 'image-1', 'image-2', etc.)
         gallery_images = {img['image_id']: img['image_url'] for img in data}
-
     except Exception as e:
         print(f"Erro ao buscar imagens: {str(e)}")
         gallery_images = {}
 
-    return render_template('admin.html',
-                           logged_in=logged_in,
-                           gallery_images=gallery_images)
+    try:
+        # Buscar vídeo atual
+        video_data = supabase.table("videos").select("*").eq("id", 1).execute()
+        video_url = video_data.data[0]["video_url"] if video_data.data else None
+    except Exception as e:
+        print(f"Erro ao buscar vídeo: {str(e)}")
+        video_url = None
+
+    return render_template(
+        'admin.html',
+        logged_in=logged_in,
+        gallery_images=gallery_images,
+        video_url=video_url
+    )
 
 # Página de registro
 @app.route('/register', methods=['GET', 'POST'])
@@ -414,6 +432,7 @@ def deletar_logo():
         print("Erro ao deletar logo:", e)
         return jsonify({"success": False, "error": str(e)})
 
+# Função para definir fundo da logo/imagem na admin de acordo com a cor dela
 def cor_dominante_e_clara(image_bytes):
     with Image.open(io.BytesIO(image_bytes)) as img:
         img = img.convert('RGBA')  # mantém canal alfa
@@ -439,7 +458,6 @@ def cor_dominante_e_clara(image_bytes):
         luminancia = 0.2126 * avg_r + 0.7152 * avg_g + 0.0722 * avg_b
 
         return luminancia > 160  # Limiar ajustável
-
 
 # Rota GET unificada
 @app.route('/api/theme', methods=['GET'])
@@ -966,8 +984,57 @@ def listar_servicos():
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 
+@app.route('/admin/upload_video', methods=['POST'])
+def upload_video():
+    file = request.files.get("video")
+    if not file:
+        return jsonify({"success": False, "error": "Nenhum arquivo recebido."})
 
-    
+    try:
+        # Novo nome de arquivo
+        filename = f"video-{uuid.uuid4()}.mp4"
+        file_data = file.read()
+
+        # Verifica vídeo antigo
+        existing = supabase.table("videos").select("*").eq("id", 1).execute()
+        if existing.data:
+            old_url = existing.data[0].get("video_url")
+            if old_url:
+                # Extrai o nome do arquivo da URL pública
+                old_filename = old_url.split("/")[-1].split("?")[0]
+
+                # Remove vídeo anterior do bucket
+                try:
+                    supabase.storage.from_("videos").remove([old_filename])
+                except Exception as e:
+                    print("Erro ao remover vídeo antigo:", e)
+
+        # Upload novo vídeo
+        supabase.storage.from_("videos").upload(filename, file_data, {
+            "content-type": file.mimetype
+        })
+
+        # Nova URL pública
+        public_url = supabase.storage.from_("videos").get_public_url(filename)
+
+        # Atualiza/inserir no banco
+        if existing.data:
+            supabase.table("videos").update({
+                "video_url": public_url,
+                "is_active": True
+            }).eq("id", 1).execute()
+        else:
+            supabase.table("videos").insert({
+                "id": 1,
+                "video_url": public_url,
+                "is_active": True
+            }).execute()
+
+        return jsonify({"success": True, "video_url": public_url})
+
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)})
+
 if __name__ == '__main__':
     app.run(debug=True)
     

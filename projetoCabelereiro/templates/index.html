@@ -14,8 +14,8 @@
       }
 
       body {
-        background-color: var(--cor-body);
-        color: var(--cor-body-font);
+        background-color: {{ cor_body }} !important;
+        color: {{ cor_body_font }} !important;
       }
 
       /* Itens da navbar e textos do showcase usam cor_background_font */
@@ -30,7 +30,7 @@
       #navbar-items li a:hover {
         color: var(--cor-principal);
       }
-      
+
       /* Seções com fundo da section */
       #features,
       #footer,
@@ -58,9 +58,13 @@
       #features .feature-title,
       #features .texto,
       #features .texto p,
-      #features span,
-      #features i {
+      #features span {
         color: var(--cor-body-font);
+      }
+
+      /* Ícones dentro de #features devem ter a cor do body-font */
+      #features i {
+        color: var(--cor-body-font); /* Aplica a cor diretamente via CSS */
       }
 
       /* Testimonials */
@@ -87,7 +91,6 @@
     </style>
 
     <!-- CODIGOS JS -->
-
     <!-- JS theme -->
     <script>
       async function applyThemeColor() {
@@ -117,7 +120,6 @@
               child.style.color = backgroundFont;
             });
           }
-
 
           // Aplica fundo e fonte da seção (SECTION FONT COLOR)
           ['features', 'footer'].forEach(id => {
@@ -165,6 +167,11 @@
             features.querySelectorAll('p, span, .feature-title, .texto').forEach(el => {
               el.style.color = bodyFont;
             });
+
+            // Aplique a cor para os ícones dentro de #features
+            features.querySelectorAll('i').forEach(icon => {
+              icon.style.color = bodyFont;  // Aplica a cor do body aos ícones
+            });
           }
 
         } catch (err) {
@@ -182,20 +189,26 @@
     </script>
 
     <script>
+      window.themeColor = "{{ cor_body }}";
+      localStorage.setItem("corBody", window.themeColor);
+    </script>
+
+    <script>
       // Recebe as cores do Flask via Jinja
       const corPrincipal = "{{ cor_principal }}";
       const corBody = "{{ cor_body }}";
       const corBodyFont = "{{ cor_body_font }}";
       const corSectionFont = "{{ cor_section_font }}";
-      const corBackgroundFont = "{{ cor_background_font }}"
+      const corBackgroundFont = "{{ cor_background_font }}";
 
       // Armazena tudo no localStorage
       localStorage.setItem("corPrincipal", corPrincipal);
       localStorage.setItem("corBody", corBody);
       localStorage.setItem("corBodyFont", corBodyFont);
       localStorage.setItem("corSectionFont", corSectionFont);
-      localStorage.setItem("corBackgroundFont", "{{ cor_background_font }}");
+      localStorage.setItem("corBackgroundFont", corBackgroundFont);
     </script>
+
   
     <!-- Carregamento do CSS não-crítico -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v={{ cor_principal }}">
@@ -260,8 +273,7 @@
             />
             <span class="logo-text"></span>
           </h1>
-        {% endif %}
-                
+        {% endif %}                
           <ul id="navbar-items">
             <!-- <li><a href="#showcase">Início</a></li> -->
             <li><a href="#testimonials">Serviços</a></li>
@@ -391,7 +403,7 @@
           controlsList="nodownload"
           poster="{{ url_for('static', filename='img/capa.png') }}"
         >
-          <source src="{{ url_for('static', filename='img/video.mp4') }}" type="video/mp4" />
+          <source src="{{ video_url }}" type="video/mp4" />
         </video>
       </div>
     </section>
