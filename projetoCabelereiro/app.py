@@ -221,8 +221,22 @@ def index():
     except Exception as e:
         print(f"Erro ao buscar vídeo: {e}")
         video_url = url_for('static', filename='img/video.mp4')
+        
+    # 10) Buscar dados do footer (telefone e endereço formatado)
+    try:
+        resp_footer = supabase.table('contato_footer').select('telefone, endereco').eq('id', 1).limit(1).execute()
+        footer_data = resp_footer.data[0] if resp_footer.data else {
+            "telefone": "(45) 3254-4200",
+            "endereco": "Rua Santa Catarina, N° 577 - Centro, Cidade: Marechal Cândido Rondon PR"
+        }
+    except Exception as e:
+        print(f"Erro ao buscar contato_footer: {e}")
+        footer_data = {
+            "telefone": "(45) 3254-4200",
+            "endereco": "Rua Santa Catarina, N° 577 - Centro, Cidade: Marechal Cândido Rondon PR"
+        }
 
-    # 10) Renderizar template passando todas as variáveis, incluindo cores das fontes
+    # 11) Renderizar template passando todas as variáveis, incluindo cores das fontes
     return render_template(
         'index.html',
         cor_principal=cor_principal,
@@ -238,7 +252,8 @@ def index():
         funcionarios=funcionarios,
         servicos_lookup=servicos_lookup,
         logo=logo_data,
-        video_url=video_url
+        video_url=video_url,
+        footer_data=footer_data
     )
 
 @app.route('/admin')
@@ -1034,6 +1049,29 @@ def upload_video():
 
     except Exception as e:
         return jsonify({"success": False, "error": str(e)})
+    
+@app.route('/salvar-contato', methods=['POST'])
+def salvar_contato():
+    data = request.get_json()
+    telefone = data.get('telefone')
+    endereco = data.get('endereco')
+
+    if not telefone or not endereco:
+        return jsonify({'error': 'Dados incompletos'}), 400
+
+    try:
+        supabase.table('contato_footer').upsert({
+            "id": 1,
+            "telefone": telefone,
+            "endereco": endereco
+        }).execute()
+
+        return jsonify({'message': 'Contato atualizado com sucesso'}), 200
+    except Exception as e:
+        print(f"Erro ao salvar contato_footer: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)
