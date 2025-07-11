@@ -77,7 +77,7 @@
   font-family: "Calibri", "Arial", "Calibri Light", sans-serif;
 }
 
-#loguin-section input:focus {
+#login-section input:focus {
   border-color: #007bff;
   outline: none;
 }
@@ -646,8 +646,6 @@
 }
 
 /* index.css container "Nossos Serviços" */
-
-/* Container flex simplificado */
 /* Container flex simplificado */
 #funcionarios-admin-container {
   width: 80%;
