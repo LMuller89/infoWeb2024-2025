@@ -955,3 +955,58 @@
 .map-config-container button:hover {
   background-color: #0056b3;
 }
+
+/* EDITAR INFORMAÇÕES DE CONTATO */
+#contact-form {
+  max-width: 500px;
+  margin: 20px auto;
+  padding: 25px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+#contact-form label {
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+#contact-form input[type="text"] {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: border-color 0.3s ease;
+}
+
+#contact-form input[type="text"]:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+#contact-form button {
+  margin-top: 10px;
+  padding: 12px;
+  background-color: #007bff;
+  color: #fff;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#contact-form button:hover {
+  background-color: #0056b3;
+}
+
+h6 {
+  text-align: center;
+  font-size: 18px;
+  color: #444;
+  margin-top: 30px;
+}
