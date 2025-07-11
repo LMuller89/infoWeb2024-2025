@@ -520,69 +520,102 @@
         </section>
 
         <!-- THEME BUTTONS -->
-        <section id="theme-section" class="theme-form">
-          <h3>Alterar Cor do Tema (Seção)</h3>
-          <div class="form-group">
-            <label for="theme-color">Cor de Fundo da Seção:</label>
-            <input
-              type="color"
-              id="theme-color"
-              name="theme-color"
-              value="#ffffff"
-            />
-            <button id="save-theme-btn" class="btn">Salvar Seção</button>
-          </div>
-        </section>
+        <div class="theme-grid">
+          <div class="column">
+            <section id="theme-section" class="theme-form">
+              <h3>Alterar Cor do Tema (Seção)</h3>
+              <div class="form-group">
+                <label for="theme-color">Fundo da Seção:</label>
+                <input type="color" id="theme-color" name="theme-color" value="#ffffff" />
+                <button id="save-theme-btn" class="btn">Salvar Cor</button>
+              </div>
+            </section>
 
-        <section id="body-section" class="theme-form">
-          <h3>Alterar Cor do Fundo (Body)</h3>
-          <div class="form-group">
-            <label for="body-color">Cor de Fundo do Body:</label>
-            <input
-              type="color"
-              id="body-color"
-              name="body-color"
-              value="#ffffff"
-            />
-            <button id="save-body-btn" class="btn">Salvar Body</button>
+            <section id="section-font-section" class="theme-form">
+              <h3>Alterar Cor da Fonte (Section)</h3>
+              <div class="form-group">
+                <label for="section-font-color">Fonte da Section:</label>
+                <input type="color" id="section-font-color" value="#000000" />
+                <button id="save-section-font-btn" class="btn">Salvar Cor</button>
+              </div>
+            </section>
           </div>
-        </section>
 
-        <section id="background-font-section" class="theme-form">
-          <h3>Alterar Cor da Fonte (Background)</h3>
-          <div class="form-group">
-            <label for="background-font-color"
-              >Cor da Fonte do Background:</label
-            >
-            <input type="color" id="background-font-color" value="#000000" />
-            <button id="save-background-font-btn" class="btn">
-              Salvar Fonte Background
-            </button>
-          </div>
-        </section>
+          <div class="divider-small"></div>
 
-        <section id="body-font-section" class="theme-form">
-          <h3>Alterar Cor da Fonte (Body)</h3>
-          <div class="form-group">
-            <label for="body-font-color">Cor da Fonte do Body:</label>
-            <input type="color" id="body-font-color" value="#000000" />
-            <button id="save-body-font-btn" class="btn">
-              Salvar Fonte Body
-            </button>
-          </div>
-        </section>
+          <div class="column">
+            <section id="body-section" class="theme-form">
+              <h3>Alterar Cor do Fundo (Body)</h3>
+              <div class="form-group">
+                <label for="body-color">Fundo do Body:</label>
+                <input type="color" id="body-color" name="body-color" value="#ffffff" />
+                <button id="save-body-btn" class="btn">Salvar Cor</button>
+              </div>
+            </section>
 
-        <section id="section-font-section" class="theme-form">
-          <h3>Alterar Cor da Fonte (Section)</h3>
-          <div class="form-group">
-            <label for="section-font-color">Cor da Fonte da Section:</label>
-            <input type="color" id="section-font-color" value="#000000" />
-            <button id="save-section-font-btn" class="btn">
-              Salvar Fonte Section
-            </button>
+            <section id="body-font-section" class="theme-form">
+              <h3>Alterar Cor da Fonte (Body)</h3>
+              <div class="form-group">
+                <label for="body-font-color">Fonte do Body:</label>
+                <input type="color" id="body-font-color" value="#000000" />
+                <button id="save-body-font-btn" class="btn">Salvar Cor</button>
+              </div>
+            </section>
+          </div>
+
+          <div class="divider-small"></div>
+
+          <div class="column">
+            <section id="background-font-section" class="theme-form">
+              <h3>Alterar Cor da Fonte (Background)</h3>
+              <div class="form-group">
+                <label for="background-font-color">Fonte do Background:</label>
+                <input type="color" id="background-font-color" value="#000000" />
+                <button id="save-background-font-btn" class="btn">Salvar Cor</button>
+              </div>
+            </section>
+
+            <!-- NOVO CONTAINER COM INPUT FILE -->
+            <section id="background-file-section" class="theme-form">
+              <div class="form-group">
+                <label for="background-file">Escolher Arquivo:</label>
+                <input type="file" id="background-file" name="background-file" />
+                <button id="upload-background-file-btn" class="btn">Enviar</button>
+              </div>
+              <script>
+                document.getElementById("upload-background-file-btn").addEventListener("click", async (e) => {
+                  e.preventDefault();
+
+                  const fileInput = document.getElementById("background-file");
+                  if (!fileInput.files.length) {
+                    alert("Selecione um arquivo antes de enviar.");
+                    return;
+                  }
+
+                  const formData = new FormData();
+                  formData.append("background-file", fileInput.files[0]);
+
+                  try {
+                    const res = await fetch("/upload-showcase-image", {
+                      method: "POST",
+                      body: formData,
+                    });
+                    const data = await res.json();
+
+                    if (data.success) {
+                      alert("Upload feito com sucesso! Nova URL: " + data.url);
+                      // Opcional: atualizar preview, limpar input, etc
+                    } else {
+                      alert("Erro no upload: " + (data.error || "Desconhecido"));
+                    }
+                  } catch (error) {
+                    alert("Erro na requisição: " + error.message);
+                  }
+                });
+              </script>
+            </section>
           </div>
         </section>
-        
 
         <!-- SCRIPT JS THEME -->
 
@@ -734,7 +767,7 @@
             </button>
             <span id="loading-spinner"></span>
           </form>
-
+          <h2 class="video-upload-title">Vídeo Armazenado</h2>
           {% if video_url %}
           <div
             class="video-preview"
@@ -1289,6 +1322,26 @@
         </form>
 
         <script>
+          async function carregarContatoSalvo() {
+            try {
+              const res = await fetch('/get-contato');
+              const data = await res.json();
+
+              if (data && data.rua) {
+                document.getElementById('rua').value = data.rua || '';
+                document.getElementById('numero').value = data.numero || '';
+                document.getElementById('bairro').value = data.bairro || '';
+                document.getElementById('cidade').value = data.cidade || '';
+                document.getElementById('telefone').value = data.telefone || '';
+              }
+            } catch (err) {
+              console.error("Erro ao carregar contato salvo:", err);
+            }
+          }
+
+          // Chama assim que a página carregar
+          document.addEventListener('DOMContentLoaded', carregarContatoSalvo);
+
           document.getElementById('contact-form').addEventListener('submit', async function (e) {
             e.preventDefault();
 
@@ -1321,8 +1374,6 @@
             }
           });
         </script>
-
-
         {% endif %}
       </div>
     </main>
