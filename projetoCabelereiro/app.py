@@ -235,8 +235,14 @@ def index():
             "telefone": "(45) 3254-4200",
             "endereco": "Rua Santa Catarina, N° 577 - Centro, Cidade: Marechal Cândido Rondon PR"
         }
+        
+    # 11) Buscar no banco a URL da imagem do showcase
+    data = supabase.table("site_config").select("showcase_image_url").limit(1).execute()
+    img_url = None
+    if data.data and len(data.data) > 0:
+        img_url = data.data[0].get("showcase_image_url")
 
-    # 11) Renderizar template passando todas as variáveis, incluindo cores das fontes
+    # 12) Renderizar template passando todas as variáveis, incluindo cores das fontes
     return render_template(
         'index.html',
         cor_principal=cor_principal,
@@ -253,7 +259,8 @@ def index():
         servicos_lookup=servicos_lookup,
         logo=logo_data,
         video_url=video_url,
-        footer_data=footer_data
+        footer_data=footer_data,
+        showcase_url=img_url
     )
 
 @app.route('/admin')
@@ -345,6 +352,12 @@ def upload_logo():
         return jsonify({"success": False, "error": "Arquivo ou altura ausente"})
 
     try:
+        # 🚫 VERIFICA SE JÁ EXISTEM 4 LOGOS
+        existing_logos = supabase.table("logos").select("id").execute()
+        if len(existing_logos.data) >= 4:
+            return jsonify({"success": False, "error": "Limite de 4 logos atingido. Exclua uma antes de adicionar outra."})
+
+        # CONTINUA O PROCESSO NORMAL
         filename = secure_filename(file.filename)
         extension = os.path.splitext(filename)[1]
         unique_name = f"logo-{uuid.uuid4()}{extension}"
@@ -369,7 +382,7 @@ def upload_logo():
             "logo_url": public_url,
             "height_px": int(height),
             "is_active": False,
-            "bg_contraste": bg_contraste  # ← novo campo
+            "bg_contraste": bg_contraste
         }).execute()
 
         if not insert.data:
@@ -583,6 +596,47 @@ def update_background_font_color():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route("/upload-showcase-image", methods=["POST"])
+def upload_showcase_image():
+    BUCKET_NAME = "backgroundimage"  # aqui o nome correto da bucket
+
+    supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+
+    file = request.files.get("background-file")
+    if not file:
+        return jsonify({"success": False, "error": "Nenhum arquivo enviado"}), 400
+
+    existing = supabase.table("site_config").select("showcase_image_url", "id").limit(1).execute()
+
+    if existing.data and len(existing.data) > 0:
+        old_url = existing.data[0].get("showcase_image_url", "")
+        record_id = existing.data[0].get("id")
+
+        if old_url:
+            try:
+                old_filename = old_url.split(f"/{BUCKET_NAME}/")[1]
+                supabase.storage.from_(BUCKET_NAME).remove([old_filename])
+            except Exception as e:
+                print("Erro ao deletar arquivo antigo:", e)
+    else:
+        record_id = None
+
+    filename = f"showcase-{uuid.uuid4()}.png"
+
+    try:
+        file_bytes = file.read()
+        supabase.storage.from_(BUCKET_NAME).upload(filename, file_bytes, {"content-type": file.content_type})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+    public_url = f"{SUPABASE_URL}/storage/v1/object/public/{BUCKET_NAME}/{filename}"
+
+    if record_id:
+        supabase.table("site_config").update({"showcase_image_url": public_url}).eq("id", record_id).execute()
+    else:
+        supabase.table("site_config").insert({"showcase_image_url": public_url}).execute()
+
+    return jsonify({"success": True, "url": public_url})
 
 # Rota para obter imagens
 @app.route('/api/gallery', methods=['GET'])
@@ -1070,6 +1124,45 @@ def salvar_contato():
     except Exception as e:
         print(f"Erro ao salvar contato_footer: {e}")
         return jsonify({'error': str(e)}), 500
+    
+import re
+
+@app.route('/get-contato', methods=['GET'])
+def get_contato():
+    try:
+        resp = supabase.table('contato_footer').select('telefone, endereco').eq('id', 1).limit(1).execute()
+        data = resp.data[0] if resp.data else None
+
+        if not data:
+            return jsonify({}), 200
+
+        telefone = data['telefone'].strip()
+        endereco = data['endereco'].strip()
+
+        # Tenta extrair usando expressão regular
+        match = re.match(r'^(.*?),\s*N[°º]?\s*(.*?)\s*-\s*(.*?),\s*Cidade:\s*(.*)$', endereco)
+        if match:
+            rua = match.group(1)
+            numero = match.group(2)
+            bairro = match.group(3)
+            cidade = match.group(4)
+        else:
+            print("⚠️ Endereço mal formatado:", endereco)
+            rua = numero = bairro = ''
+            cidade = endereco  # joga tudo na cidade se não reconhecer
+
+        return jsonify({
+            "rua": rua.strip(),
+            "numero": numero.strip(),
+            "bairro": bairro.strip(),
+            "cidade": cidade.strip(),
+            "telefone": telefone
+        }), 200
+
+    except Exception as e:
+        print("❌ Erro em /get-contato:", e)
+        return jsonify({}), 500
+    
 
 
 
