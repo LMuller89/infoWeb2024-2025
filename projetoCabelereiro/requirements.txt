@@ -19,3 +19,4 @@ import json
 
 (EXEC) python -m hypercorn app:app
 (EXEC) python -m hypercorn app:app
+(EXEC) python -m hypercorn app:app
