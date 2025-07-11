@@ -15,8 +15,11 @@ from uuid import uuid4
 import uuid
 import re
 import json
-
-
-(EXEC) python -m hypercorn app:app
-(EXEC) python -m hypercorn app:app
-(EXEC) python -m hypercorn app:app
+import os
+from urllib.parse import urlparse
+from PIL import Image
+import io
+from flask import request, redirect, render_template_string
+import uuid
+import asyncio
+from flask import Flask, request, render_template_string, redirectpip install Flask
