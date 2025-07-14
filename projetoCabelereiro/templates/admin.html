@@ -1137,46 +1137,51 @@
           <div id="funcionarios-admin-container"></div>
         </div>
 
+        
         <!-- gallery -->
-
         <section id="gallery-admin-section">
-          <div style="display: flex; align-items: center; gap: 16px">
+          <!-- 1. Adicionamos uma classe ao cabeçalho para estilizá-lo -->
+          <div class="gallery-admin-header">
             <h3>Gerenciar Galeria</h3>
-
-            <label>
-              <input type="radio" name="gallery-visibility" value="none" />
-              Esconder Seção
-            </label>
-
-            <label>
-              <input type="radio" name="gallery-visibility" value="partial" />
-              Mostrar 3 imagens
-            </label>
-
-            <label>
-              <input type="radio" name="gallery-visibility" value="full" />
-              Mostrar todas
-            </label>
+        
+            <div class="gallery-visibility-options">
+              <label>
+                <input type="radio" name="gallery-visibility" value="none" />
+                Esconder Seção
+              </label>
+              <label>
+                <input type="radio" name="gallery-visibility" value="partial" />
+                Mostrar 3 imagens
+              </label>
+              <label>
+                <input type="radio" name="gallery-visibility" value="full" />
+                Mostrar todas
+              </label>
+            </div>
           </div>
-
-          {% for i in range(1,7) %}
-          <div class="gallery-admin-item">
-            <label>Posição {{ i }}:</label>
-            <input
-              type="file"
-              accept="image/png, image/jpeg"
-              class="image-upload-input"
-              data-image-id="image-{{ i }}"
-            />
-            <img
-              src="{{ gallery_images.get('image-' ~ i, '') }}"
-              class="image-preview"
-            />
-            <div class="upload-status"></div>
+        
+          <!-- 2. Adicionamos o container da grade para agrupar os itens -->
+          <div id="gallery-container">
+            {% for i in range(1,7) %}
+            <div class="gallery-admin-item">
+              <label>Posição {{ i }}:</label>
+              <input
+                type="file"
+                accept="image/png, image/jpeg"
+                class="image-upload-input"
+                data-image-id="image-{{ i }}"
+              />
+              <img
+                src="{{ gallery_images.get('image-' ~ i, '') }}"
+                class="image-preview"
+              />
+              <div class="upload-status"></div>
+            </div>
+            {% endfor %}
           </div>
-          {% endfor %}
         </section>
-
+        
+        
         <!-- REDES SOCIAIS -->
 
         <section id="social-links-section">
@@ -1379,3 +1384,4 @@
     </main>
   </body>
 </html>
+

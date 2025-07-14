@@ -826,13 +826,104 @@
   display: block;
   margin: 10px auto;
 }
+.Gerenciar-Galeria {
+  color: #000;
+  padding: auto;
+}
 
 /* Ajuste para os itens da galeria */
 #gallery-container {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px;
   margin: 20px 0;
+}
+/*gallery section*/
+#gallery-admin-section {
+  background: #fff;
+  padding: 25px;
+  border-radius: 12px;
+  margin: 40px auto;
+  width: 95%;
+  max-width: 900px; /* Aumentei um pouco para a grade caber melhor */
+  font-family: "Calibri", "Arial", sans-serif;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+/* Estilo para o cabeçalho da seção (título e opções) */
+.gallery-admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #eee; /* Linha que separa o título do conteúdo */
+  flex-wrap: wrap; /* Permite que os itens quebrem a linha em telas menores */
+  gap: 15px;
+}
+
+.gallery-admin-header h3 {
+  color: #333;
+  margin: 0;
+}
+
+.gallery-visibility-options {
+  display: flex;
+  gap: 15px;
+  font-size: 0.9rem;
+}
+
+/* Container da grade de imagens (A MÁGICA ACONTECE AQUI) */
+#gallery-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* Cria 3 colunas de tamanho igual */
+  gap: 20px; /* Espaçamento entre os cards */
+}
+
+/* Estilo para cada card de upload */
+.gallery-admin-item {
+  padding: 15px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  text-align: center; /* Centraliza o conteúdo do card */
+  background-color: #fdfdfd;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  /* Removemos a margem antiga que empilhava os itens */
+}
+
+.gallery-admin-item label {
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+/* Ajuste no input de arquivo para ficar mais discreto */
+.image-upload-input {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+}
+
+/* Pré-visualização da imagem */
+.image-preview {
+  width: 100%; /* Ocupa toda a largura do card */
+  height: 150px; /* Altura fixa para manter todos os cards alinhados */
+  object-fit: cover; /* Garante que a imagem preencha o espaço sem distorcer */
+  border-radius: 6px;
+  background-color: #f0f0f0; /* Cor de fundo caso não haja imagem */
+  display: block;
+  margin: 0;
+  max-width: none; /* Sobrescreve o estilo antigo */
+}
+
+/* Placeholder para quando não houver imagem (opcional, mas recomendado) */
+.image-preview:not([src]),
+.image-preview[src=""] {
+  border: 2px dashed #ccc;
+  /* Esconde o ícone de imagem quebrada */
+  content: " ";
 }
 
 .empty-image-placeholder {
