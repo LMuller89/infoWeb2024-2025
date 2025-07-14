@@ -267,29 +267,36 @@ def index():
 def admin():
     print("Session data:", session)
     logged_in = 'user_id' in session
-
+    
+    1# Buscar imagens da galeria
     try:
-        # Buscar imagens da galeria
         response = supabase.table('gallery_images').select('*').execute()
         data = response.data if response.data else []
         gallery_images = {img['image_id']: img['image_url'] for img in data}
     except Exception as e:
         print(f"Erro ao buscar imagens: {str(e)}")
         gallery_images = {}
-
+        
+    2# Buscar vídeo atual
     try:
-        # Buscar vídeo atual
         video_data = supabase.table("videos").select("*").eq("id", 1).execute()
         video_url = video_data.data[0]["video_url"] if video_data.data else None
     except Exception as e:
         print(f"Erro ao buscar vídeo: {str(e)}")
         video_url = None
 
+    3# Buscar background image
+    result = supabase.table("site_config").select("showcase_image_url").limit(1).execute()
+    showcase_url = None
+    if result.data and len(result.data) > 0:
+        showcase_url = result.data[0]["showcase_image_url"]
+        
     return render_template(
         'admin.html',
         logged_in=logged_in,
         gallery_images=gallery_images,
-        video_url=video_url
+        video_url=video_url,
+        showcase_url=showcase_url
     )
 
 # Página de registro
@@ -871,13 +878,13 @@ def section_visibility():
             print(f"Erro ao atualizar visibilidade: {e}")
             return jsonify({'error': str(e)}), 500
         
-# --- INÍCIO: rota separada /admin/map para editar o Google Maps --- #
+# --- ROTA PRINCIPAL: /admin/map para exibir e salvar o Google Maps --- #
 @app.route('/admin/map', methods=['GET', 'POST'])
 def admin_map():
-    # (1) Mesmo critério de autenticação que /admin
+    # (1) Verifica se está logado
     logged_in = 'user_id' in session
 
-    # (2) Se veio via POST, atualiza o map_url
+    # (2) Se for POST, atualiza o map_url
     if request.method == 'POST':
         nova_url = request.form.get("map_url", "").strip()
         if nova_url:
@@ -889,10 +896,9 @@ def admin_map():
                 print("DEBUG: map_url atualizado para:", nova_url)
             except Exception as e:
                 print(f"Erro ao atualizar map_url: {e}")
-        # Redireciona de volta para a mesma tela em GET
         return redirect(url_for('admin_map'))
 
-    # (3) Se for GET, buscamos primeiro os gallery_images (igual /admin)
+    # (3) Busca imagens da galeria
     try:
         response = supabase.table('gallery_images').select('*').execute()
         data = response.data or []
@@ -901,7 +907,7 @@ def admin_map():
         print(f"Erro ao buscar imagens no admin_map: {e}")
         gallery_images = {}
 
-    # (4) Agora buscamos o map_url atual na tabela settingsmap
+    # (4) Busca o map_url atual
     try:
         resp_map = supabase.table("settingsmap") \
             .select("map_url") \
@@ -909,21 +915,37 @@ def admin_map():
             .execute()
         data_map = resp_map.data
         print("DEBUG: data_map retornado pelo Supabase:", data_map)
-        if data_map and len(data_map) > 0:
-            map_url_atual = data_map[0]["map_url"] or ""
-        else:
-            map_url_atual = ""
+        map_url_atual = data_map[0]["map_url"] if data_map and len(data_map) > 0 else ""
     except Exception as e:
         print(f"Erro ao buscar map_url no admin_map (GET): {e}")
         map_url_atual = ""
 
-    # (5) Passa EXATAMENTE as mesmas variáveis de /admin, mais map_url_atual
+    # (5) Renderiza o admin.html com as variáveis necessárias
     return render_template(
         'admin.html',
         logged_in=logged_in,
         gallery_images=gallery_images,
-        map_url_atual=map_url_atual
+        map_url_atual=map_url_atual  # opcional agora, pois o JS faz a busca
     )
+
+# --- NOVA ROTA AUXILIAR: /api/map-url para JS buscar o valor atual --- #
+@app.route("/api/map-url", methods=["GET"])
+def api_map_url():
+    try:
+        result = supabase.table("settingsmap") \
+            .select("map_url") \
+            .eq("id", 1) \
+            .execute()
+
+        data = result.data
+        if data and len(data) > 0:
+            return jsonify({"map_url": data[0]["map_url"]})
+        else:
+            return jsonify({"map_url": ""})
+    except Exception as e:
+        print("Erro ao buscar map_url:", e)
+        return jsonify({"map_url": ""}), 500
+
 
 
 # GERENCIAMENTO NOSSOS SERVIÇOS
