@@ -575,45 +575,133 @@
               </div>
             </section>
 
-            <!-- NOVO CONTAINER COM INPUT FILE -->
-            <section id="background-file-section" class="theme-form">
-              <div class="form-group">
-                <label for="background-file">Escolher Arquivo:</label>
-                <input type="file" id="background-file" name="background-file" />
-                <button id="upload-background-file-btn" class="btn">Enviar</button>
-              </div>
-              <script>
-                document.getElementById("upload-background-file-btn").addEventListener("click", async (e) => {
-                  e.preventDefault();
+          <!-- NOVO CONTAINER COM INPUT FILE -->
+          <section id="background-file-section" class="theme-form" style="text-align: center;">
+            <div class="form-group">
+              <label for="background-file"></label>
+              <input type="file" id="background-file" name="background-file" />
+              <button id="upload-background-file-btn" class="btn">Enviar</button>
+            </div>
 
-                  const fileInput = document.getElementById("background-file");
-                  if (!fileInput.files.length) {
-                    alert("Selecione um arquivo antes de enviar.");
-                    return;
+            <!-- BOTÃO FLECHA CENTRALIZADO -->
+            <div style="margin-top: 10px;">
+              <button id="toggle-current-bg" class="btn" style="font-size: 14px;">
+                Ver imagem atual
+              </button>
+            </div>
+
+            <!-- PREVIEW OCULTO -->
+            <div id="current-bg-wrapper" style="margin-top: 20px; display: none;">
+              {% if showcase_url %}
+                <div id="current-bg-container" style="position: relative; margin: 0 auto; width: 100%; max-width: 600px;">
+                  <img
+                    src="{{ showcase_url }}"
+                    alt="Imagem atual"
+                    id="showcase-preview-img"
+                    style="width: 95%; height: auto; border: 1px solid #ccc; border-radius: 8px; display: block; margin: 0 auto;"
+                  />
+                  <button
+                    id="close-preview-btn"
+                    style="
+                      position: absolute;
+                      top: 50%;
+                      left: 50%;
+                      transform: translate(-50%, -50%);
+                      background: rgba(0, 0, 0, 0.7);
+                      color: white;
+                      font-size: 22px;
+                      border: none;
+                      padding: 8px 14px;
+                      border-radius: 50%;
+                      cursor: pointer;
+                      z-index: 10;
+                      opacity: 0;
+                      transition: opacity 0.2s ease;
+                      pointer-events: none;
+                    "
+                  >✖</button>
+                </div>
+              {% else %}
+                <p style="color: #777;">Nenhuma imagem atual encontrada.</p>
+              {% endif %}
+            </div>
+
+            <!-- SCRIPT -->
+            <script>
+              // Upload da imagem
+              document.getElementById("upload-background-file-btn").addEventListener("click", async (e) => {
+                e.preventDefault();
+
+                const fileInput = document.getElementById("background-file");
+                if (!fileInput.files.length) {
+                  alert("Selecione um arquivo antes de enviar.");
+                  return;
+                }
+
+                const formData = new FormData();
+                formData.append("background-file", fileInput.files[0]);
+
+                try {
+                  const res = await fetch("/upload-showcase-image", {
+                    method: "POST",
+                    body: formData,
+                  });
+                  const data = await res.json();
+
+                  if (data.success) {
+                    alert("Upload feito com sucesso!");
+                    location.reload(); // recarrega para mostrar nova imagem
+                  } else {
+                    alert("Erro no upload: " + (data.error || "Desconhecido"));
                   }
+                } catch (error) {
+                  alert("Erro na requisição: " + error.message);
+                }
+              });
 
-                  const formData = new FormData();
-                  formData.append("background-file", fileInput.files[0]);
+              // Toggle de imagem
+              const toggleBtn = document.getElementById("toggle-current-bg");
+              const wrapper = document.getElementById("current-bg-wrapper");
 
-                  try {
-                    const res = await fetch("/upload-showcase-image", {
-                      method: "POST",
-                      body: formData,
-                    });
-                    const data = await res.json();
-
-                    if (data.success) {
-                      alert("Upload feito com sucesso! Nova URL: " + data.url);
-                      // Opcional: atualizar preview, limpar input, etc
-                    } else {
-                      alert("Erro no upload: " + (data.error || "Desconhecido"));
-                    }
-                  } catch (error) {
-                    alert("Erro na requisição: " + error.message);
+              if (toggleBtn && wrapper) {
+                toggleBtn.addEventListener("click", () => {
+                  const style = window.getComputedStyle(wrapper);
+                  if (style.display === "none") {
+                    wrapper.style.display = "block";
+                    toggleBtn.style.display = "none";
+                  } else {
+                    wrapper.style.display = "none";
+                    toggleBtn.style.display = "inline-block";
+                    toggleBtn.textContent = "Ver imagem atual";
                   }
                 });
-              </script>
-            </section>
+              }
+
+              // Mostrar/ocultar botão "X" no hover da imagem
+              const previewImg = document.getElementById("showcase-preview-img");
+              const closeBtn = document.getElementById("close-preview-btn");
+
+              if (previewImg && closeBtn) {
+                const container = document.getElementById("current-bg-container");
+
+                container.addEventListener("mouseenter", () => {
+                  closeBtn.style.opacity = "1";
+                  closeBtn.style.pointerEvents = "auto";
+                });
+
+                container.addEventListener("mouseleave", () => {
+                  closeBtn.style.opacity = "0";
+                  closeBtn.style.pointerEvents = "none";
+                });
+
+                closeBtn.addEventListener("click", () => {
+                  wrapper.style.display = "none";
+                  toggleBtn.style.display = "inline-block"; // <<< aqui!
+                  toggleBtn.textContent = "Ver imagem atual";
+                });
+              }
+            </script>
+          </section>
           </div>
 
         </div>
@@ -1228,6 +1316,50 @@
 
           <button id="save-links-btn">Salvar Links</button>
         </section>
+        
+        <script>
+          window.addEventListener("DOMContentLoaded", async () => {
+            // 1. Preencher os inputs com os dados do Supabase
+            try {
+              const res = await fetch("/api/social-links");
+              const data = await res.json();
+
+              if (data.instagram) document.getElementById("insta-link").value = data.instagram;
+              if (data.facebook) document.getElementById("face-link").value = data.facebook;
+              if (data.x)        document.getElementById("x-link").value = data.x;
+              if (data.youtube)  document.getElementById("yt-link").value = data.youtube;
+            } catch (err) {
+              console.error("Erro ao carregar os links sociais:", err);
+            }
+
+            // 2. Preencher checkbox de visibilidade dos links (se usar Supabase)
+            try {
+              const res = await fetch("/api/section-visibility");
+              const data = await res.json();
+              document.getElementById("toggle-clients").checked = data.clients === true;
+            } catch (err) {
+              console.error("Erro ao carregar visibilidade da seção de clientes:", err);
+            }
+          });
+
+          // 3. Atualizar visibilidade dos links quando o checkbox mudar
+          document.getElementById("toggle-clients").addEventListener("change", async (e) => {
+            const updated = { clients: e.target.checked };
+            try {
+              const res = await fetch("/api/section-visibility", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(updated),
+              });
+              if (!res.ok) {
+                console.error("Erro ao atualizar visibilidade:", await res.text());
+              }
+            } catch (err) {
+              console.error("Erro na requisição:", err);
+            }
+          });
+        </script>
+
 
         <!-- Container para editar a URL do Google Maps -->
         <div class="map-config-container">
@@ -1238,7 +1370,6 @@
               type="text"
               name="map_url"
               id="map_url"
-              value="{{ map_url_atual }}"
               placeholder="Cole aqui a URL completa do iframe..."
               required
             />
@@ -1265,8 +1396,20 @@
         </div>
 
         <script>
-          // Quando a página carregar, marca checkbox conforme visibilidade atual
+          // Quando a página carregar
           window.addEventListener("DOMContentLoaded", async () => {
+            // 1. Preencher o input map_url via JS
+            try {
+              const mapRes = await fetch("/api/map-url");
+              const mapData = await mapRes.json();
+              if (mapData?.map_url) {
+                document.getElementById("map_url").value = mapData.map_url;
+              }
+            } catch (err) {
+              console.error("Erro ao carregar URL do mapa:", err);
+            }
+
+            // 2. Marcar checkbox com base na visibilidade atual
             try {
               const visRes = await fetch("/api/section-visibility");
               const visData = await visRes.json();
@@ -1277,7 +1420,7 @@
             }
           });
 
-          // Atualiza a visibilidade quando o checkbox mudar
+          // 3. Atualizar visibilidade quando o checkbox mudar
           document
             .getElementById("hide-localizacao")
             .addEventListener("change", async (e) => {
@@ -1299,6 +1442,7 @@
               }
             });
         </script>
+
 
         <!-- INFORMAÇÃO DE CONTATO -->
         <h6>Editar Informações de Contato</h6>

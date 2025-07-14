@@ -645,6 +645,28 @@
   }
 }
 
+#current-bg-container {
+  position: relative;
+  margin: 0 auto;
+  max-width: 600px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 20px;
+}
+
+#showcase-preview-img {
+  width: auto;
+  height: calc(100% - 30px); /* diminui 30px da altura total */
+  object-fit: contain;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  display: block;
+  margin: 0 auto;
+  position: relative;
+  top: -99.5px; /* se quiser puxar a imagem para cima */
+}
+
 /* index.css container "Nossos Serviços" */
 
 /* Container flex simplificado */
