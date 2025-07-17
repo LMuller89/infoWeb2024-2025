@@ -329,83 +329,84 @@
     <!-- JS GALLERY -->
 
     <script>
-      document.querySelectorAll(".image-upload-input").forEach((input) => {
-        input.addEventListener("change", async function (e) {
-          const file = e.target.files[0];
-          const imageId = this.dataset.imageId;
-          const preview = this.parentElement.querySelector(".image-preview");
-          const status = this.parentElement.querySelector(".upload-status");
+      window.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll(".image-upload-input").forEach((input) => {
+          input.addEventListener("change", async function (e) {
+            const file = e.target.files[0];
+            const imageId = this.dataset.imageId;
+            const preview = this.parentElement.querySelector(".image-preview");
+            const status = this.parentElement.querySelector(".upload-status");
 
-          if (!file) return;
+            if (!file) return;
 
-          const formData = new FormData();
-          formData.append("image", file);
-          formData.append("image_id", imageId);
+            const formData = new FormData();
+            formData.append("image", file);
+            formData.append("image_id", imageId);
 
-          try {
-            status.textContent = "Enviando...";
-            const response = await fetch("/api/gallery", {
-              method: "POST",
-              body: formData,
-            });
-
-            const result = await response.json();
-
-            if (!response.ok)
-              throw new Error(result.error || "Falha no upload");
-
-            // Atualizar preview com cache‐busting
-            preview.src = result.new_url;
-            status.textContent = "✔️ Atualizado!";
-            setTimeout(() => (status.textContent = ""), 2000);
-          } catch (error) {
-            // 👇 Aqui a correção: usar crases para template literal
-            status.textContent = `Erro: ${error.message}`;
-            status.style.color = "red";
-          }
-        });
-      });
-
-      // Atualizar visibilidade da galeria
-      document
-        .querySelectorAll("input[name='gallery-visibility']")
-        .forEach((radio) => {
-          radio.addEventListener("change", async (e) => {
-            const visibility = e.target.value; // 'none' | 'partial' | 'full'
             try {
-              const response = await fetch("/api/section-visibility", {
+              status.textContent = "Enviando...";
+              const response = await fetch("/api/gallery", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ gallery: visibility }),
+                body: formData,
               });
-              if (!response.ok) {
-                const erro = await response.json();
-                console.error("Erro ao atualizar gallery:", erro);
-              }
-            } catch (err) {
-              console.error("Falha ao chamar /api/section-visibility:", err);
+
+              const result = await response.json();
+
+              if (!response.ok)
+                throw new Error(result.error || "Falha no upload");
+
+              preview.src = result.new_url;
+              status.textContent = "✔️ Atualizado!";
+              setTimeout(() => (status.textContent = ""), 2000);
+            } catch (error) {
+              status.textContent = `Erro: ${error.message}`;
+              status.style.color = "red";
             }
           });
         });
 
-      // Carregar visibilidade ao abrir a página
-      window.addEventListener("DOMContentLoaded", async () => {
-        try {
-          const visRes = await fetch("/api/section-visibility");
-          const visData = await visRes.json();
-          const currentGalleryVis = visData.gallery || "full";
-
-          const radios = document.querySelectorAll(
-            "input[name='gallery-visibility']"
-          );
-          radios.forEach((radio) => {
-            radio.checked = radio.value === currentGalleryVis;
+        // Atualizar visibilidade da galeria
+        document
+          .querySelectorAll("input[name='gallery-visibility']")
+          .forEach((radio) => {
+            radio.addEventListener("change", async (e) => {
+              const visibility = e.target.value;
+              try {
+                const response = await fetch("/api/section-visibility", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ gallery: visibility }),
+                });
+                if (!response.ok) {
+                  const erro = await response.json();
+                  console.error("Erro ao atualizar gallery:", erro);
+                }
+              } catch (err) {
+                console.error("Falha ao chamar /api/section-visibility:", err);
+              }
+            });
           });
-        } catch (err) {
-          console.error("Erro ao carregar visibilidade:", err);
-        }
+
+        // Carregar visibilidade ao abrir a página
+        (async () => {
+          try {
+            const visRes = await fetch("/api/section-visibility");
+            const visData = await visRes.json();
+            const currentGalleryVis = visData.gallery || "full";
+
+            const radios = document.querySelectorAll(
+              "input[name='gallery-visibility']"
+            );
+            radios.forEach((radio) => {
+              radio.checked = radio.value === currentGalleryVis;
+            });
+          } catch (err) {
+            console.error("Erro ao carregar visibilidade:", err);
+          }
+        })();
       });
     </script>
+
 
     <!-- JS REDES SOCIAIS -->
 
@@ -887,6 +888,13 @@
         <!-- VIDEO FORM -->
         <h2 class="video-upload-title">Upload de Vídeo</h2>
 
+        <div class="video-hide-checkbox-wrapper">
+          <label>
+            <input type="checkbox" id="video-visibility-checkbox" name="video-visibility-checkbox" />
+            Ocultar Vídeo
+          </label>
+        </div>
+
         <div class="video-upload-container">
           <form
             id="upload-video-form"
@@ -905,7 +913,9 @@
             </button>
             <span id="loading-spinner"></span>
           </form>
+          
           <h2 class="video-upload-title">Vídeo Armazenado</h2>
+          
           {% if video_url %}
           <div
             class="video-preview"
@@ -922,6 +932,49 @@
           </p>
           {% endif %}
         </div> <!-- FECHAMENTO DO CONTAINER -->
+
+        <script>
+          // Carrega estado inicial
+          async function loadVideoVisibility() {
+            try {
+              const res = await fetch('/api/section-visibility');
+              if (!res.ok) throw new Error('Erro ao buscar visibilidade do vídeo');
+              const data = await res.json();
+              const videoHidden = data.video || false;
+              const checkbox = document.getElementById('video-visibility-checkbox');
+              checkbox.checked = videoHidden; // Agora: checked = oculto
+            } catch (err) {
+              console.error(err);
+            }
+          }
+
+          // Atualiza backend
+          async function updateVideoVisibility(isHidden) {
+            try {
+              const res = await fetch('/api/section-visibility', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ video: isHidden })  // Marcar = ocultar
+              });
+              if (!res.ok) {
+                const err = await res.json();
+                console.error('Erro ao atualizar vídeo:', err);
+              }
+            } catch (err) {
+              console.error('Falha ao chamar /api/section-visibility:', err);
+            }
+          }
+
+          // Listener de mudança no checkbox
+          document.addEventListener('DOMContentLoaded', () => {
+            loadVideoVisibility();
+            const checkbox = document.getElementById('video-visibility-checkbox');
+            checkbox.addEventListener('change', (e) => {
+              updateVideoVisibility(e.target.checked);
+            });
+          });
+        </script>
+
 
         <!-- Agora o script está FORA do container -->
         <script>

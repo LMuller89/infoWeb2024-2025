@@ -140,7 +140,7 @@ def index():
             'youtube': '#'
         }
 
-    # 4) Buscar visibilidade de seções (clients, gallery, localizacao, testimonials)
+    # 4) Buscar visibilidade de seções incluindo vídeo
     try:
         response = supabase.table('hidden_sections').select('*').execute()
         rows = response.data or []
@@ -149,7 +149,8 @@ def index():
             'clients': False,
             'gallery': 'full',
             'localizacao': False,
-            'testimonials': False
+            'testimonials': False,
+            'video': False  # False = visível por padrão
         }
 
         for row in rows:
@@ -162,6 +163,8 @@ def index():
                 section_visibility['localizacao'] = bool(row.get('hidden', False))
             elif sid == 'testimonials':
                 section_visibility['testimonials'] = bool(row.get('hidden', False))
+            elif sid == 'video':
+                section_visibility['video'] = bool(row.get('hidden', False))
 
         print("DEBUG section_visibility:", section_visibility)
     except Exception as e:
@@ -170,7 +173,8 @@ def index():
             'clients': False,
             'gallery': 'full',
             'localizacao': False,
-            'testimonials': False
+            'testimonials': False,
+            'video': False
         }
 
     # 5) Buscar o map_url na tabela settingsmap
@@ -198,7 +202,7 @@ def index():
     except Exception as e:
         print(f"Erro ao buscar serviços: {e}")
         servicos_lookup = {}
-        
+
     # 8) Buscar logo ativa
     try:
         resp_logo = supabase.table('logos').select('*').eq('is_active', True).limit(1).execute()
@@ -213,7 +217,7 @@ def index():
             "height_px": 120
         }
 
-    # 9) Buscar logo ativa
+    # 9) Buscar vídeo armazenado
     try:
         resp_video = supabase.table('videos').select('video_url').eq('id', 1).limit(1).execute()
         video_data = resp_video.data[0] if resp_video.data else None
@@ -221,7 +225,7 @@ def index():
     except Exception as e:
         print(f"Erro ao buscar vídeo: {e}")
         video_url = url_for('static', filename='img/video.mp4')
-        
+
     # 10) Buscar dados do footer (telefone e endereço formatado)
     try:
         resp_footer = supabase.table('contato_footer').select('telefone, endereco').eq('id', 1).limit(1).execute()
@@ -235,14 +239,16 @@ def index():
             "telefone": "(45) 3254-4200",
             "endereco": "Rua Santa Catarina, N° 577 - Centro, Cidade: Marechal Cândido Rondon PR"
         }
-        
-    # 11) Buscar no banco a URL da imagem do showcase
-    data = supabase.table("site_config").select("showcase_image_url").limit(1).execute()
-    img_url = None
-    if data.data and len(data.data) > 0:
-        img_url = data.data[0].get("showcase_image_url")
 
-    # 12) Renderizar template passando todas as variáveis, incluindo cores das fontes
+    # 11) Buscar no banco a URL da imagem do showcase
+    try:
+        data = supabase.table("site_config").select("showcase_image_url").limit(1).execute()
+        img_url = data.data[0].get("showcase_image_url") if data.data and len(data.data) > 0 else None
+    except Exception as e:
+        print(f"Erro ao buscar showcase_image_url: {e}")
+        img_url = None
+
+    # 12) Renderizar template passando todas as variáveis, incluindo video_hidden
     return render_template(
         'index.html',
         cor_principal=cor_principal,
@@ -259,6 +265,7 @@ def index():
         servicos_lookup=servicos_lookup,
         logo=logo_data,
         video_url=video_url,
+        video_hidden=section_visibility.get('video', False),
         footer_data=footer_data,
         showcase_url=img_url
     )
@@ -770,7 +777,7 @@ def social_links():
 
 @app.route('/api/section-visibility', methods=['GET', 'POST'])
 def section_visibility():
-    # retorna estado atual de *clients* e *gallery*
+    # retorna estado atual de clients, gallery, localizacao, testimonials e video
 
     if request.method == 'GET':
         try:
@@ -787,7 +794,10 @@ def section_visibility():
                         vis['localizacao'] = bool(row.get('hidden', False))
                     elif section_id == 'testimonials':
                         vis['testimonials'] = bool(row.get('hidden', False))
+                    elif section_id == 'video':
+                        vis['video'] = bool(row.get('hidden', False))
 
+                # Define padrão caso alguma chave não exista
                 if 'clients' not in vis:
                     vis['clients'] = False
                 if 'gallery' not in vis:
@@ -796,31 +806,33 @@ def section_visibility():
                     vis['localizacao'] = False
                 if 'testimonials' not in vis:
                     vis['testimonials'] = False
+                if 'video' not in vis:
+                    vis['video'] = False  # False = visível, True = oculto (pode ajustar conforme preferir)
 
             else:
-                # Se a tabela estiver vazia, assume clientes visível e galeria em 'full'
+                # Se a tabela estiver vazia, retorna padrão
                 vis = {
                     'clients': False,
                     'gallery': 'full',
                     'localizacao': False,
-                    'testimonials': False
+                    'testimonials': False,
+                    'video': False
                 }
-                
+
             return jsonify(vis)
+
         except Exception as e:
             print(f"Erro ao buscar visibilidade: {e}")
             return jsonify({}), 500
 
-    # atualiza *clients* e/ou *gallery* JSON de entrada pode ter: { "clients": <true|false> } e/ou { "gallery": "<none|partial|full>" }
-    
     elif request.method == 'POST':
         try:
             data = request.get_json() or {}
-            # No mínimo deve haver a chave 'clients', 'gallery' ou 'localizacao' no JSON
-            if not any(key in data for key in ('clients', 'gallery', 'localizacao', 'testimonials')):
-                return jsonify({'error': "Envie 'clients', 'gallery', 'localizacao' ou 'testimonials' no corpo."}), 400
+            # No mínimo deve haver alguma chave válida no JSON
+            if not any(key in data for key in ('clients', 'gallery', 'localizacao', 'testimonials', 'video')):
+                return jsonify({'error': "Envie 'clients', 'gallery', 'localizacao', 'testimonials' ou 'video' no corpo."}), 400
 
-            # 2.1) Se vier valor para clients, faz upsert em hidden
+            # clients
             if 'clients' in data:
                 valor_clients = data['clients']
                 try:
@@ -834,7 +846,7 @@ def section_visibility():
                     'updated_at': datetime.now().isoformat()
                 }, on_conflict='id').execute()
 
-            # 2.2) Se vier valor para gallery, faz upsert em gallery_visibility
+            # gallery
             if 'gallery' in data:
                 modo = data['gallery']
                 if modo not in ('none', 'partial', 'full'):
@@ -846,7 +858,7 @@ def section_visibility():
                     'updated_at': datetime.now().isoformat()
                 }, on_conflict='id').execute()
 
-            # 2.3) Se vier valor para localizacao, faz upsert em hidden
+            # localizacao
             if 'localizacao' in data:
                 valor_loc = data['localizacao']
                 try:
@@ -859,7 +871,8 @@ def section_visibility():
                     'hidden': ocultar,
                     'updated_at': datetime.now().isoformat()
                 }, on_conflict='id').execute()
-            
+
+            # testimonials
             if 'testimonials' in data:
                 valor_test = data['testimonials']
                 try:
@@ -873,10 +886,27 @@ def section_visibility():
                     'updated_at': datetime.now().isoformat()
                 }, on_conflict='id').execute()
 
+            # video (nova seção)
+            if 'video' in data:
+                valor_video = data['video']
+                try:
+                    ocultar = bool(valor_video)
+                except:
+                    return jsonify({'error': "Valor inválido para 'video_section' (deve ser true/false)."}), 400
+
+                supabase.table('hidden_sections').upsert({
+                    'id': 'video',
+                    'hidden': ocultar,
+                    'updated_at': datetime.now().isoformat()
+                }, on_conflict='id').execute()
+
+
             return jsonify({'message': 'Visibilidade atualizada!'})
+
         except Exception as e:
             print(f"Erro ao atualizar visibilidade: {e}")
             return jsonify({'error': str(e)}), 500
+
         
 # --- ROTA PRINCIPAL: /admin/map para exibir e salvar o Google Maps --- #
 @app.route('/admin/map', methods=['GET', 'POST'])

@@ -108,11 +108,24 @@
 /* admin.css */
 /* VIDEOFORM SECTION */
 .video-upload-title {
-  text-align: center;
-  margin-top: 30px;
+  margin-top: 60px;
   font-size: 26px;
   font-weight: bold;
   color: #333;
+  text-align: center;
+  display: block;
+  width: 100%;
+}
+
+.video-hide-checkbox-wrapper {
+  text-align: center;
+  width: 100%;
+}
+
+.video-hide-checkbox-wrapper label {
+  font-size: 15px;
+  color: #333;
+  cursor: pointer;
 }
 
 .video-upload-container {
