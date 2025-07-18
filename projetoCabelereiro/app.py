@@ -97,6 +97,8 @@ def get_cached_theme(force_refresh=False):
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', 'mysecretkey')  # Recomendação: usar variável de ambiente
 
+
+
 # Redirecionamento da raiz para /home
 @app.route('/')
 def redirect_to_home():
@@ -339,23 +341,62 @@ def logout():
 # Login
 @app.route('/admin/login', methods=['POST'])
 def login():
-    email = request.form['email']
-    password = request.form['password']
+    email = request.form.get('email')
+    password = request.form.get('password')
 
-    # Buscar usuário no Supabase
-    response = supabase.table('users').select('*').eq('email', email).execute()
-    users = response.data
+    if not email or not password:
+        flash('E-mail e senha são obrigatórios.', 'danger')
+        return redirect(url_for('admin'))
 
-    if users and len(users) > 0:
-        user = users[0]
-        if check_password_hash(user['password'], password):
-            session['user_id'] = user['id']
-            session['email'] = user['email']
+    try:
+        response = supabase.auth.sign_in_with_password({
+            'email': email,
+            'password': password,
+        })
+
+        if response.user:
+            session['user_id'] = response.user.id
+            session['email'] = response.user.email
+            session['access_token'] = response.session.access_token
+            print(f"Login bem-sucedido: {response.user.email}")
             flash('Login realizado com sucesso!', 'success')
             return redirect(url_for('admin'))
+        else:
+            print(f"Erro no login: {response.error.message}")
+            flash('E-mail ou senha inválidos.', 'danger')
+            return redirect(url_for('admin'))
+    except Exception as e:
+        print(f"Erro inesperado: {str(e)}")
+        flash(f'Erro no login: {str(e)}', 'danger')
+        return redirect(url_for('admin'))
+    
+@app.route('/update-site-config', methods=['POST'])
+def update_site_config():
+    if 'access_token' not in session:
+        flash('Usuário não autenticado.', 'danger')
+        return redirect(url_for('admin'))
 
-    flash('Email ou senha inválidos.', 'danger')
-    return redirect(url_for('admin'))
+    supabase.auth.set_auth(session['access_token'])
+    user = supabase.auth.get_user()
+    print(f"Usuário logado: {user.user.email if user.user else 'Nenhum'}")
+
+    try:
+        data, error = (
+            supabase.table("site_config")
+            .update({"campo": request.json.get("campo")})
+            .eq("id", 1)
+            .execute()
+        )
+        if error:
+            print(f"Erro do Supabase: {error.message}")
+            flash(f'Erro ao atualizar: {error.message}', 'danger')
+            return redirect(url_for('admin'))
+        flash('Atualização bem-sucedida!', 'success')
+        return redirect(url_for('admin'))
+    except Exception as e:
+        print(f"Erro inesperado: {str(e)}")
+        flash(f'Erro: {str(e)}', 'danger')
+        return redirect(url_for('admin'))
 
 @app.route("/upload-logo", methods=["POST"])
 def upload_logo():
@@ -612,39 +653,47 @@ def update_background_font_color():
 
 @app.route("/upload-showcase-image", methods=["POST"])
 def upload_showcase_image():
-    BUCKET_NAME = "backgroundimage"  # aqui o nome correto da bucket
+    BUCKET_NAME = "backgroundimage"
 
-    supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+    # Use a service role key para criar o client com permissão total
+    supabase = create_client(SUPABASE_URL, SUPABASE_KEY)  # SUPABASE_KEY é a service role key
 
+    # Pega o arquivo enviado no form-data
     file = request.files.get("background-file")
     if not file:
         return jsonify({"success": False, "error": "Nenhum arquivo enviado"}), 400
 
+    # Busca registro existente para remover imagem antiga (se houver)
     existing = supabase.table("site_config").select("showcase_image_url", "id").limit(1).execute()
 
+    record_id = None
     if existing.data and len(existing.data) > 0:
         old_url = existing.data[0].get("showcase_image_url", "")
         record_id = existing.data[0].get("id")
 
-        if old_url:
+        if old_url and f"/{BUCKET_NAME}/" in old_url:
             try:
                 old_filename = old_url.split(f"/{BUCKET_NAME}/")[1]
+                # Remove a imagem antiga do bucket
                 supabase.storage.from_(BUCKET_NAME).remove([old_filename])
             except Exception as e:
                 print("Erro ao deletar arquivo antigo:", e)
-    else:
-        record_id = None
 
-    filename = f"showcase-{uuid.uuid4()}.png"
+    # Gera nome único para o arquivo (extensão respeitando o enviado)
+    ext = file.filename.rsplit('.', 1)[-1] if '.' in file.filename else 'png'
+    filename = f"showcase-{uuid.uuid4()}.{ext}"
 
+    # Faz upload para o bucket
     try:
         file_bytes = file.read()
         supabase.storage.from_(BUCKET_NAME).upload(filename, file_bytes, {"content-type": file.content_type})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
+    # Monta URL pública
     public_url = f"{SUPABASE_URL}/storage/v1/object/public/{BUCKET_NAME}/{filename}"
 
+    # Atualiza ou insere no banco o novo URL
     if record_id:
         supabase.table("site_config").update({"showcase_image_url": public_url}).eq("id", record_id).execute()
     else:
@@ -668,7 +717,6 @@ def get_gallery_images():
         return jsonify(images)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
 
 @app.route('/api/gallery', methods=['POST'])
 def update_gallery_image():

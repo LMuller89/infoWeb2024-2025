@@ -44,6 +44,20 @@
 }
 
 /* Área de login */
+.alert {
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+}
+.alert-success {
+  background-color: #dff0d8;
+  color: #3c763d;
+}
+.alert-danger {
+  background-color: #f2dede;
+  color: #a94442;
+}
+
 #login-section {
   background: #fff;
   padding: 30px;
