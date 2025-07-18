@@ -329,83 +329,84 @@
     <!-- JS GALLERY -->
 
     <script>
-      document.querySelectorAll(".image-upload-input").forEach((input) => {
-        input.addEventListener("change", async function (e) {
-          const file = e.target.files[0];
-          const imageId = this.dataset.imageId;
-          const preview = this.parentElement.querySelector(".image-preview");
-          const status = this.parentElement.querySelector(".upload-status");
+      window.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll(".image-upload-input").forEach((input) => {
+          input.addEventListener("change", async function (e) {
+            const file = e.target.files[0];
+            const imageId = this.dataset.imageId;
+            const preview = this.parentElement.querySelector(".image-preview");
+            const status = this.parentElement.querySelector(".upload-status");
 
-          if (!file) return;
+            if (!file) return;
 
-          const formData = new FormData();
-          formData.append("image", file);
-          formData.append("image_id", imageId);
+            const formData = new FormData();
+            formData.append("image", file);
+            formData.append("image_id", imageId);
 
-          try {
-            status.textContent = "Enviando...";
-            const response = await fetch("/api/gallery", {
-              method: "POST",
-              body: formData,
-            });
-
-            const result = await response.json();
-
-            if (!response.ok)
-              throw new Error(result.error || "Falha no upload");
-
-            // Atualizar preview com cache‐busting
-            preview.src = result.new_url;
-            status.textContent = "✔️ Atualizado!";
-            setTimeout(() => (status.textContent = ""), 2000);
-          } catch (error) {
-            // 👇 Aqui a correção: usar crases para template literal
-            status.textContent = `Erro: ${error.message}`;
-            status.style.color = "red";
-          }
-        });
-      });
-
-      // Atualizar visibilidade da galeria
-      document
-        .querySelectorAll("input[name='gallery-visibility']")
-        .forEach((radio) => {
-          radio.addEventListener("change", async (e) => {
-            const visibility = e.target.value; // 'none' | 'partial' | 'full'
             try {
-              const response = await fetch("/api/section-visibility", {
+              status.textContent = "Enviando...";
+              const response = await fetch("/api/gallery", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ gallery: visibility }),
+                body: formData,
               });
-              if (!response.ok) {
-                const erro = await response.json();
-                console.error("Erro ao atualizar gallery:", erro);
-              }
-            } catch (err) {
-              console.error("Falha ao chamar /api/section-visibility:", err);
+
+              const result = await response.json();
+
+              if (!response.ok)
+                throw new Error(result.error || "Falha no upload");
+
+              preview.src = result.new_url;
+              status.textContent = "✔️ Atualizado!";
+              setTimeout(() => (status.textContent = ""), 2000);
+            } catch (error) {
+              status.textContent = `Erro: ${error.message}`;
+              status.style.color = "red";
             }
           });
         });
 
-      // Carregar visibilidade ao abrir a página
-      window.addEventListener("DOMContentLoaded", async () => {
-        try {
-          const visRes = await fetch("/api/section-visibility");
-          const visData = await visRes.json();
-          const currentGalleryVis = visData.gallery || "full";
-
-          const radios = document.querySelectorAll(
-            "input[name='gallery-visibility']"
-          );
-          radios.forEach((radio) => {
-            radio.checked = radio.value === currentGalleryVis;
+        // Atualizar visibilidade da galeria
+        document
+          .querySelectorAll("input[name='gallery-visibility']")
+          .forEach((radio) => {
+            radio.addEventListener("change", async (e) => {
+              const visibility = e.target.value;
+              try {
+                const response = await fetch("/api/section-visibility", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ gallery: visibility }),
+                });
+                if (!response.ok) {
+                  const erro = await response.json();
+                  console.error("Erro ao atualizar gallery:", erro);
+                }
+              } catch (err) {
+                console.error("Falha ao chamar /api/section-visibility:", err);
+              }
+            });
           });
-        } catch (err) {
-          console.error("Erro ao carregar visibilidade:", err);
-        }
+
+        // Carregar visibilidade ao abrir a página
+        (async () => {
+          try {
+            const visRes = await fetch("/api/section-visibility");
+            const visData = await visRes.json();
+            const currentGalleryVis = visData.gallery || "full";
+
+            const radios = document.querySelectorAll(
+              "input[name='gallery-visibility']"
+            );
+            radios.forEach((radio) => {
+              radio.checked = radio.value === currentGalleryVis;
+            });
+          } catch (err) {
+            console.error("Erro ao carregar visibilidade:", err);
+          }
+        })();
       });
     </script>
+
 
     <!-- JS REDES SOCIAIS -->
 
@@ -574,7 +575,7 @@
                 <button id="save-background-font-btn" class="btn">Salvar Cor</button>
               </div>
             </section>
-
+            
           <!-- NOVO CONTAINER COM INPUT FILE -->
 
           <section id="background-file-section" class="theme-form" style="text-align: center;">
@@ -582,111 +583,71 @@
               <input type="file" id="background-file" name="background-file" />
               <div style="position: relative; display: inline-block;">
                 <button id="upload-background-file-btn" class="btn">Enviar</button>
-                <div id="loading-spinner2"></div>
+                <div id="loading-spinner2" style="display:none;"></div>
               </div>
             </div>
 
             <!-- BOTÃO FLECHA CENTRALIZADO -->
-          <div style="margin-top: 10px;">
-            <button id="toggle-current-bg" class="btn" style="font-size: 14px;">
-              Ver imagem atual
-            </button>
-          </div>
+            <div style="margin-top: 10px;">
+              <button id="toggle-current-bg" class="btn" style="font-size: 14px;">
+                Ver imagem atual
+              </button>
+            </div>
 
-          <script>
-            const uploadBtn = document.getElementById("upload-background-file-btn");
-            const spinner = document.getElementById("loading-spinner2");
-
-            uploadBtn.addEventListener("click", async (e) => {
-              e.preventDefault();
-
-              const fileInput = document.getElementById("background-file");
-              if (!fileInput.files.length) {
-                alert("Selecione um arquivo antes de enviar.");
-                return;
-              }
-
-              // Mostrar spinner e desabilitar botão
-              uploadBtn.disabled = true;
-              uploadBtn.textContent = "";
-              spinner.style.display = "inline-block";
-
-              const formData = new FormData();
-              formData.append("background-file", fileInput.files[0]);
-
-              try {
-                const res = await fetch("/upload-showcase-image", {
-                  method: "POST",
-                  body: formData,
-                });
-                const data = await res.json();
-
-                if (data.success) {
-                  alert("Upload feito com sucesso!");
-                  location.reload();
-                } else {
-                  alert("Erro no upload: " + (data.error || "Desconhecido"));
-                }
-              } catch (error) {
-                alert("Erro na requisição: " + error.message);
-              } finally {
-                // Voltar ao estado normal (se não recarregar a página)
-                uploadBtn.disabled = false;
-                uploadBtn.textContent = "Enviar";
-                spinner.style.display = "none";
-              }
-            });
-          </script>
-
-
-          <!-- PREVIEW OCULTO -->
-          <div id="current-bg-wrapper" style="margin-top: 20px; display: none;">
-            {% if showcase_url %}
-              <div id="current-bg-container" style="position: relative; margin: 0 auto; width: 100%; max-width: 600px;">
-                <img
-                  src="{{ showcase_url }}"
-                  alt="Imagem atual"
-                  id="showcase-preview-img"
-                  style="width: 95%; height: auto; border: 1px solid #ccc; border-radius: 8px; display: block; margin: 0 auto;"
-                />
-                <button
-                  id="close-preview-btn"
-                  style="
-                    position: absolute;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    background: rgba(0, 0, 0, 0.7);
-                    color: white;
-                    font-size: 22px;
-                    border: none;
-                    padding: 8px 14px;
-                    border-radius: 50%;
-                    cursor: pointer;
-                    z-index: 10;
-                    opacity: 0;
-                    transition: opacity 0.2s ease;
-                    pointer-events: none;
-                  "
-                >✖</button>
-              </div>
-            {% else %}
-              <p style="color: #777;">Nenhuma imagem atual encontrada.</p>
-            {% endif %}
-          </div>
-
+            <!-- PREVIEW OCULTO -->
+            <div id="current-bg-wrapper" style="margin-top: 20px; display: none;">
+              {% if showcase_url %}
+                <div id="current-bg-container" style="position: relative; margin: 0 auto; width: 100%; max-width: 600px;">
+                  <img
+                    src="{{ showcase_url }}"
+                    alt="Imagem atual"
+                    id="showcase-preview-img"
+                    style="width: 95%; height: auto; border: 1px solid #ccc; border-radius: 8px; display: block; margin: 0 auto;"
+                  />
+                  <button
+                    id="close-preview-btn"
+                    style="
+                      position: absolute;
+                      top: 50%;
+                      left: 50%;
+                      transform: translate(-50%, -50%);
+                      background: rgba(0, 0, 0, 0.7);
+                      color: white;
+                      font-size: 22px;
+                      border: none;
+                      padding: 8px 14px;
+                      border-radius: 50%;
+                      cursor: pointer;
+                      z-index: 10;
+                      opacity: 0;
+                      transition: opacity 0.2s ease;
+                      pointer-events: none;
+                    "
+                  >✖</button>
+                </div>
+              {% else %}
+                <p style="color: #777;">Nenhuma imagem atual encontrada.</p>
+              {% endif %}
+            </div>
 
             <!-- SCRIPT -->
             <script>
-              // Upload da imagem
-              document.getElementById("upload-background-file-btn").addEventListener("click", async (e) => {
+              const uploadBtn = document.getElementById("upload-background-file-btn");
+              const spinner = document.getElementById("loading-spinner2");
+              const fileInput = document.getElementById("background-file");
+
+              uploadBtn.addEventListener("click", async (e) => {
                 e.preventDefault();
 
-                const fileInput = document.getElementById("background-file");
                 if (!fileInput.files.length) {
                   alert("Selecione um arquivo antes de enviar.");
                   return;
                 }
+
+                // Mostrar spinner e desabilitar botão
+                uploadBtn.disabled = true;
+                uploadBtn.textContent = "";
+                spinner.style.display = "inline-block";
 
                 const formData = new FormData();
                 formData.append("background-file", fileInput.files[0]);
@@ -700,16 +661,21 @@
 
                   if (data.success) {
                     alert("Upload feito com sucesso!");
-                    location.reload(); // recarrega para mostrar nova imagem
+                    location.reload();
                   } else {
                     alert("Erro no upload: " + (data.error || "Desconhecido"));
                   }
                 } catch (error) {
                   alert("Erro na requisição: " + error.message);
+                } finally {
+                  // Voltar ao estado normal (se não recarregar a página)
+                  uploadBtn.disabled = false;
+                  uploadBtn.textContent = "Enviar";
+                  spinner.style.display = "none";
                 }
               });
 
-              // Toggle de imagem
+              // Toggle de imagem atual
               const toggleBtn = document.getElementById("toggle-current-bg");
               const wrapper = document.getElementById("current-bg-wrapper");
 
@@ -746,12 +712,13 @@
 
                 closeBtn.addEventListener("click", () => {
                   wrapper.style.display = "none";
-                  toggleBtn.style.display = "inline-block"; // <<< aqui!
+                  toggleBtn.style.display = "inline-block";
                   toggleBtn.textContent = "Ver imagem atual";
                 });
               }
             </script>
           </section>
+
           </div>
         </section>
 
@@ -887,6 +854,13 @@
         <!-- VIDEO FORM -->
         <h2 class="video-upload-title">Upload de Vídeo</h2>
 
+        <div class="video-hide-checkbox-wrapper">
+          <label>
+            <input type="checkbox" id="video-visibility-checkbox" name="video-visibility-checkbox" />
+            Ocultar Vídeo
+          </label>
+        </div>
+
         <div class="video-upload-container">
           <form
             id="upload-video-form"
@@ -905,7 +879,9 @@
             </button>
             <span id="loading-spinner"></span>
           </form>
+          
           <h2 class="video-upload-title">Vídeo Armazenado</h2>
+          
           {% if video_url %}
           <div
             class="video-preview"
@@ -922,6 +898,49 @@
           </p>
           {% endif %}
         </div> <!-- FECHAMENTO DO CONTAINER -->
+
+        <script>
+          // Carrega estado inicial
+          async function loadVideoVisibility() {
+            try {
+              const res = await fetch('/api/section-visibility');
+              if (!res.ok) throw new Error('Erro ao buscar visibilidade do vídeo');
+              const data = await res.json();
+              const videoHidden = data.video || false;
+              const checkbox = document.getElementById('video-visibility-checkbox');
+              checkbox.checked = videoHidden; // Agora: checked = oculto
+            } catch (err) {
+              console.error(err);
+            }
+          }
+
+          // Atualiza backend
+          async function updateVideoVisibility(isHidden) {
+            try {
+              const res = await fetch('/api/section-visibility', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ video: isHidden })  // Marcar = ocultar
+              });
+              if (!res.ok) {
+                const err = await res.json();
+                console.error('Erro ao atualizar vídeo:', err);
+              }
+            } catch (err) {
+              console.error('Falha ao chamar /api/section-visibility:', err);
+            }
+          }
+
+          // Listener de mudança no checkbox
+          document.addEventListener('DOMContentLoaded', () => {
+            loadVideoVisibility();
+            const checkbox = document.getElementById('video-visibility-checkbox');
+            checkbox.addEventListener('change', (e) => {
+              updateVideoVisibility(e.target.checked);
+            });
+          });
+        </script>
+
 
         <!-- Agora o script está FORA do container -->
         <script>

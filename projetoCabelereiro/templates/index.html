@@ -456,21 +456,24 @@
     <!-- Video slot -->
     <section id="videoslot">
       <div class="headline"></div>
-      <div id="video-container" class="video-wireframe">
-        
-        <!-- Video player -->
-        <video
-          id="my-video"
-          width="100%"
-          height="auto"
-          controls
-          controlsList="nodownload"
-          poster="{{ url_for('static', filename='img/capa.png') }}"
-        >
-          <source src="{{ video_url }}" type="video/mp4" />
-        </video>
-      </div>
+      {% if not video_hidden and video_url %}
+        <div id="video-container" class="video-wireframe">
+          <!-- Video player -->
+          <video
+            id="my-video"
+            width="100%"
+            height="auto"
+            controls
+            controlsList="nodownload"
+            poster="{{ url_for('static', filename='img/capa.png') }}"
+          >
+            <source src="{{ video_url }}" type="video/mp4" />
+          </video>
+        </div>
+      {% endif %}
     </section>
+
+
 
     {% if section_visibility.get('clients') != True %}
     <section id="clients">
