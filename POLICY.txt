@@ -1,0 +1,11 @@
+CREATE POLICY "Admin full access"
+ON public.gallery_images
+FOR ALL
+TO authenticated
+USING (
+  auth.email() = 'admin@meusite.com'
+);
+
+
+email cadastrado = cristiano@hotmail.com
+senha: 12341234
