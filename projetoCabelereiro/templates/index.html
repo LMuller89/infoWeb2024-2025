@@ -502,27 +502,19 @@
     </section>
     {% endif %}
 
-
-
-
     {% if not section_visibility.localizacao %}
-      <!-- Inserção de dados referente ao contato -->
       <section class="localizacao">
-        <div class="mapa">
-          {% if map_url %}
-            <iframe
-              src="{{ map_url }}"
-              width="854"
-              height="540"
-              style="border:0;"
-              allowfullscreen=""
-              loading="lazy"
-              referrerpolicy="no-referrer-when-downgrade">
-            </iframe>
-          {% else %}
-            <p>Mapa não configurado.</p>
-          {% endif %}
-        </div>
+        {% if map_url %}
+          <iframe
+            class="mapa"
+            src="{{ map_url }}"
+            allowfullscreen=""
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade">
+          </iframe>
+        {% else %}
+          <p>Mapa não configurado.</p>
+        {% endif %}
       </section>
     {% endif %}
 
@@ -555,7 +547,6 @@
 
     <!-- Our JS file -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
- 
   </body>
 </html>
 

@@ -168,7 +168,7 @@ def index():
             elif sid == 'video':
                 section_visibility['video'] = bool(row.get('hidden', False))
 
-        print("DEBUG section_visibility:", section_visibility)
+        print("DEBUG section_visibility:", section_visibility)  # <-- AGORA DENTRO DO TRY
     except Exception as e:
         print(f"Erro ao buscar visibilidade: {e}")
         section_visibility = {
@@ -178,6 +178,7 @@ def index():
             'testimonials': False,
             'video': False
         }
+
 
     # 5) Buscar o map_url na tabela settingsmap
     try:
@@ -1267,5 +1268,4 @@ def get_contato():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
-    
+    app.run(host='0.0.0.0', debug=True, port=8000)
