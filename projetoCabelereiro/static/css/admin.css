@@ -31,7 +31,7 @@
 /* Corpo da área admin */
 .admin-main {
   padding: 40px 0;
-  background-color: #edf7f7;
+  background-color: #f4f7f6; /* Cor mais natural, clara e leve */
   min-height: 80vh;
   font-family: "Calibri", "Arial", "Calibri Light", sans-serif;
 }
@@ -59,59 +59,107 @@
 }
 
 #login-section {
-  background: #fff;
-  padding: 30px;
-  border-radius: 5px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  background: #ffffff;
+  padding: 40px 30px;
+  border-radius: 8px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05); /* Sombra mais suave */
   max-width: 400px;
   margin: auto;
+  text-align: center; /* Centraliza conteúdos internos */
   font-family: "Calibri", "Arial", "Calibri Light", sans-serif;
 }
 
-#login-section .form-group {
+.logo-container {
   margin-bottom: 20px;
+}
+
+.logo-container svg {
+  display: block;
+  margin: 0 auto;
+}
+
+#login-section h2 {
+  margin-bottom: 30px;
+  color: #333;
+  font-size: 24px;
+}
+
+#login-section .form-group {
+  margin-bottom: 25px;
+  text-align: left; /* Alinha labels e inputs à esquerda */
 }
 
 #login-section label {
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   font-weight: bold;
-  color: #333;
+  color: #555; /* Cor mais suave */
   font-family: "Calibri", "Arial", "Calibri Light", sans-serif;
 }
 
 #login-section input {
   width: 100%;
   padding: 12px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  border: 1px solid #ddd; /* Borda mais leve */
+  border-radius: 6px;
   font-size: 15px;
   box-sizing: border-box;
-  transition: border-color 0.3s;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  background-color: rgba(
+    255,
+    255,
+    255,
+    0.95
+  ); /* Leve opacidade para suavidade */
   font-family: "Calibri", "Arial", "Calibri Light", sans-serif;
 }
 
-#loguin-section input:focus {
-  border-color: #007bff;
+#login-section input::placeholder {
+  color: #aaa; /* Placeholder mais suave */
+  opacity: 0.8;
+}
+
+#login-section input:focus {
+  border-color: #3498db; /* Cor foco mais natural e leve */
+  box-shadow: 0 0 5px rgba(52, 152, 219, 0.3); /* Efeito de foco suave */
   outline: none;
 }
 
 .btn {
   display: block;
-  width: 70%;
-  background-color: #0564c9;
+  width: 100%; /* Botão full width para melhor usabilidade */
+  background-color: #3498db; /* Cor mais natural, azul claro e leve */
   color: white;
-  padding: 10px;
+  padding: 12px;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   font-size: 16px;
-  transition: background-color 0.3s ease;
-  margin-top: 10px;
+  transition: background-color 0.3s ease, transform 0.2s;
+  margin: 20px auto 0;
+  cursor: pointer;
   font-family: "Calibri", "Arial", "Calibri Light", sans-serif;
 }
 
 .btn:hover {
-  background-color: #0056b3;
+  background-color: #2980b9;
+  transform: translateY(-2px); /* Efeito leve de elevação */
+}
+
+.footer-links {
+  margin-top: 30px;
+  font-size: 14px;
+  color: #777;
+}
+
+.footer-links a {
+  color: #777;
+  text-decoration: none;
+  margin: 0 15px;
+  transition: color 0.3s;
+}
+
+.footer-links a:hover {
+  color: #333;
 }
 
 #dashboard-section .dashboard-content {
