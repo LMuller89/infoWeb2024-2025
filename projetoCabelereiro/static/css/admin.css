@@ -72,10 +72,18 @@
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   max-width: 400px; /* Mantém largura confortável em desktop */
   margin: 40px auto; /* Centraliza verticalmente com espaçamento */
+  background: #ffffff;
+  padding: 40px 30px;
+  border-radius: 8px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05); /* Sombra mais suave */
+  max-width: 400px;
+  margin: auto;
+  text-align: center; /* Centraliza conteúdos internos */
   font-family: "Calibri", "Arial", "Calibri Light", sans-serif;
   display: flex;
   flex-direction: column; /* Garante que os elementos fiquem um abaixo do outro */
 }
+
 
 /* Cada grupo de campo (login ou senha) */
 #login-section .form-group {
@@ -89,6 +97,32 @@
   margin-bottom: 6px; /* Espaço menor entre label e input */
   font-weight: bold;
   color: #333;
+.logo-container {
+  margin-bottom: 20px;
+}
+
+.logo-container svg {
+  display: block;
+  margin: 0 auto;
+}
+
+#login-section h2 {
+  margin-bottom: 30px;
+  color: #333;
+  font-size: 24px;
+}
+
+#login-section .form-group {
+  margin-bottom: 25px;
+  text-align: left; /* Alinha labels e inputs à esquerda */
+}
+
+#login-section label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: bold;
+  color: #555; /* Cor mais suave */
+  font-family: "Calibri", "Arial", "Calibri Light", sans-serif;
 }
 
 .login-logo {
@@ -103,8 +137,8 @@
 #login-section input {
   width: 100%;
   padding: 12px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  border: 1px solid #ddd; /* Borda mais leve */
+  border-radius: 6px;
   font-size: 15px;
   box-sizing: border-box;
   transition: border-color 0.3s;
@@ -112,6 +146,24 @@
 
 #login-section input:focus {
   border-color: #007bff;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  background-color: rgba(
+    255,
+    255,
+    255,
+    0.95
+  ); /* Leve opacidade para suavidade */
+  font-family: "Calibri", "Arial", "Calibri Light", sans-serif;
+}
+
+#login-section input::placeholder {
+  color: #aaa; /* Placeholder mais suave */
+  opacity: 0.8;
+}
+
+#login-section input:focus {
+  border-color: #3498db; /* Cor foco mais natural e leve */
+  box-shadow: 0 0 5px rgba(52, 152, 219, 0.3); /* Efeito de foco suave */
   outline: none;
 }
 
@@ -120,20 +172,44 @@
   display: block;
   width: 100%;
   background-color: #0564c9;
+  width: 100%; /* Botão full width para melhor usabilidade */
+  background-color: #3498db; /* Cor mais natural, azul claro e leve */
   color: white;
   padding: 12px;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   font-size: 16px;
   transition: background-color 0.3s ease;
   cursor: pointer;
 
   /* Novo espaçamento para afastar do campo de senha */
   margin-top: 18px; /* Mantém distância agradável */
+  transition: background-color 0.3s ease, transform 0.2s;
+  margin: 20px auto 0;
+  cursor: pointer;
+  font-family: "Calibri", "Arial", "Calibri Light", sans-serif;
 }
 
 .btn:hover {
-  background-color: #0056b3;
+  background-color: #2980b9;
+  transform: translateY(-2px); /* Efeito leve de elevação */
+}
+
+.footer-links {
+  margin-top: 30px;
+  font-size: 14px;
+  color: #777;
+}
+
+.footer-links a {
+  color: #777;
+  text-decoration: none;
+  margin: 0 15px;
+  transition: color 0.3s;
+}
+
+.footer-links a:hover {
+  color: #333;
 }
 
 .login-title {

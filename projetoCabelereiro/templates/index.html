@@ -2,20 +2,6 @@
 <html lang="en">
   <head>
     <!-- Força carregamento da logo -->
-      <script>
-        // Logo logo no head para evitar flash
-        (function() {
-          const savedLogoUrl = localStorage.getItem('logoUrl');
-          if (savedLogoUrl) {
-            // Já existe logo salva no localStorage, setar direto na tag
-            // Como a tag img pode ainda não estar criada no DOM,
-            // vamos adicionar uma tag style para alterar o src via CSS não rola, então
-            // melhor criar uma tag img temporária no head e trocar depois
-            // Mas pra simplificar, só guardamos a URL na data attribute do html
-            document.documentElement.dataset.savedLogo = savedLogoUrl;
-          }
-        })();
-      </script>
 
       <!-- Força carregamento do background image -->
       <script>
@@ -301,30 +287,35 @@
           <h1 class="logo">
             <img
               id="logo-img"
-              src="{{ logo.logo_url }}"
+              src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
+              data-src="{{ logo.logo_url }}"
               class="logo-img"
-              alt=""
+              alt="Logo"
               style="height: {{ logo.height_px }}px; width: auto;"
             />
             <span class="logo-text"></span>
           </h1>
           <script>
-            // Após DOM carregado, aplica logo do localStorage, se existir
-            document.addEventListener('DOMContentLoaded', () => {
+            (function() {
               const logoImg = document.getElementById('logo-img');
-              const savedLogoUrl = document.documentElement.dataset.savedLogo;
+              if (!logoImg) return;
 
-              if (savedLogoUrl && logoImg && logoImg.src !== savedLogoUrl) {
-                // Substitui src para evitar pisc
-                logoImg.src = savedLogoUrl;
+              const savedLogoUrl = localStorage.getItem('logoUrl');
+              const serverLogoUrl = logoImg.dataset.src;
+
+              // Use cached URL first to prevent flicker, fallback to server URL
+              const finalUrl = savedLogoUrl || serverLogoUrl;
+              if (finalUrl) {
+                logoImg.src = finalUrl;
               }
 
-              // Atualiza localStorage com a URL da logo atual do template
-              // para usar no próximo carregamento da página
-              if (logoImg && logoImg.src) {
-                localStorage.setItem('logoUrl', logoImg.src);
-              }
-            });
+              // After page load, update cache with the definitive server URL
+              window.addEventListener('load', () => {
+                if (serverLogoUrl && localStorage.getItem('logoUrl') !== serverLogoUrl) {
+                  localStorage.setItem('logoUrl', serverLogoUrl);
+                }
+              });
+            })();
           </script>
         {% endif %}                
           <ul id="navbar-items">
@@ -502,27 +493,19 @@
     </section>
     {% endif %}
 
-
-
-
     {% if not section_visibility.localizacao %}
-      <!-- Inserção de dados referente ao contato -->
       <section class="localizacao">
-        <div class="mapa">
-          {% if map_url %}
-            <iframe
-              src="{{ map_url }}"
-              width="854"
-              height="540"
-              style="border:0;"
-              allowfullscreen=""
-              loading="lazy"
-              referrerpolicy="no-referrer-when-downgrade">
-            </iframe>
-          {% else %}
-            <p>Mapa não configurado.</p>
-          {% endif %}
-        </div>
+        {% if map_url %}
+          <iframe
+            class="mapa"
+            src="{{ map_url }}"
+            allowfullscreen=""
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade">
+          </iframe>
+        {% else %}
+          <p>Mapa não configurado.</p>
+        {% endif %}
       </section>
     {% endif %}
 
@@ -555,7 +538,5 @@
 
     <!-- Our JS file -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
- 
   </body>
 </html>
-

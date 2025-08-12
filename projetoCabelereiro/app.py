@@ -168,7 +168,7 @@ def index():
             elif sid == 'video':
                 section_visibility['video'] = bool(row.get('hidden', False))
 
-        print("DEBUG section_visibility:", section_visibility)
+        print("DEBUG section_visibility:", section_visibility)  # <-- AGORA DENTRO DO TRY
     except Exception as e:
         print(f"Erro ao buscar visibilidade: {e}")
         section_visibility = {
@@ -178,6 +178,7 @@ def index():
             'testimonials': False,
             'video': False
         }
+
 
     # 5) Buscar o map_url na tabela settingsmap
     try:
@@ -407,25 +408,33 @@ def upload_logo():
         return jsonify({"success": False, "error": "Arquivo ou altura ausente"})
 
     try:
-        # 🚫 VERIFICA SE JÁ EXISTEM 4 LOGOS
+        # Limite de 4 logos
         existing_logos = supabase.table("logos").select("id").execute()
         if len(existing_logos.data) >= 4:
             return jsonify({"success": False, "error": "Limite de 4 logos atingido. Exclua uma antes de adicionar outra."})
 
-        # CONTINUA O PROCESSO NORMAL
         filename = secure_filename(file.filename)
-        extension = os.path.splitext(filename)[1]
+        extension = os.path.splitext(filename)[1].lower()
         unique_name = f"logo-{uuid.uuid4()}{extension}"
         file_data = file.read()
 
-        # 🧠 Detectar se a imagem é clara
-        is_clara = cor_dominante_e_clara(file_data)
-        bg_contraste = "black" if is_clara else "white"
+        # Detectar contraste de fundo só para PNG/JPG
+        if extension in [".png", ".jpg", ".jpeg"]:
+            is_clara = cor_dominante_e_clara(file_data)
+            bg_contraste = "black" if is_clara else "white"
+        else:
+            # Para SVG e outros formatos não rasterizados
+            bg_contraste = "white"  # escolha padrão ou deixe configurável
+
+        # Corrigir MIME para SVG
+        content_type = file.mimetype
+        if extension == ".svg":
+            content_type = "image/svg+xml"
 
         # Upload no Supabase
         try:
             supabase.storage.from_('logos').upload(unique_name, file_data, {
-                "content-type": file.mimetype
+                "content-type": content_type
             })
         except Exception as e:
             return jsonify({"success": False, "error": f"Erro no upload: {str(e)}"})
@@ -1267,5 +1276,4 @@ def get_contato():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
-    
+    app.run(host='0.0.0.0', debug=True, port=8000)
