@@ -1,29 +1,35 @@
 /* Estilo específico para a área de administração */
 
 .admin-header {
-  background-color: #d9f3e5;
+  background-color: #04343c;
+  color: #f45b1b;
   padding: 10px 0;
   font-size: 1.2rem;
   font-family: "Calibri", "Arial", "Calibri Light", sans-serif;
+  border-bottom: 1px solid #e0e0e0; /* Borda sutil para separar do conteúdo */
 }
 
 .admin-header .h1 {
-  color: #0a0a0a;
   text-align: center;
+  margin: 0 auto;
 }
 
 .admin-header-content {
   display: flex;
-  justify-content: space-between;
+  justify-content: center; /* centraliza todo o conteúdo */
   align-items: center;
+  position: relative; /* permite posicionar o logout de forma absoluta */
 }
 
+/* Botão de SAIR da área de admin */
 .btn-logout {
-  color: #0a0a0a;
+  position: absolute;
+  color: #04c3bb;
   font-size: 1rem;
-  text-transform: uppercase;
+  right: 10px; /* mantém botão à direita */
   border: none;
   text-decoration: none;
+  text-transform: uppercase;
   cursor: pointer;
   font-family: "Calibri", "Arial", "Calibri Light", sans-serif;
 }
@@ -31,7 +37,7 @@
 /* Corpo da área admin */
 .admin-main {
   padding: 40px 0;
-  background-color: #f4f7f6; /* Cor mais natural, clara e leve */
+  background-color: #fff; /* Cor Fundo */
   min-height: 80vh;
   font-family: "Calibri", "Arial", "Calibri Light", sans-serif;
 }
@@ -50,7 +56,7 @@
   border-radius: 4px;
 }
 .alert-success {
-  background-color: #dff0d8;
+  background-color: #f0e8d8;
   color: #3c763d;
 }
 .alert-danger {
@@ -58,7 +64,14 @@
   color: #a94442;
 }
 
+/* ===== ÁREA DE LOGIN ===== */
 #login-section {
+  background: #fff;
+  padding: 30px;
+  border-radius: 5px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  max-width: 400px; /* Mantém largura confortável em desktop */
+  margin: 40px auto; /* Centraliza verticalmente com espaçamento */
   background: #ffffff;
   padding: 40px 30px;
   border-radius: 8px;
@@ -67,8 +80,23 @@
   margin: auto;
   text-align: center; /* Centraliza conteúdos internos */
   font-family: "Calibri", "Arial", "Calibri Light", sans-serif;
+  display: flex;
+  flex-direction: column; /* Garante que os elementos fiquem um abaixo do outro */
 }
 
+
+/* Cada grupo de campo (login ou senha) */
+#login-section .form-group {
+  display: flex;
+  flex-direction: column; /* Label e input empilhados */
+  margin-bottom: 12px; /* Espaço reduzido entre campos */
+}
+
+/* Label do campo */
+#login-section label {
+  margin-bottom: 6px; /* Espaço menor entre label e input */
+  font-weight: bold;
+  color: #333;
 .logo-container {
   margin-bottom: 20px;
 }
@@ -97,6 +125,15 @@
   font-family: "Calibri", "Arial", "Calibri Light", sans-serif;
 }
 
+.login-logo {
+  vertical-align: middle;
+  height: 1.8em;
+  width: auto;
+  margin-right: 0.5rem;
+  display: inline-block;
+}
+
+/* Campo de entrada */
 #login-section input {
   width: 100%;
   padding: 12px;
@@ -104,6 +141,11 @@
   border-radius: 6px;
   font-size: 15px;
   box-sizing: border-box;
+  transition: border-color 0.3s;
+}
+
+#login-section input:focus {
+  border-color: #007bff;
   transition: border-color 0.3s, box-shadow 0.3s;
   background-color: rgba(
     255,
@@ -125,8 +167,11 @@
   outline: none;
 }
 
+/* Botão de login */
 .btn {
   display: block;
+  width: 100%;
+  background-color: #0564c9;
   width: 100%; /* Botão full width para melhor usabilidade */
   background-color: #3498db; /* Cor mais natural, azul claro e leve */
   color: white;
@@ -134,6 +179,11 @@
   border: none;
   border-radius: 6px;
   font-size: 16px;
+  transition: background-color 0.3s ease;
+  cursor: pointer;
+
+  /* Novo espaçamento para afastar do campo de senha */
+  margin-top: 18px; /* Mantém distância agradável */
   transition: background-color 0.3s ease, transform 0.2s;
   margin: 20px auto 0;
   cursor: pointer;
@@ -162,9 +212,84 @@
   color: #333;
 }
 
-#dashboard-section .dashboard-content {
-  text-align: center;
-  margin-bottom: 30px;
+.login-title {
+  display: inline-flex; /* Mantém logo e texto lado a lado */
+  align-items: center; /* Centraliza verticalmente */
+  gap: 8px; /* Espaço entre logo e texto */
+  font-size: 1.8rem; /* Ajuste do tamanho do texto */
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.login-logo {
+  width: 50px; /* Aumente ou diminua conforme necessário */
+  height: auto;
+}
+
+/* Contêiner principal lado a lado */
+.login-wrapper {
+  display: flex;
+  flex-wrap: nowrap; /* impede quebra para baixo */
+  align-items: center; /* centraliza verticalmente */
+  gap: 20px; /* espaço entre logo e campos */
+}
+
+/* Logo maior */
+.login-logo {
+  width: 160px; /* tamanho ajustável */
+  height: auto;
+}
+
+/* Campos ocupam o restante */
+.form-fields {
+  flex: 1;
+}
+
+/* Mantém inputs empilhados dentro do bloco */
+.form-fields .form-group {
+  margin-bottom: 10px;
+}
+
+@media (max-width: 600px) {
+  .login-wrapper {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+/* ===== RESPONSIVIDADE ===== */
+@media (max-width: 480px) {
+  #login-section {
+    padding: 20px;
+    max-width: 95%;
+    margin: 20px auto;
+  }
+
+  .btn {
+    font-size: 14px;
+    padding: 10px;
+    margin-top: 16px; /* Mantém bom espaçamento no mobile */
+  }
+}
+
+/* Botão de SAIR da área de admin */
+@media (max-width: 600px) {
+  .btn-logout {
+    position: static; /* volta para o fluxo normal */
+    margin-top: 10px; /* espaço abaixo do título */
+    order: 2; /* garante que venha depois do título */
+  }
+
+  .admin-header-content {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .admin-header .h1 {
+    order: 1;
+    text-align: center;
+  }
 }
 
 /* admin.css */
@@ -207,6 +332,8 @@
   padding: 30px 40px;
   border-radius: 12px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  flex-wrap: wrap; /* Permite que os itens quebrem a linha em telas menores */
+  justify-content: center; /* Centraliza os itens quando quebram a linha */
 }
 
 /* Botão file selector - mantém seu estilo */
@@ -252,6 +379,29 @@
 .video-upload-form button[type="submit"]:disabled {
   background-color: #94d3a2;
   cursor: not-allowed;
+}
+
+/* Vídeo Preview (Armazenado) - Novo container para o vídeo salvo */
+.video-preview-container {
+  width: 90%; /* Ocupa 90% da largura do container pai, tornando-o flexível */
+  max-width: 800px; /* Limita a largura máxima em telas grandes para não ficar desproporcional */
+  margin: 20px auto 0 auto; /* Adiciona espaço acima e centraliza horizontalmente */
+  text-align: center; /* Centraliza o título h3 */
+}
+
+.video-preview-container h3 {
+  font-size: 22px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.video-preview-container video {
+  width: 100%; /* Faz o vídeo ocupar 100% da largura do seu container (.video-preview-container) */
+  height: auto; /* Mantém a proporção do vídeo ao redimensionar a largura */
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background: #000; /* Adiciona um fundo preto para o player, melhorando a estética */
 }
 
 /* Spinner */
@@ -554,34 +704,25 @@
   display: flex;
   flex-direction: column;
   gap: 30px;
-  flex: 1 1 300px; /* mínimo 300px, cresce */
-  max-width: 33.33%;
+  flex: 1 1 300px; /* Base de 300px, permite que o item cresça e encolha, criando um layout fluido. */
   box-sizing: border-box;
   /* altura automática para evitar overflow */
-  height: auto;
-  min-height: 180px; /* garante altura mínima */
+  height: auto; /* A altura é definida pelo conteúdo, não é mais fixa */
 }
 
 /* Containers iguais, fixos e alinhados */
 .theme-form {
   background: #fff;
   padding: 20px;
-  border-radius: 6px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
   font-family: "Calibri", "Arial", "Calibri Light", sans-serif;
   box-sizing: border-box;
   width: 100%;
-
-  /* Define altura fixa para uniformizar */
-  height: 180px;
-
+  height: 100%; /* Ocupa a altura da coluna, permitindo alinhamento interno */
   display: flex;
   flex-direction: column;
-  justify-content: flex-start; /* conteúdo no topo */
   gap: 15px;
-
-  /* Evita que cresça mais que 150px */
-  flex-grow: 0;
-  min-height: unset;
 }
 
 /* Cada grupo label + input + botão alinhados em linha */
@@ -591,14 +732,19 @@
   gap: 10px;
   width: 100%;
   box-sizing: border-box;
-  overflow: hidden;
+  flex-wrap: wrap; /* Permite que os itens quebrem para a linha de baixo */
+}
+
+/* Empurra o grupo do botão para o final do card */
+.theme-form .form-group:last-of-type {
+  margin-top: auto; /* Mágica: empurra este grupo para o fundo do card */
+  padding-top: 15px; /* Adiciona um espaço acima para separar visualmente */
 }
 
 .theme-form label {
   width: 160px;
   font-weight: bold;
-  white-space: nowrap;
-  flex-shrink: 0;
+  white-space: normal; /* Permite que o texto do label quebre a linha */
   user-select: none;
 }
 
@@ -652,15 +798,12 @@
   white-space: nowrap;
   text-overflow: ellipsis;
   transition: background-color 0.3s ease;
-  flex-shrink: 0;
   line-height: 1;
   display: inline-block;
   vertical-align: middle;
   width: auto; /* largura automática */
   max-width: 120px;
-
-  /* AJUSTE FINALEIRA */
-  margin-top: -1px; /* ou teste -3px se ainda estiver levemente baixo */
+  margin-left: auto; /* Mágica 2: Alinha o botão à direita dentro do seu grupo */
 }
 
 .theme-form button.btn:hover {
@@ -683,43 +826,6 @@
   height: 300px;
   border-radius: 4px;
   align-self: center;
-}
-
-/* Responsividade */
-@media (max-width: 1024px) {
-  .theme-grid {
-    flex-direction: column;
-    gap: 30px;
-  }
-
-  .divider,
-  .divider-small {
-    display: none;
-  }
-
-  .column {
-    max-width: 100%;
-    height: auto; /* colunas sem altura fixa no mobile */
-  }
-
-  .theme-form {
-    height: auto; /* containers com altura flexível no mobile */
-  }
-
-  .theme-form button.btn {
-    margin-left: 0; /* botão alinhado normal no mobile */
-    width: 100%;
-  }
-
-  .theme-form .form-group {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .theme-form label {
-    width: auto;
-    margin-bottom: 4px;
-  }
 }
 
 /* loading spinner / background file input options */
@@ -803,31 +909,13 @@
   pointer-events: auto;
 }
 
-/* index.css container "Nossos Serviços" */
-
-/* Container flex simplificado */
-/* Container flex simplificado */
-#funcionarios-admin-container {
-  width: 80%;
-  margin: auto;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center; /* Centralizado por padrão */
-  align-items: flex-start;
-  box-sizing: border-box;
-  gap: 15px; /* Espaçamento consistente */
-}
-
-/* Remoção de todas as classes específicas de contagem - não são mais necessárias */
-
-/* Estilo do card - mais flexível */
-/* Container flex - corrigido para layout responsivo */
+/* Container para os cards de funcionários/serviços */
 #funcionarios-admin-container {
   width: 80%;
   margin: 2rem auto;
   display: flex;
   flex-wrap: wrap;
-  justify-content: flex-start; /* Alinhamento à esquerda */
+  justify-content: center; /* Centraliza os cards no container */
   align-items: stretch; /* Cards com mesma altura */
   box-sizing: border-box;
   gap: 20px; /* Espaçamento uniforme */
@@ -835,7 +923,7 @@
 
 /* Estilo do card - corrigido para 2 colunas */
 .testimonial {
-  flex: 0 1 calc(50% - 10px); /* 2 colunas com espaçamento */
+  flex: 0 1 calc(50% - 20px); /* Força 2 colunas com gap considerado */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -851,11 +939,9 @@
   transition: transform 0.3s ease;
 }
 
-/* Media query para telas menores */
-@media (max-width: 768px) {
-  .testimonial {
-    flex: 0 1 100%; /* 1 coluna em telas pequenas */
-  }
+/* NOVO: Garante que se tiver número ímpar (como 3), os cards fiquem balanceados */
+#funcionarios-admin-container:has(.testimonial:nth-child(3):last-child) {
+  justify-content: space-between; /* distribui melhor os 3 cards */
 }
 
 .testimonial:hover {
@@ -950,17 +1036,22 @@
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
 }
 
-/*gallery section*/
+/* gallery section */
 #gallery-admin-section {
   background: #fff;
   padding: 20px;
   border-radius: 8px;
   margin-top: 30px;
   width: 100%;
-  max-width: 800px; /* Largura máxima */
+  max-width: 800px;
   margin-left: auto;
   margin-right: auto;
   font-family: "Calibri", "Arial", "Calibri Light", sans-serif;
+
+  /* Adicionado para centralizar com espaçamento lateral */
+  padding-left: 20px;
+  padding-right: 20px;
+  box-sizing: border-box;
 }
 
 .gallery-admin-item {
@@ -970,7 +1061,6 @@
   border-radius: 8px;
   width: 100%;
   box-sizing: border-box;
-
   font-family: "Calibri", "Arial", "Calibri Light", sans-serif;
 }
 
@@ -990,9 +1080,30 @@
 /* Ajuste para os itens da galeria */
 #gallery-container {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px;
   margin: 20px 0;
+}
+
+/* Responsividade */
+@media (max-width: 1024px) {
+  #gallery-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  #gallery-container {
+    grid-template-columns: 1fr;
+  }
+
+  .image-preview {
+    max-width: 100%;
+  }
+
+  .image-upload-input {
+    max-width: 100%;
+  }
 }
 
 .empty-image-placeholder {
@@ -1011,14 +1122,158 @@
   font-family: "Calibri", "Arial", "Calibri Light", sans-serif;
 }
 
-/* CONTAINER DE LINKS */
+/* Container para os cards de funcionários/serviços */
+#funcionarios-admin-container {
+  width: 80%;
+  margin: 2rem auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center; /* Centraliza os cards no container */
+  align-items: stretch; /* Cards com mesma altura */
+  box-sizing: border-box;
+  gap: 20px; /* Espaçamento uniforme */
+}
+
+/* Estilo do card - corrigido para 2 colunas */
+.testimonial {
+  flex: 0 1 calc(50% - 20px); /* Força 2 colunas com gap considerado */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 1.2rem;
+  padding: 20px;
+  border-radius: 10px;
+  background: #e3a96c;
+  color: #000;
+  min-height: 330px;
+  position: relative;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+  box-sizing: border-box;
+  transition: transform 0.3s ease;
+}
+
+/* NOVO: Garante que se tiver número ímpar (como 3), os cards fiquem balanceados */
+#funcionarios-admin-container:has(.testimonial:nth-child(3):last-child) {
+  justify-content: space-between; /* distribui melhor os 3 cards */
+}
+
+.testimonial:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.testimonial::before {
+  content: "";
+  position: absolute;
+  top: 120px;
+  width: 60%;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.testimonial .testimonial-image {
+  height: 100px;
+  width: 100px;
+  border-radius: 50%;
+  margin-bottom: 10px;
+  border: 3px solid #fff;
+  object-fit: cover;
+  background: #d99a5f; /* Cor de fundo se não tiver imagem */
+}
+
+.testimonial .testimonial-title {
+  font-size: 1.4rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+  text-align: center;
+  color: #ffffff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.testimonial-info {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 0;
+  margin-top: auto;
+  margin-bottom: auto;
+  min-height: 130px;
+}
+
+.testimonial-info.multi-col {
+  justify-content: space-around;
+}
+
+.testimonial-info ul {
+  list-style-type: none;
+  padding: 5px;
+  margin: 0;
+  text-align: left;
+  width: 100%;
+}
+
+.testimonial-info ul li {
+  margin: 8px 0;
+  padding-left: 12px;
+  position: relative;
+  font-size: 1.1rem;
+}
+
+.testimonial-info ul li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: #fff;
+  font-weight: bold;
+  font-size: 1.3rem;
+}
+
+.testimonial button {
+  margin-top: 15px;
+  padding: 8px 20px;
+  border: none;
+  border-radius: 6px;
+  background-color: #fff;
+  color: #d99a5f;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.testimonial button:hover {
+  background-color: #f8f8f8;
+  transform: scale(1.05);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* CONTAINER DE LINKS Gerenciar Redes Sociais */
+/* Estilo para o título dentro da seção */
+#social-links-section .headline {
+  font-size: 22px;
+  font-weight: bold;
+  color: #333;
+  text-align: center;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #eee;
+  width: 100%;
+}
 
 #social-links-section {
+  display: flex; /* Ativa o layout flexível */
+  flex-direction: column; /* Organiza os itens em uma coluna vertical */
+  align-items: center; /* Centraliza os itens horizontalmente */
+  gap: 15px; /* Define um espaço de 15px entre todos os itens */
   background: #fff;
   margin-top: 40px;
-  padding: 20px;
-  border-radius: 6px;
+  padding: 30px; /* Aumenta o espaçamento interno */
+  border-radius: 10px; /* Bordas mais arredondadas */
+  border: 1px solid #e0e0e0; /* Adiciona uma borda para demarcar melhor */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Sombra sutil */
   max-width: 500px;
+  width: 90%; /* Garante que o container seja responsivo e não toque as bordas da tela */
   margin-left: auto;
   margin-right: auto;
 }
@@ -1026,15 +1281,27 @@
 #social-links-section .form-group {
   display: flex;
   flex-direction: column;
-  margin-bottom: 15px;
+  align-items: center; /* Centraliza os itens do formulário (label, input) */
+  width: 90%; /* Garante que os grupos de formulário ocupem a largura total */
+}
+
+/*
+  Centraliza o conteúdo do grupo do checkbox "Esconder Seção".
+  Isso evita que ele fique alinhado à esquerda, causando a impressão de "puxar para um lado".
+*/
+#social-links-section .form-group:has(#toggle-clients) {
+  flex-direction: row;
+  justify-content: center;
 }
 
 #social-links-section label {
   font-weight: bold;
   margin-bottom: 5px;
+  text-align: center; /* Centraliza o texto dentro do label */
 }
 
 #social-links-section input[type="url"] {
+  width: 100%; /* Garante que o input ocupe toda a largura disponível */
   padding: 8px 12px;
   border: 1px solid #ccc;
   border-radius: 4px;
@@ -1042,19 +1309,21 @@
 }
 
 #save-links-btn {
-  margin-top: 15px;
-  padding: 10px 20px;
-  background-color: #444;
+  padding: 10px 10px; /* Aumenta o padding para um botão mais robusto */
+  background-color: #007bff; /* Cor azul padrão */
   color: #fff;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
   font-weight: bold;
+  font-size: 16px;
   transition: background-color 0.3s;
+  width: 40%; /* Mantém o tamanho proporcional que você gostou */
+  min-width: 150px; /* Garante que o botão não fique muito pequeno em telas estreitas */
 }
 
 #save-links-btn:hover {
-  background-color: #333;
+  background-color: #0056b3; /* Azul mais escuro no hover */
 }
 
 /* Estilos para o container que edita o Google Maps */
@@ -1167,4 +1436,133 @@ h6 {
   font-size: 18px;
   color: #444;
   margin-top: 30px;
+}
+
+/* ==========================================================================
+   REGRAS DE RESPONSIVIDADE
+   ========================================================================== */
+
+/* Telas de Tablet (<= 1024px) */
+@media (max-width: 1024px) {
+  /* Layout da seção de logos */
+  .logo-admin-container {
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+  }
+
+  /* Para os formulários de tema, empilhamos os itens para garantir a legibilidade em tablets */
+  .theme-form .form-group {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .theme-form label {
+    width: auto;
+  }
+
+  .theme-form .form-group button.btn {
+    width: 100%;
+    margin-left: 0; /* Reseta o alinhamento automático que o empurra para a direita */
+  }
+
+  /* Garante que o botão de upload de fundo também ocupe a largura total */
+  #background-file-section .form-group button.btn {
+    width: 100%;
+    align-self: auto; /* Reseta o alinhamento para o padrão */
+  }
+
+  /* Oculta divisores em telas menores */
+  .divider,
+  .divider-small {
+    display: none;
+  }
+
+  /* Lista de logos com colunas que se ajustam ao espaço */
+  #logos-list {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    width: 100%;
+  }
+}
+
+/* Telas de Tablets Menores e Celulares em Paisagem (<= 768px) */
+@media (max-width: 768px) {
+  /* Formulário de vídeo em coluna */
+  .video-upload-form {
+    flex-direction: column;
+    padding: 20px;
+    width: 90%;
+  }
+
+  .video-upload-form input[type="file"],
+  .video-upload-form button[type="submit"] {
+    width: 100%;
+    text-align: center;
+  }
+
+  /* Ajusta os containers de formulário para não tocarem as bordas */
+  #login-section,
+  #social-links-section,
+  #contact-form {
+    width: 90%;
+  }
+
+  /* Galeria de imagens com 2 colunas */
+  #gallery-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Cards de funcionários em 1 coluna */
+  #funcionarios-admin-container .testimonial {
+    flex-basis: 100%; /* Ocupa a largura total em telas menores */
+  }
+
+  /* Ajusta o cabeçalho da seção de funcionários */
+  .admin-section-header {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+/* Telas de Celulares (<= 600px) */
+@media (max-width: 600px) {
+  /* Cabeçalho empilhado */
+  .admin-header-content {
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px 0;
+  }
+
+  /* Botão de login com largura total */
+  #login-section .btn {
+    width: 100%;
+  }
+
+  /* Cards do dashboard com largura total */
+  .card {
+    width: 100%;
+  }
+
+  /* Galeria de imagens com 1 coluna */
+  #gallery-container {
+    grid-template-columns: 1fr;
+  }
+
+  /* Lista de logos com 1 coluna */
+  #logos-list {
+    grid-template-columns: 1fr;
+  }
+
+  /* Ajusta o padding da seção de redes sociais para telas menores */
+  #social-links-section {
+    padding: 20px 15px;
+  }
+
+  /* Botão de salvar links sociais com largura total em telas pequenas */
+  #save-links-btn {
+    width: 100%;
+    min-width: 0; /* Remove a largura mínima para um ajuste correto */
+  }
 }

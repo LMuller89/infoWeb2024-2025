@@ -489,7 +489,8 @@
         {% if not logged_in %}
         <!-- Se NÃO estiver logado -->
         <section id="login-section">
-          <h2>Login</h2>
+          <h2><img src="{{ url_for('static', filename='img/LOGO.svg') }}" class="login-logo" alt="logo">Login
+</h2>
           <form id="login-form" action="/admin/login" method="POST">
             <div class="form-group">
               <label for="email">Email:</label>
@@ -881,23 +882,18 @@
             </button>
             <span id="loading-spinner"></span>
           </form>
-          
-          <h2 class="video-upload-title">Vídeo Armazenado</h2>
-          
+
           {% if video_url %}
-          <div
-            class="video-preview"
-            style="text-align: center; margin-top: 30px"
-          >
-            <video width="600" height="340" controls>
+          <!-- Bloco para exibir o vídeo que já está armazenado -->
+          <div class="video-preview-container">
+            <h3>Vídeo Armazenado</h3>
+            <video src="{{ video_url }}" controls>
               <source src="{{ video_url }}" type="video/mp4" />
               Seu navegador não suporta vídeo.
             </video>
           </div>
           {% else %}
-          <p style="text-align: center; color: #888; font-size: 18px">
-            Nenhum vídeo armazenado.
-          </p>
+          <p style="text-align: center; color: #888; font-size: 18px">Nenhum vídeo armazenado.</p>
           {% endif %}
         </div> <!-- FECHAMENTO DO CONTAINER -->
 
@@ -1174,6 +1170,7 @@
             // Carrega logos quando a página abrir
             window.onload = loadLogos;
           </script>
+
 
           <!-- TESTIMONIALS -->
           <div id="servicos-funcionarios-admin">
@@ -1520,9 +1517,9 @@
 
 
         <!-- INFORMAÇÃO DE CONTATO -->
-        <h6>Editar Informações de Contato</h6>
-
+        
         <form id="contact-form">
+          <h6>Editar Informações de Contato</h6>
           <label for="rua">Rua:</label>
           <input type="text" id="rua" name="rua" required>
  
@@ -1599,4 +1596,3 @@
     </main>
   </body>
 </html>
-
