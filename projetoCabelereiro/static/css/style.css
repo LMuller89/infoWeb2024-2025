@@ -182,6 +182,7 @@ a {
   /* Estilos para o novo container */
   display: flex;
   align-items: center;
+  margin-bottom: 15px; /* 🔹 Adiciona espaço entre o título (com ícone) e o texto abaixo */
 }
 
 /* Testimonials */
@@ -355,7 +356,53 @@ a {
   font-size: 1.2rem;
 }
 
-/* Gallery */
+/* Gallery em modificação*/
+/* Carousel */
+.carousel {
+  width: 90%;
+  margin: auto;
+  overflow: hidden;
+  position: relative;
+}
+
+.carousel-track {
+  display: flex;
+  transition: transform 0.5s ease-in-out;
+}
+
+.carousel-slide {
+  min-width: 100%; /* 1 imagem por vez por padrão */
+  box-sizing: border-box;
+  padding: 10px;
+}
+
+.gallery-image {
+  width: 100%;
+  height: auto;
+  max-height: 360px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: transform 0.3s;
+}
+
+.gallery-image:hover {
+  transform: scale(1.05);
+}
+
+/* Responsividade */
+@media (min-width: 600px) {
+  .carousel-slide {
+    min-width: 50%; /* 2 imagens por vez */
+  }
+}
+
+@media (min-width: 1024px) {
+  .carousel-slide {
+    min-width: 33.33%; /* 3 imagens por vez */
+  }
+}
+
+/* Gallery em modificação 
 #gallery {
   color: #000000;
   width: 90%;
@@ -419,6 +466,7 @@ a {
   font-weight: bold;
   cursor: pointer;
 }
+/* Gallery em modificação*/
 
 /* Video Slot */
 .video-wireframe {
@@ -453,7 +501,7 @@ a {
   /*text-align: center;*/
 }
 
-/* Redes Sociais */
+/* REDE SOCIAIS */
 #clients .headline {
   text-align: center;
   margin-bottom: 30px;
@@ -461,9 +509,12 @@ a {
 
 #clients-container {
   display: grid;
-  grid-template-columns: repeat(4, 1fr); /* 4 colunas iguais */
-  justify-items: center; /*centraliza cada item na célula */
-  gap: 20px; /* Reduz o espaçamento entre colunas e linhas*/
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(60px, 1fr)
+  ); /* ajusta dinamicamente */
+  justify-items: center; /* centraliza cada item na célula */
+  gap: 20px; /* espaçamento entre colunas e linhas */
   max-width: 1000px;
   margin: 0 auto;
   padding-bottom: 30px;
@@ -490,24 +541,39 @@ a {
   transform: scale(1.1);
 }
 
-/* Responsivo para tablets nao sera util por enquanto
+/* --- RESPONSIVIDADE --- */
+
+/* Até 992px (tablets e celulares grandes) */
 @media (max-width: 992px) {
   #clients-container {
-    grid-template-columns: repeat(2, 1fr); /* 2 por linha 
+    grid-template-columns: repeat(3, 1fr); /* 🔹 Mostra 3 ícones por linha */
   }
-}*/
 
-/* Responsivo para celulares */
-@media (max-width: 768px) {
+  .client {
+    width: 70px;
+  }
+
+  .client img {
+    width: 25px;
+  }
+}
+
+/* Até 600px (celulares pequenos) */
+@media (max-width: 600px) {
   #clients-container {
-    grid-template-columns: 1fr; /* 1 por linha */
+    grid-template-columns: 1fr; /* 🔹 Um ícone por linha */
   }
 
   .client {
     width: 60px;
   }
+
+  .client img {
+    width: 20px;
+  }
 }
 
+/* Localização mapa*/
 .localizacao {
   display: flex;
   align-items: center;
@@ -580,6 +646,68 @@ a {
   justify-content: center;
   color: #666;
 }
+
+/* Botão WhatsApp flutuante em construção*/
+#whatsapp-button {
+  position: fixed;
+  bottom: 70px; /* mais acima para dar espaço ao scroll */
+  right: 10px; /* mais à direita */
+  z-index: 9999;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: #25d366;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s ease-in-out;
+}
+
+#whatsapp-button:hover {
+  transform: scale(1.1);
+}
+
+#whatsapp-button img {
+  width: 28px;
+  height: 28px;
+}
+
+/* BOTÃO DE VOLTAR AO TOPO DO RODA PÉ ADMIN*/
+#btn-voltar-topo {
+  /**/
+  position: fixed;
+  bottom: 10px; /* distância do rodapé */
+  right: 10px; /* mais à direita */
+  z-index: 100; /* suficiente para ficar visível, mas não atrapalhar */
+  background-color: transparent; /* cor do fundo transparente */
+  width: 45px;
+  height: 45px;
+  border: none;
+  border-radius: 50%;
+  font-size: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.5);
+  transition: transform 0.2s ease-in-out;
+}
+
+@media (max-width: 480px) {
+  #whatsapp-button {
+    width: 45px;
+    height: 45px;
+    bottom: 65px;
+    right: 12px;
+  }
+
+  #whatsapp-button img {
+    width: 25px;
+    height: 25px;
+  }
+}
+
+/* Botão WhatsApp flutuante em construção*/
 
 /* Media query para telas menores (smartphones) */
 @media (max-width: 600px) {

@@ -131,7 +131,8 @@ def index():
             'instagram': '#',
             'facebook': '#',
             'x': '#',
-            'youtube': '#'
+            'youtube': '#',
+            'tiktok': '#' # adicionado novo
         }
     except Exception as e:
         print(f"Erro ao buscar links sociais: {e}")
@@ -139,7 +140,8 @@ def index():
             'instagram': '#',
             'facebook': '#',
             'x': '#',
-            'youtube': '#'
+            'youtube': '#',
+            'tiktok': '#' # adicionado novo
         }
 
     # 4) Buscar visibilidade de seções incluindo vídeo
@@ -797,7 +799,8 @@ def social_links():
                 'instagram': '',
                 'facebook': '',
                 'x': '',
-                'youtube': ''
+                'youtube': '',
+                'tiktok': '' # adicionado novo
             })
 
     elif request.method == 'POST':
@@ -813,6 +816,7 @@ def social_links():
                     'facebook': data.get('facebook', ''),
                     'x': data.get('x', ''),
                     'youtube': data.get('youtube', ''),
+                    'tiktok': data.get('tiktok', ''), # adicionado novo
                     'updated_at': datetime.now().isoformat()  # ✅ Correto
                 }).eq('id', row_id).execute()
                 return jsonify({'message': 'Links atualizados com sucesso!'})
@@ -824,6 +828,7 @@ def social_links():
                     'facebook': data.get('facebook', ''),
                     'x': data.get('x', ''),
                     'youtube': data.get('youtube', ''),
+                    'tiktok': data.get('tiktok', ''), # adicionado novo
                     'updated_at': datetime.now().isoformat()  # ✅ Correto
                 }]).execute()
                 return jsonify({'message': 'Links criados com sucesso!'})
