@@ -408,7 +408,7 @@
     </div>
     {% endif %}
 
-    <!-- Gallery -->
+    <!-- Gallery modificação em andamento
     {% if section_visibility.get('gallery') != 'none' %}
     <section id="gallery">
       <div class="headline">Galeria</div>
@@ -432,6 +432,76 @@
       </div>
     </section>
     {% endif %}
+    modificação em andamento-->
+    <!-- Gallery -->
+     <section id="gallery">
+      <div class="headline">Galeria</div>
+      <div class="carousel">
+        {% set max_images = 6 %}
+        {% if section_visibility.get('gallery') == 'partial' %}
+        {% set max_images = 3 %}
+        {% endif %}
+        <div class="carousel-track">
+          {% for i in range(1, max_images + 1) %}
+          {% set url = gallery_images['image-' ~ i] %}
+          {% if url %}
+          <div class="carousel-slide">
+            <img src="{{ url }}"
+             alt="Imagem {{ i }}"
+             class="gallery-image"
+             onclick="openModal(this)"
+             loading="lazy">
+            </div>
+            {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+      </section>
+
+      <script>
+        const track = document.querySelector('.carousel-track');
+        const slides = Array.from(track.children);
+        let currentIndex = 0;
+            
+        function getVisibleSlides() {
+          if (window.innerWidth >= 1024) return 3;
+          if (window.innerWidth >= 600) return 2;
+          return 1;
+        }
+      
+        function moveToNextSlide() {
+          const visibleSlides = getVisibleSlides();
+          currentIndex++;
+          if (currentIndex > slides.length - visibleSlides) {
+            currentIndex = 0;
+          }
+          track.style.transform = `translateX(-${currentIndex * (100 / visibleSlides)}%)`;
+        }
+      
+        // Troca automática a cada 3 segundos
+        setInterval(moveToNextSlide, 3000);
+      
+        // Modal existente
+        function openModal(img) {
+          const modal = document.getElementById("modal");
+          const modalImg = document.getElementById("full-image");
+          modal.style.display = "flex";
+          modalImg.src = img.src;
+        }
+      
+        function closeModal() {
+          const modal = document.getElementById("modal");
+          modal.style.display = "none";
+        }
+      
+        // Atualiza o carrossel ao redimensionar a tela
+        window.addEventListener('resize', () => {
+          const visibleSlides = getVisibleSlides();
+          track.style.transform = `translateX(-${currentIndex * (100 / visibleSlides)}%)`;
+        });
+</script>
+
+
 
       
       <!-- exibir a imagem em tela cheia -->
@@ -443,6 +513,7 @@
       <script src="main.js"></script>
     </section>
     <br/><br/><br/><br/>
+    <!-- exibir a imagem em tela cheia -->
 
     <!-- Video slot -->
     <section id="videoslot">
@@ -489,6 +560,12 @@
         <a href="{{ social_links.youtube }}" target="_blank">
           <img src="{{ url_for('static', filename='img/smYt.png') }}" class="client" alt="YouTube" />
         </a>
+
+        <!-- TikTok -->
+        <a href="{{ social_links.tiktok }}" target="_blank">
+          <img src="{{ url_for('static', filename='img/tiktok.png') }}" class="client" alt="TikTok" />
+        </a>
+
       </div>
     </section>
     {% endif %}
@@ -524,8 +601,48 @@
 
     <footer id="footer">
       <p>&copy; 2025 Studio Florescer - Todos os direitos reservados.</p>
+      <p> Desenvolvido por<b> Win_code </b> pelo sistema "nome do sistema"</p>
     </footer>
+
+      <!-- *** BOTÃO WATSAPP FLUTUANTE EM CONSTRUÇÃO *** -->
+    <div> 
+      <a href="https://wa.me/5511999998888"
+      id="whatsapp-button" 
+      target="_blank" 
+      aria-label="Converse no WhatsApp">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
+    </a>
+
+      <!-- *** Botão voltar ao topo *** -->
+       <button id="btn-voltar-topo" onclick="voltarAoTopo()">⬆</button>
+
+    <script>
+      // Função voltar ao topo
+      function voltarAoTopo() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
     
+  // mostra/esconde o botão ao rolar a página
+      window.onscroll = function() {
+        let btn = document.getElementById("btn-voltar-topo");
+        if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
+          btn.style.display = "block";
+        } else {
+          btn.style.display = "none";
+        }
+      };
+    
+      // função de voltar ao topo
+      function voltarAoTopo() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    </script>
+    </div>
+
+
+    <!-- *** BOTÃO WATSAPP FLUTUANTE EM CONSTRUÇÃO *** -->
+
+
     <!-- Font Awesome -->
     <script src="https://kit.fontawesome.com/8bd8696d67.js" crossorigin="anonymous"></script>
 

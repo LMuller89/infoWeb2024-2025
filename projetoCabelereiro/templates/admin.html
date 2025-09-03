@@ -28,35 +28,29 @@
           return;
         }
 
+        // Função para criar uma nova linha de serviço em construção
         function criarLinhaServico() {
           const div = document.createElement("div");
           div.className = "linha-servico";
-          div.style.display = "flex";
-          div.style.alignItems = "center";
-          div.style.gap = "10px";
-          div.style.marginBottom = "10px";
-
+                
+          // --- Select (escolher serviço) ---
           const select = document.createElement("select");
           select.name = "servico_id";
           select.required = true;
-          select.style.flex = "2";
-          select.style.padding = "12px";
-          select.style.fontSize = "16px";
-          select.style.borderRadius = "6px";
-          select.style.border = "1px solid #ccc";
-
+                
           const optionDefault = document.createElement("option");
           optionDefault.value = "";
           optionDefault.textContent = "-- Selecione um serviço --";
           select.appendChild(optionDefault);
-
+                
           servicos.forEach((s) => {
             const option = document.createElement("option");
             option.value = s.id;
             option.textContent = s.nome;
             select.appendChild(option);
           });
-
+        
+          // --- Input preço ---
           const inputPreco = document.createElement("input");
           inputPreco.type = "number";
           inputPreco.name = "preco";
@@ -64,46 +58,116 @@
           inputPreco.step = "0.01";
           inputPreco.placeholder = "Preço (R$)";
           inputPreco.required = true;
-          inputPreco.style.flex = "1";
-          inputPreco.style.padding = "12px";
-          inputPreco.style.fontSize = "16px";
-          inputPreco.style.borderRadius = "6px";
-          inputPreco.style.border = "1px solid #ccc";
-
+        
+          // --- Botões dentro de um container ---
+          const botoesDiv = document.createElement("div");
+          botoesDiv.className = "botoes";
+        
+          // Botão adicionar
           const btnAdd = document.createElement("button");
           btnAdd.type = "button";
           btnAdd.textContent = "+";
           btnAdd.title = "Adicionar novo serviço";
-          btnAdd.style.padding = "12px 16px";
-          btnAdd.style.fontSize = "20px";
-          btnAdd.style.backgroundColor = "#28a745";
-          btnAdd.style.color = "white";
-          btnAdd.style.border = "none";
-          btnAdd.style.borderRadius = "6px";
-          btnAdd.style.cursor = "pointer";
-          btnAdd.onclick = () =>
-            servicosContainer.appendChild(criarLinhaServico());
-
+          btnAdd.classList.add("add"); // classe para CSS
+          btnAdd.onclick = () => servicosContainer.appendChild(criarLinhaServico());
+        
+          // Botão remover
           const btnRemove = document.createElement("button");
           btnRemove.type = "button";
           btnRemove.textContent = "×";
           btnRemove.title = "Remover este serviço";
-          btnRemove.style.padding = "12px 16px";
-          btnRemove.style.fontSize = "20px";
-          btnRemove.style.backgroundColor = "#dc3545";
-          btnRemove.style.color = "white";
-          btnRemove.style.border = "none";
-          btnRemove.style.borderRadius = "6px";
-          btnRemove.style.cursor = "pointer";
+          btnRemove.classList.add("remove"); // classe para CSS
           btnRemove.onclick = () => div.remove();
-
+        
+          // Adiciona os botões dentro do container
+          botoesDiv.appendChild(btnAdd);
+          botoesDiv.appendChild(btnRemove);
+        
+          // Monta a linha completa
           div.appendChild(select);
           div.appendChild(inputPreco);
-          div.appendChild(btnAdd);
-          div.appendChild(btnRemove);
-
+          div.appendChild(botoesDiv);
+        
           return div;
         }
+
+        //function criarLinhaServico() {
+          //const div = document.createElement("div");
+          //div.className = "linha-servico";
+          //div.style.display = "flex";
+          //div.style.alignItems = "center";
+          //div.style.gap = "10px";
+          //div.style.marginBottom = "10px";
+
+          //const select = document.createElement("select");
+          //select.name = "servico_id";
+          //select.required = true;
+          //select.style.flex = "2";
+          //select.style.padding = "12px";
+          //select.style.fontSize = "16px";
+          //select.style.borderRadius = "6px";
+          //select.style.border = "1px solid #ccc";
+
+          //const optionDefault = document.createElement("option");
+          //optionDefault.value = "";
+          //optionDefault.textContent = "-- Selecione um serviço --";
+          //select.appendChild(optionDefault);
+
+          //servicos.forEach((s) => {
+            //const option = document.createElement("option");
+            //option.value = s.id;
+            //option.textContent = s.nome;
+            //select.appendChild(option);
+          //});
+
+          //const inputPreco = document.createElement("input");
+          //inputPreco.type = "number";
+          //inputPreco.name = "preco";
+          //inputPreco.min = "0";
+          //inputPreco.step = "0.01";
+          //inputPreco.placeholder = "Preço (R$)";
+          //inputPreco.required = true;
+          //inputPreco.style.flex = "1";
+          //inputPreco.style.padding = "12px";
+          //inputPreco.style.fontSize = "16px";
+          //inputPreco.style.borderRadius = "6px";
+          //inputPreco.style.border = "1px solid #ccc";
+
+          //const btnAdd = document.createElement("button");
+          //btnAdd.type = "button";
+          //btnAdd.textContent = "+";
+          //btnAdd.title = "Adicionar novo serviço";
+          //btnAdd.style.padding = "12px 16px";
+          //btnAdd.style.fontSize = "20px";
+          //btnAdd.style.backgroundColor = "#28a745";
+          //btnAdd.style.color = "white";
+          //btnAdd.style.border = "none";
+          //btnAdd.style.borderRadius = "6px";
+          //btnAdd.style.cursor = "pointer";
+          //btnAdd.onclick = () =>
+            //servicosContainer.appendChild(criarLinhaServico());
+
+          //const btnRemove = document.createElement("button");
+          //btnRemove.type = "button";
+          //btnRemove.textContent = "×";
+          //btnRemove.title = "Remover este serviço";
+          //btnRemove.style.padding = "12px 16px";
+          //btnRemove.style.fontSize = "20px";
+          ///btnRemove.style.backgroundColor = "#dc3545";
+          //btnRemove.style.color = "white";
+          //btnRemove.style.border = "none";
+          //btnRemove.style.borderRadius = "6px";
+          //btnRemove.style.cursor = "pointer";
+          //btnRemove.onclick = () => div.remove();
+
+          //div.appendChild(select);
+          //div.appendChild(inputPreco);
+         // div.appendChild(btnAdd);
+          //div.appendChild(btnRemove);
+
+          //return div;
+        //}
+        // Função para criar uma nova linha de serviço em construção
 
         // Inicializa com uma linha vazia
         servicosContainer.appendChild(criarLinhaServico());
@@ -420,6 +484,7 @@
             facebook: document.getElementById("face-link").value,
             x: document.getElementById("x-link").value,
             youtube: document.getElementById("yt-link").value,
+            tiktok: document.getElementById("tiktok-link").value, // Adicionei esta linha
           };
 
           const res = await fetch("/api/social-links", {
@@ -448,6 +513,8 @@
               dataLinks.facebook || "";
             document.getElementById("x-link").value = dataLinks.x || "";
             document.getElementById("yt-link").value = dataLinks.youtube || "";
+            document.getElementById("tiktok-link").value =
+              dataLinks.tiktok || ""; // Adicionei esta linha
           }
 
           const visRes = await fetch("/api/section-visibility");
@@ -489,8 +556,8 @@
         {% if not logged_in %}
         <!-- Se NÃO estiver logado -->
         <section id="login-section">
-          <h2><img src="{{ url_for('static', filename='img/LOGO.svg') }}" class="login-logo" alt="logo">Login
-</h2>
+          <img src="{{ url_for('static', filename='img/graphic.svg') }}" class="login-logo" alt="logo">
+          <h2>Login</h2>
           <form id="login-form" action="/admin/login" method="POST">
             <div class="form-group">
               <label for="email">Email:</label>
@@ -1173,6 +1240,7 @@
 
 
           <!-- TESTIMONIALS -->
+           <!-- ### Modificaçaõ em contrução a baixo### -->
           <div id="servicos-funcionarios-admin">
             <div
               style="
@@ -1182,6 +1250,7 @@
                 flex-wrap: wrap;
               "
             >
+            
               <h3 style="font-size: 28px; font-weight: bold; margin: 0">
                 Gerenciar Funcionários
               </h3>
@@ -1265,6 +1334,7 @@
                   "
                 />
               </div>
+              
 
               <!-- Serviços dinâmicos -->
               <div id="servicos-container" style="margin-bottom: 20px"></div>
@@ -1292,6 +1362,7 @@
           <!-- Container onde os cards serão inseridos -->
           <div id="funcionarios-admin-container"></div>
         </div>
+        <!-- ### Modificaçaõ em contrução a cima ### -->
 
         
         <!-- gallery -->
@@ -1379,6 +1450,17 @@
             />
           </div>
 
+          <!-- *** tik tok em contrução *** -->
+          <div class="form-group">
+            <label for="tiktok-link">TikTok</label>
+            <input
+              type="url"
+              id="tiktok-link"
+              placeholder="https://www.tiktok.com/@seuperfil"
+            />
+          </div>
+          <!-- *** tik tok em contrução *** -->
+
           <div class="form-group">
             <label>
               <input type="checkbox" id="toggle-clients" />
@@ -1400,6 +1482,7 @@
               if (data.facebook) document.getElementById("face-link").value = data.facebook;
               if (data.x)        document.getElementById("x-link").value = data.x;
               if (data.youtube)  document.getElementById("yt-link").value = data.youtube;
+              if (data.tiktok)    document.getElementById("tiktok-link").value = data.tiktok; // <-- TikTok em contrução
             } catch (err) {
               console.error("Erro ao carregar os links sociais:", err);
             }
@@ -1594,5 +1677,31 @@
         {% endif %}
       </div>
     </main>
+
+    <!-- ### Rodapé, footer e botão de voltar ao topo ### -->
+    <footer id="footer">
+      <!-- *** Botão voltar ao topo *** -->
+       <button id="btn-topo" onclick="voltarAoTopo()">⬆</button>
+
+      <p>&copy; 2025 <b>Win_code</b> Software - Todos os direitos reservados.</p>
+    </footer>
+    <script>
+  // mostra/esconde o botão ao rolar a página
+      window.onscroll = function() {
+        let btn = document.getElementById("btn-topo");
+        if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
+          btn.style.display = "block";
+        } else {
+          btn.style.display = "none";
+        }
+      };
+    
+      // função de voltar ao topo
+      function voltarAoTopo() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    </script>
+
+    <!-- Acaba aqui -->
   </body>
 </html>
