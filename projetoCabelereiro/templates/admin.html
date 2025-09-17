@@ -475,34 +475,34 @@
     <!-- JS REDES SOCIAIS -->
 
     <script>
-      // Salvar os links das redes sociais
-      document
-        .getElementById("save-links-btn")
-        .addEventListener("click", async () => {
-          const links = {
-            instagram: document.getElementById("insta-link").value,
-            facebook: document.getElementById("face-link").value,
-            x: document.getElementById("x-link").value,
-            youtube: document.getElementById("yt-link").value,
-            tiktok: document.getElementById("tiktok-link").value, // Adicionei esta linha
-          };
+      window.addEventListener("DOMContentLoaded", async () => {
+        // Salvar os links das redes sociais
+        document
+          .getElementById("save-links-btn")
+          .addEventListener("click", async () => {
+            const links = {
+              instagram: document.getElementById("insta-link").value,
+              facebook: document.getElementById("face-link").value,
+              x: document.getElementById("x-link").value,
+              youtube: document.getElementById("yt-link").value,
+              tiktok: document.getElementById("tiktok-link").value,
+            };
 
-          const res = await fetch("/api/social-links", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(links),
+            const res = await fetch("/api/social-links", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(links),
+            });
+
+            const data = await res.json();
+            if (data.message) {
+              alert("Links atualizados com sucesso!");
+            } else {
+              alert("Erro: " + data.error);
+            }
           });
 
-          const data = await res.json();
-          if (data.message) {
-            alert("Links atualizados com sucesso!");
-          } else {
-            alert("Erro: " + data.error);
-          }
-        });
-
-      // Carregar links e visibilidade ao abrir a página
-      window.addEventListener("DOMContentLoaded", async () => {
+        // Carregar links e visibilidade ao abrir a página
         try {
           const resLinks = await fetch("/api/social-links");
           const dataLinks = await resLinks.json();
@@ -514,7 +514,7 @@
             document.getElementById("x-link").value = dataLinks.x || "";
             document.getElementById("yt-link").value = dataLinks.youtube || "";
             document.getElementById("tiktok-link").value =
-              dataLinks.tiktok || ""; // Adicionei esta linha
+              dataLinks.tiktok || "";
           }
 
           const visRes = await fetch("/api/section-visibility");
@@ -524,19 +524,26 @@
         } catch (err) {
           console.error("Erro ao carregar dados:", err);
         }
-      });
 
-      // Atualizar visibilidade da seção clients ao marcar/desmarcar
-      document
-        .getElementById("toggle-clients")
-        .addEventListener("change", async (e) => {
-          const updated = { clients: e.target.checked };
-          await fetch("/api/section-visibility", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(updated),
+        // Atualizar visibilidade da seção clients ao marcar/desmarcar
+        document
+          .getElementById("toggle-clients")
+          .addEventListener("change", async (e) => {
+            const updated = { clients: e.target.checked };
+            try {
+              const res = await fetch("/api/section-visibility", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(updated),
+              });
+              if (!res.ok) {
+                console.error("Erro ao atualizar visibilidade:", await res.text());
+              }
+            } catch (err) {
+              console.error("Erro na requisição:", err);
+            }
           });
-        });
+      });
     </script>
   </head>
 
